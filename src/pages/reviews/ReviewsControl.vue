@@ -2,6 +2,8 @@
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
 import ProductService from '@/services/ProductService';
+import ReviewService from "../../services/Reviews/ReviewService";
+
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 
@@ -32,9 +34,17 @@ const representatives = ref([
 
 const customerService = new CustomerService();
 const productService = new ProductService();
+const reviewsService = new ReviewService();
+
+
 
 onBeforeMount(() => {
-    productService.getProductsWithOrdersSmall().then((data) => (products.value = data));
+    productService.getProducts().then((data) => (products.value = data));
+    reviewsService.getReviews().then((data) => {
+        console.log(data)
+        products.value = data
+
+    });
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
         loading1.value = false;
@@ -62,15 +72,11 @@ const initFilters1 = () => {
 const clearFilter1 = () => {
     initFilters1();
 };
-const expandAll = () => {
-    expandedRows.value = products.value.filter((p) => p.id);
-};
-const collapseAll = () => {
-    expandedRows.value = null;
-};
-const formatCurrency = (value) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-};
+
+
+// const formatCurrency = (value) => {
+//     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+// };
 
 const formatDate = (value) => {
     return value.toLocaleDateString('en-US', {
@@ -79,18 +85,7 @@ const formatDate = (value) => {
         year: 'numeric'
     });
 };
-const calculateCustomerTotal = (name) => {
-    let total = 0;
-    if (customer3.value) {
-        for (let customer of customer3.value) {
-            if (customer.representative.name === name) {
-                total++;
-            }
-        }
-    }
 
-    return total;
-};
 </script>
 
 <template>
@@ -171,14 +166,14 @@ const calculateCustomerTotal = (name) => {
                             <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
                         </template>
                     </Column>
-                    <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">
-                        <template #body="{ data }">
-                            {{ formatCurrency(data.balance) }}
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />
-                        </template>
-                    </Column>
+<!--                    <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">-->
+<!--                        <template #body="{ data }">-->
+<!--                            {{ formatCurrency(data.balance) }}-->
+<!--                        </template>-->
+<!--                        <template #filter="{ filterModel }">-->
+<!--                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />-->
+<!--                        </template>-->
+<!--                    </Column>-->
                     <Column field="status" header="Status" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             <span :class="'customer-badge status-' + data.status">{{ data.status }}</span>
