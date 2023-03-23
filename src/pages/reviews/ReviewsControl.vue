@@ -1,7 +1,7 @@
 <script setup>
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import CustomerService from '@/service/CustomerService';
-import ProductService from '@/service/ProductService';
+import CustomerService from '@/services/CustomerService';
+import ProductService from '@/services/ProductService';
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 
@@ -40,8 +40,6 @@ onBeforeMount(() => {
         loading1.value = false;
         customer1.value.forEach((customer) => (customer.date = new Date(customer.date)));
     });
-    customerService.getCustomersLarge().then((data) => (customer2.value = data));
-    customerService.getCustomersMedium().then((data) => (customer3.value = data));
     loading2.value = false;
 
     initFilters1();
