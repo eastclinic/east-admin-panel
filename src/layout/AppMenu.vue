@@ -5,7 +5,7 @@ import AppMenuItem from './AppMenuItem.vue';
 //todo links depend by user access rules
 const model = ref([
     {
-        items: [{ label: 'Table', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
+        items: [{ label: 'Reviews', icon: 'pi pi-fw pi-comments', to: '/pages/reviews' },
         ]
     },
     {
