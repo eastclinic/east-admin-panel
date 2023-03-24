@@ -37,14 +37,14 @@ const productService = new ProductService();
 const reviewsService = new ReviewService();
 
 
-
-onBeforeMount(() => {
+ onBeforeMount(async () => {
     productService.getProducts().then((data) => (products.value = data));
-    reviewsService.getReviews().then((data) => {
-        console.log(data)
-        products.value = data
-
-    });
+    // await reviewsService.getReviews().then((data) => {
+    //     console.log(data)
+    //     products.value = data
+    //
+    // });
+    await reviewsService.getReviews();
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
         loading1.value = false;
@@ -52,8 +52,15 @@ onBeforeMount(() => {
     });
     loading2.value = false;
 
+
+});
+
+
+onBeforeMount(() => {
     initFilters1();
 });
+
+
 
 const initFilters1 = () => {
     filters1.value = {
