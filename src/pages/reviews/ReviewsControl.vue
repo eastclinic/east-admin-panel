@@ -45,7 +45,8 @@ const reviewsService = ReviewService;
     //
     // });
      console.log(reviewsService)
-    await reviewsService.fetchServer();
+
+    await reviewsService.fetchServerData();
      console.log(reviewsService.reviews())
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
