@@ -1,7 +1,6 @@
 <script setup>
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
-import ProductService from '@/services/ProductService';
 import ReviewService from "../../services/Reviews/ReviewsService";
 
 import { ref, onBeforeMount } from 'vue';
@@ -9,51 +8,36 @@ import { useLayout } from '@/layout/composables/layout';
 
 const { contextPath } = useLayout();
 
+const reviews = ref(null);
+
+
 const customer1 = ref(null);
-const customer2 = ref(null);
-const customer3 = ref(null);
 const filters1 = ref(null);
 const loading1 = ref(null);
-const loading2 = ref(null);
-const idFrozen = ref(false);
-const products = ref(null);
-const expandedRows = ref([]);
+
 const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
 const representatives = ref([
-    { name: 'Amy Elsner', image: 'amyelsner.png' },
-    { name: 'Anna Fali', image: 'annafali.png' },
-    { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-    { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-    { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-    { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-    { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-    { name: 'Onyama Limba', image: 'onyamalimba.png' },
-    { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-    { name: 'XuXue Feng', image: 'xuxuefeng.png' }
+
 ]);
 
 const customerService = new CustomerService();
-const productService = new ProductService();
+
 const reviewsService = ReviewService;
 
 
  onBeforeMount(async () => {
-    productService.getProducts().then((data) => (products.value = data));
-    // await reviewsService.getReviews().then((data) => {
-    //     console.log(data)
-    //     products.value = data
-    //
-    // });
+
      console.log(reviewsService)
 
     await reviewsService.fetchServerData();
-     console.log(reviewsService.reviews())
+
+     reviews.value = reviewsService.reviews();
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
         loading1.value = false;
         customer1.value.forEach((customer) => (customer.date = new Date(customer.date)));
     });
-    loading2.value = false;
+
 
 
 });
@@ -102,20 +86,16 @@ const formatDate = (value) => {
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <h5>Filter Menu</h5>
+
                 <DataTable
-                    :value="customer1"
+                    :value="reviews"
                     :paginator="true"
                     class="p-datatable-gridlines"
                     :rows="10"
                     dataKey="id"
                     :rowHover="true"
-                    v-model:filters="filters1"
                     filterDisplay="menu"
-                    :loading="loading1"
-                    :filters="filters1"
                     responsiveLayout="scroll"
-                    :globalFilterFields="['name', 'country.name', 'representative.name', 'balance', 'status']"
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
@@ -128,9 +108,61 @@ const formatDate = (value) => {
                     </template>
                     <template #empty> No customers found. </template>
                     <template #loading> Loading customers data. Please wait. </template>
-                    <Column field="name" header="Name" style="min-width: 12rem">
+
+                    <Column field="author" header="Автор" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.name }}
+                            {{ data.author }}
+                        </template>
+                        <template #filter="{ filterModel }">
+                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />
+                        </template>
+                    </Column>
+                    <Column field="author" header="Рейтинг" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            <Rating v-model="data.rating" readonly :cancel="false" />
+                        </template>
+                        <template #filter="{ filterModel }">
+                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by rating" />
+
+                        </template>
+                    </Column>
+
+                </DataTable>
+            </div>
+        </div>
+
+
+        <div class="col-12">
+            <div class="card">
+
+                <DataTable
+                        :value="customer1"
+                        :paginator="true"
+                        class="p-datatable-gridlines"
+                        :rows="10"
+                        dataKey="id"
+                        :rowHover="true"
+                        v-model:filters="filters1"
+                        filterDisplay="menu"
+                        :loading="loading1"
+                        :filters="filters1"
+                        responsiveLayout="scroll"
+                        :globalFilterFields="['name', 'country.name', 'representative.name', 'balance', 'status']"
+                >
+                    <template #header>
+                        <div class="flex justify-content-between flex-column sm:flex-row">
+                            <Button type="button" icon="pi pi-filter-slash" label="Clear" class="p-button-outlined mb-2" @click="clearFilter1()" />
+                            <span class="p-input-icon-left mb-2">
+                                <i class="pi pi-search" />
+                                <InputText v-model="filters1['global'].value" placeholder="Keyword Search" style="width: 100%" />
+                            </span>
+                        </div>
+                    </template>
+                    <template #empty> No customers found. </template>
+                    <template #loading> Loading customers data. Please wait. </template>
+                    <Column field="author" header="Автор" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.author }}
                         </template>
                         <template #filter="{ filterModel }">
                             <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />
@@ -176,14 +208,14 @@ const formatDate = (value) => {
                             <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
                         </template>
                     </Column>
-<!--                    <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">-->
-<!--                        <template #body="{ data }">-->
-<!--                            {{ formatCurrency(data.balance) }}-->
-<!--                        </template>-->
-<!--                        <template #filter="{ filterModel }">-->
-<!--                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />-->
-<!--                        </template>-->
-<!--                    </Column>-->
+                    <!--                    <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">-->
+                    <!--                        <template #body="{ data }">-->
+                    <!--                            {{ formatCurrency(data.balance) }}-->
+                    <!--                        </template>-->
+                    <!--                        <template #filter="{ filterModel }">-->
+                    <!--                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />-->
+                    <!--                        </template>-->
+                    <!--                    </Column>-->
                     <Column field="status" header="Status" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             <span :class="'customer-badge status-' + data.status">{{ data.status }}</span>
