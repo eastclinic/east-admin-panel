@@ -1,84 +1,16 @@
 <script setup>
-import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import CustomerService from '@/services/CustomerService';
-import ReviewsService from "../../services/Reviews/ReviewsService";
+import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
+    customerService, initFilters1, clearFilter1, formatDate, reviewsService, onBeforeMountHook, onBeforeMountInitFilters
+} from './ReviewsControlData'
 
-import { ref, onBeforeMount } from 'vue';
-import { useLayout } from '@/layout/composables/layout';
-
-const { contextPath } = useLayout();
-
-const reviews = ref(null);
+import {  onBeforeMount } from 'vue';
 
 
-const customer1 = ref(null);
-const filters1 = ref(null);
-const loading1 = ref(null);
-
-const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
-const representatives = ref([
-
-]);
-
-const customerService = new CustomerService();
-
-const reviewsService = ReviewsService;
+ onBeforeMount(onBeforeMountHook());
 
 
- onBeforeMount(async () => {
+onBeforeMount(onBeforeMountInitFilters());
 
-     console.log(reviewsService)
-
-    await reviewsService.fetchServerData();
-
-     reviews.value = reviewsService.reviews();
-    customerService.getCustomersLarge().then((data) => {
-        customer1.value = data;
-        loading1.value = false;
-        customer1.value.forEach((customer) => (customer.date = new Date(customer.date)));
-    });
-
-
-
-});
-
-
-onBeforeMount(() => {
-    initFilters1();
-});
-
-
-
-const initFilters1 = () => {
-    filters1.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        representative: { value: null, matchMode: FilterMatchMode.IN },
-        date: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
-        balance: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-        status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-        activity: { value: [0, 50], matchMode: FilterMatchMode.BETWEEN },
-        verified: { value: null, matchMode: FilterMatchMode.EQUALS }
-    };
-};
-
-const clearFilter1 = () => {
-    initFilters1();
-};
-
-
-// const formatCurrency = (value) => {
-//     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-// };
-
-const formatDate = (value) => {
-    return value.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-};
 
 </script>
 
