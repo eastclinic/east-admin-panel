@@ -2,7 +2,7 @@
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
 import ProductService from '@/services/ProductService';
-import ReviewService from "../../services/Reviews/ReviewService";
+import ReviewService from "../../services/Reviews/ReviewsService";
 
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
@@ -34,7 +34,7 @@ const representatives = ref([
 
 const customerService = new CustomerService();
 const productService = new ProductService();
-const reviewsService = new ReviewService();
+const reviewsService = ReviewService;
 
 
  onBeforeMount(async () => {
@@ -44,6 +44,7 @@ const reviewsService = new ReviewService();
     //     products.value = data
     //
     // });
+     console.log(reviewsService)
     await reviewsService.getReviews();
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
