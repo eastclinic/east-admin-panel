@@ -1,7 +1,7 @@
 <script setup>
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
-import ReviewService from "../../services/Reviews/ReviewsService";
+import ReviewsService from "../../services/Reviews/ReviewsService";
 
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
@@ -22,7 +22,7 @@ const representatives = ref([
 
 const customerService = new CustomerService();
 
-const reviewsService = ReviewService;
+const reviewsService = ReviewsService;
 
 
  onBeforeMount(async () => {
