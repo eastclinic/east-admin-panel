@@ -10,7 +10,6 @@ export default (() => ({
             if( Object.keys(this._requestData).length > 0 ){
                 // Create the URL with the parameters
                 const queryParams = new URLSearchParams(this._requestData);
-                console.log(queryParams)
                 requestUrl += '?'+queryParams;
                 //request['body'] = JSON.stringify(this._requestData);
             }

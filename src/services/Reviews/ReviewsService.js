@@ -10,7 +10,6 @@ export default {
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
-        console.log(requestAdapter)
 
         if( requestAdapter )    reviewsApi.withRequestData(requestAdapter.toArray());
         if( reviewsState.requestData() )  reviewsApi.withRequestData(reviewsState.requestData());

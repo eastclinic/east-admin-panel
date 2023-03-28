@@ -29,7 +29,7 @@ export const reviewsService = ReviewsService;
 export const onBeforeMountHook = () => async () => {
 
 
-    await reviewsService.fetchServerData(request.page(0));
+    await reviewsService.fetchServerData();
     reviews.value = reviewsService.reviews();
     count.value = reviewsService.count();
     customerService.getCustomersLarge().then((data) => {

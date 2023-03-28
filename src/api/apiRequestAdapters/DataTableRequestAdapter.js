@@ -5,7 +5,7 @@ export default (() => ({
         return this;
     },
     perPage(perPage){
-        this.requestData['perPage'] = ( perPage ) ? perPage : 10;
+        this.requestData['per_page'] = ( perPage ) ? perPage : 10;
         return this;
     },
 
