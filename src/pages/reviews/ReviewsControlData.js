@@ -14,6 +14,7 @@ export const reviews = ref(null);
 export  const customer1 = ref(null);
 export const filters1 = ref(null);
 export const loading1 = ref(null);
+export const count = ref(null);
 
 export const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
 export const representatives = ref([]);
@@ -29,7 +30,7 @@ export const onBeforeMountHook = () => async () => {
 
     await reviewsService.fetchServerData();
     reviews.value = reviewsService.reviews();
-
+    count.value = reviewsService.count();
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
         loading1.value = false;
@@ -77,4 +78,13 @@ export const formatDate = (value) => {
         year: 'numeric'
     });
 };
+export const onPage = (e) =>{
+
+    console.log(reviewsService)
+}
+// export const count = () =>{
+//     console.log(reviewsService)
+//     return reviewsService.count();
+// }
+
 

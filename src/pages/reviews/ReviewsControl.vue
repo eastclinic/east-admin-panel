@@ -1,6 +1,7 @@
 <script setup>
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
-    customerService, initFilters1, clearFilter1, formatDate, reviewsService, onBeforeMountHook, onBeforeMountInitFilters
+    customerService, initFilters1, clearFilter1, formatDate, reviewsService, onBeforeMountHook, onBeforeMountInitFilters,
+    page,count
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -18,16 +19,18 @@ onBeforeMount(onBeforeMountInitFilters());
     <div class="grid">
         <div class="col-12">
             <div class="card">
-
                 <DataTable
                     :value="reviews"
                     :paginator="true"
                     class="p-datatable-gridlines"
-                    :rows="10"
+                    :rows="5"
+                    :lazy="true"
                     dataKey="id"
                     :rowHover="true"
                     filterDisplay="menu"
                     responsiveLayout="scroll"
+                    @page="onPage"
+                    :totalRecords="count"
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">

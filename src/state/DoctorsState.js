@@ -5,6 +5,7 @@ const DoctorsState = {
     _state : reactive({}),
 
 };
-
+//init state
+MultiStateManager.state();
 
 export default { ...MultiStateManager, ...DoctorsState };

@@ -17,6 +17,9 @@ export default {
         if(Object.keys(res).length > 0 && res.items){
             reviewsState.setItems(res.items);
         }
+
+        reviewsState.setCount(res.count);
+
         //todo handle error
         return this;
     },
@@ -27,6 +30,8 @@ export default {
         if( !condition ) return this.state.getItems();
     },
 
-
+    count(){
+        return this.state.count();
+    }
 
 }
