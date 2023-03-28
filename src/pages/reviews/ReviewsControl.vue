@@ -1,7 +1,7 @@
 <script setup>
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
     customerService, initFilters1, clearFilter1, formatDate, reviewsService, onBeforeMountHook, onBeforeMountInitFilters,
-    page,count
+    onPage,count
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';

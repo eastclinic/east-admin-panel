@@ -2,6 +2,7 @@
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
 import ReviewsService from "../../services/Reviews/ReviewsService";
+import request from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
@@ -28,7 +29,7 @@ export const reviewsService = ReviewsService;
 export const onBeforeMountHook = () => async () => {
 
 
-    await reviewsService.fetchServerData();
+    await reviewsService.fetchServerData(request.page(0));
     reviews.value = reviewsService.reviews();
     count.value = reviewsService.count();
     customerService.getCustomersLarge().then((data) => {
@@ -78,9 +79,9 @@ export const formatDate = (value) => {
         year: 'numeric'
     });
 };
-export const onPage = (e) =>{
-
-    console.log(reviewsService)
+export const onPage = async (e) =>{
+    await reviewsService.fetchServerData(request.page(e.page).perPage(10));
+    console.log(e)
 }
 // export const count = () =>{
 //     console.log(reviewsService)
