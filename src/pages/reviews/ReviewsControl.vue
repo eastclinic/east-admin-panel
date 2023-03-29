@@ -1,6 +1,6 @@
 <script setup>
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
-    customerService, initFilters1, clearFilter1, formatDate, reviewsService, onBeforeMountHook, onBeforeMountInitFilters,
+    customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
     onPage,count
 } from './ReviewsControlData'
 
@@ -18,6 +18,7 @@ onBeforeMount(onBeforeMountInitFilters());
 <template>
     <div class="grid">
         <div class="col-12">
+            {{count}}
             <div class="card">
                 <DataTable
                     :value="reviews"

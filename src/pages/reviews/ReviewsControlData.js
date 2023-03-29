@@ -6,34 +6,31 @@ import request from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
-export const reviewsService = ReviewsService;
+
 export const { contextPath } = useLayout();
 
-export const reviews = ref(reviewsService.reviews());
+
 
 
 export  const customer1 = ref(null);
 export const filters1 = ref(null);
 export const loading1 = ref(null);
-export const count = ref(reviewsService.count());
-// count.value = reviewsService.count().value;
+
 
 export const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
 export const representatives = ref([]);
 
 export const customerService = new CustomerService();
 
-
+const reviewsService = ReviewsService;
+export const reviews = reviewsService.reviews();
+export const count = reviewsService.count();
 
 
 
 
 export const onBeforeMountHook = () => async () => {
-
-    console.log(count)
-    console.log(reviews)
     await reviewsService.fetchServerData();
-    // reviews.value = reviewsService.reviews();
     customerService.getCustomersLarge().then((data) => {
         customer1.value = data;
         loading1.value = false;
@@ -70,10 +67,6 @@ export const clearFilter1 = () => {
 };
 
 
-// const formatCurrency = (value) => {
-//     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-// };
-
 export const formatDate = (value) => {
     return value.toLocaleDateString('en-US', {
         day: '2-digit',
@@ -87,10 +80,5 @@ export const onPage = async (e) =>{
 const fetchServerData = async (requestApi) =>{
     return reviewsService.fetchServerData(requestApi);
 }
-
-// export const count = () =>{
-//     console.log(reviewsService)
-//     return reviewsService.count();
-// }
 
 

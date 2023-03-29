@@ -32,7 +32,6 @@ export default {
     },
 
     count(){
-        console.log(this.state.count())
         return this.state.count();
     }
 

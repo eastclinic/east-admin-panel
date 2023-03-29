@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue';
+import { ref, reactive, computed, toRef } from 'vue';
 
 export default (() => ({
     _stateName:'default',
@@ -6,7 +6,7 @@ export default (() => ({
     //mutations
     setItems(items){
         if(!items)   return this;
-        return this._setCashItems(items)._setItemsIds(items);
+        return this._setCashItems(items)._setItemsIds(items)._setItems(items);
     },
     _setCashItems(items){
         if(!this._state[this._stateName]._cash) this._state[this._stateName]._cash = {};
@@ -23,6 +23,16 @@ export default (() => ({
         this._state[this._stateName].itemsIds = itemsIds;
         return this;
     },
+    _setItems(items){
+        if(!this._state[this._stateName].itemsIds)  return this;
+        const store = this._state[this._stateName];
+        let itemsStore = [];
+        for (const id of store.itemsIds) {
+            if( store._cash[id] )   itemsStore.push(store._cash[id]);
+        }
+        this._state[this._stateName].items = itemsStore;
+        return this;
+    },
     setCount(count){
 
         this._state[this._stateName].count = count;
@@ -31,34 +41,18 @@ export default (() => ({
     state(name){
         name = (name) ? name : 'default';
         this._stateName = name;
-        if(!this._state[this._stateName])this._state[this._stateName] = {count:0}
+        if(!this._state[this._stateName])this._state[this._stateName] = { count : 0, items : [] }
         window.state1 = this._state[this._stateName];
         return this;
     },
 
 
     //getters
-    getItems(){
-        return computed(() => {
-            if(!this._state[this._stateName].itemsIds)return [];
-            const store = this._state[this._stateName];
-            let itemsStore = [];
-            for (const id of store.itemsIds) {
-                if( store._cash[id] )   itemsStore.push(store._cash[id]);
-            }
-            return itemsStore;
-        })
-
-
-        return this._state[this._stateName].items;      },
+    getItems(){        return toRef(this._state[this._stateName], 'items'); },
 
     requestData(){      return this._requestData;    },
 
     count() {
-        return computed(() => {
-            return this._state[this._stateName].count
-        })
-        // console.log(this._state[this._stateName])
-        // return this._state[this._stateName].count;    }
-    }
+        return toRef(this._state[this._stateName], 'count');
+        }
 }))();
