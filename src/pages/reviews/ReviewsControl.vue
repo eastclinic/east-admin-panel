@@ -1,13 +1,14 @@
 <script setup>
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
-    onPage, count, countRows
+    onPage, count, countRows,
+    onOpenEdit, visibleEditDialog
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
+import EditDialog from "./EditDialog.vue";
 
-
- onBeforeMount(onBeforeMountHook());
+onBeforeMount(onBeforeMountHook());
 
 
 onBeforeMount(onBeforeMountInitFilters());
@@ -16,9 +17,9 @@ onBeforeMount(onBeforeMountInitFilters());
 </script>
 
 <template>
+<EditDialog v-model:visible="visibleEditDialog"></EditDialog>
     <div class="grid">
         <div class="col-12">
-            {{count}}
             <div class="card">
                 <DataTable
                     :value="reviews"
@@ -32,6 +33,8 @@ onBeforeMount(onBeforeMountInitFilters());
                     responsiveLayout="scroll"
                     @page="onPage"
                     :totalRecords="count"
+                    editMode="row"
+                    @row-edit-init="onOpenEdit"
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
@@ -62,7 +65,7 @@ onBeforeMount(onBeforeMountInitFilters());
 
                         </template>
                     </Column>
-
+                    <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
                 </DataTable>
             </div>
         </div>
@@ -204,5 +207,9 @@ onBeforeMount(onBeforeMountInitFilters());
 
 ::v-deep(.p-datatable-scrollable .p-frozen-column) {
     font-weight: bold;
+}
+::v-deep(.editable-cells-table td.p-cell-editing) {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
 }
 </style>
