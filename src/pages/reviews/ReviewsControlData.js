@@ -25,6 +25,7 @@ export const customerService = new CustomerService();
 const reviewsService = ReviewsService;
 export const reviews = reviewsService.reviews();
 export const count = reviewsService.count();
+export const countRows = 10;
 
 
 
@@ -75,7 +76,7 @@ export const formatDate = (value) => {
     });
 };
 export const onPage = async (e) =>{
-    await fetchServerData(request.page(e.page+1).perPage(10));
+    await fetchServerData(request.page(e.page+1).perPage(countRows));
 }
 const fetchServerData = async (requestApi) =>{
     return reviewsService.fetchServerData(requestApi);

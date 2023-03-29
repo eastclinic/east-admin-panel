@@ -1,7 +1,7 @@
 <script setup>
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
-    onPage,count
+    onPage, count, countRows
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -24,7 +24,7 @@ onBeforeMount(onBeforeMountInitFilters());
                     :value="reviews"
                     :paginator="true"
                     class="p-datatable-gridlines"
-                    :rows="5"
+                    :rows="countRows"
                     :lazy="true"
                     dataKey="id"
                     :rowHover="true"

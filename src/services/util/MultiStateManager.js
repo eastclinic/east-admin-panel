@@ -24,17 +24,10 @@ export default (() => ({
         return this;
     },
     _setItems(items){
-        if(!this._state[this._stateName].itemsIds)  return this;
-        const store = this._state[this._stateName];
-        let itemsStore = [];
-        for (const id of store.itemsIds) {
-            if( store._cash[id] )   itemsStore.push(store._cash[id]);
-        }
-        this._state[this._stateName].items = itemsStore;
+        this._state[this._stateName].items = items;
         return this;
     },
     setCount(count){
-
         this._state[this._stateName].count = count;
         return this;
     },

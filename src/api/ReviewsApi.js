@@ -14,7 +14,6 @@ export default (() => ({
                 //request['body'] = JSON.stringify(this._requestData);
             }
 
-            console.log(requestUrl)
             const res = await fetch(requestUrl, request);
             if(!res) return {};
             const data = await res.json()

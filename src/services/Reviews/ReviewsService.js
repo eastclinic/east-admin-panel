@@ -31,8 +31,6 @@ export default {
         if( !condition ) return this.state.getItems();
     },
 
-    count(){
-        return this.state.count();
-    }
+    count(){   return this.state.count();  }
 
 }
