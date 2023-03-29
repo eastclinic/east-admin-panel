@@ -4,7 +4,7 @@ import CustomerService from '@/services/CustomerService';
 import ReviewsService from "../../services/Reviews/ReviewsService";
 import request from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 
 export const { contextPath } = useLayout();
@@ -16,6 +16,7 @@ export  const customer1 = ref(null);
 export const filters1 = ref(null);
 export const loading1 = ref(null);
 export const visibleEditDialog = ref(false);
+export const editData = ref({});
 
 
 export const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
@@ -81,9 +82,8 @@ export const onPage = async (e) =>{
 }
 
 export const onOpenEdit = async (e) =>{
-    console.log('onOpenEdit')
-    console.log(e.data.text)
     visibleEditDialog.value = true;
+    editData.value = e.data;
 }
 
 const fetchServerData = async (requestApi) =>{
