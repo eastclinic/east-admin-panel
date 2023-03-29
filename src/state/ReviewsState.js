@@ -5,6 +5,7 @@ import MultiStateManager from '../services/util/MultiStateManager.js'
 const ReviewsState = {
     _state : reactive({}),
     ...MultiStateManager,
+
 };
 ReviewsState.state();
 

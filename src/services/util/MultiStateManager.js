@@ -1,4 +1,4 @@
-// import { reactive, computed } from 'vue';
+import { reactive, computed } from 'vue';
 
 export default (() => ({
     _stateName:'default',
@@ -6,7 +6,6 @@ export default (() => ({
     //mutations
     setItems(items){
         if(!items)   return this;
-        if(!this._state[this._stateName]) this._state[this._stateName] = {};
         return this._setCashItems(items)._setItemsIds(items);
     },
     _setCashItems(items){
@@ -37,25 +36,29 @@ export default (() => ({
         return this;
     },
 
-    //actions
-    getItems(){
-        const store = this._state[this._stateName];
-        if( !store || !store.itemsIds || !store._cash ) return[];
-        let items = [];
-        for (const id of store.itemsIds) {
-            if( store._cash[id] )items.push(store._cash[id]);
-        }
-        return items;
-    },
-
 
     //getters
-    requestData(){
-        return this._requestData;
-    },
-    count(){
-       return this._state[this._stateName].count;
+    getItems(){
+        return computed(() => {
+            if(!this._state[this._stateName].itemsIds)return [];
+            const store = this._state[this._stateName];
+            let itemsStore = [];
+            for (const id of store.itemsIds) {
+                if( store._cash[id] )   itemsStore.push(store._cash[id]);
+            }
+            return itemsStore;
+        })
 
+
+        return this._state[this._stateName].items;      },
+
+    requestData(){      return this._requestData;    },
+
+    count() {
+        return computed(() => {
+            return this._state[this._stateName].count
+        })
+        // console.log(this._state[this._stateName])
+        // return this._state[this._stateName].count;    }
     }
-
 }))();
