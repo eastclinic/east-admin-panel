@@ -26,6 +26,13 @@ export default {
     },
 
 
+    async saveReview( data ){
+        const res = await reviewsApi.saveReview(data);
+        if(Object.keys(res).length > 0 && res.items){
+            reviewsState.setItems(res.items);
+        }
+    },
+
     //getters
     reviews(condition){
         if( !condition ) return this.state.getItems();

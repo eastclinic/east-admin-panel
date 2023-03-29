@@ -1,5 +1,6 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
+import reviewsState from "../state/ReviewsState";
 
 export default (() => ({
         ...UseRequestAdapters,
@@ -20,4 +21,12 @@ export default (() => ({
             if(!data || !data.items) return {};
             return data;
         },
+    async saveReview( data ){
+        const res = await reviewsApi.saveReview(data);
+        if(Object.keys(res).length > 0 && res.items){
+            reviewsState.setItems(res.items);
+        }
+    },
+
+
     }))();
