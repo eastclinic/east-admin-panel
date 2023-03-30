@@ -2,10 +2,11 @@
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
 import ReviewsService from "../../services/Reviews/ReviewsService";
-import request from "../../api/apiRequestAdapters/DataTableRequestAdapter";
+import dataTableRequestAdapter from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
 import { ref, reactive } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
+import reviewsState from "../../state/ReviewsState";
 
 export const { contextPath } = useLayout();
 
@@ -78,7 +79,8 @@ export const formatDate = (value) => {
     });
 };
 export const onPage = async (e) =>{
-    await fetchServerData(request.page(e.page+1).perPage(countRows));
+
+    await reviewsService.fetchServerData({...dataTableRequestAdapter.page(e.page+1).requestData()});
 }
 
 export const onOpenEdit = async (e) =>{
@@ -86,8 +88,7 @@ export const onOpenEdit = async (e) =>{
     editData.value = e.data;
 }
 
-const fetchServerData = async (requestApi) =>{
-    return reviewsService.fetchServerData(requestApi);
+
+export const updateReview = async (id) =>{
+    await reviewsService.fetchServerData({...dataTableRequestAdapter.requestData(), id:id});
 }
-
-

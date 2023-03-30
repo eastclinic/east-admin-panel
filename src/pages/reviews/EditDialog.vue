@@ -37,7 +37,7 @@
         visible: Boolean,
         editData:Object
     })
-    const emit = defineEmits(['update:visible'])
+    const emit = defineEmits(['update:visible', 'update:review'])
     const editedData = props.editData;
 
     const header = ref((Object.keys(props.editData).length > 0) ? 'Редактирование отзыва' : 'Создание нового отзыва')
@@ -49,6 +49,7 @@
         const res = await reviewsService.saveReview(editedData);
         if(res.ok ) dismissModal();
         //todo refresh row from server
+        emit('update:review', props.editData.id);
     }
 
 

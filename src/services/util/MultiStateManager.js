@@ -8,6 +8,12 @@ export default (() => ({
         if(!items)   return this;
         return this._setCashItems(items)._setItemsIds(items)._setItems(items);
     },
+
+    refreshItems(items){
+        if(!items)   return this;
+        return this._setCashItems(items)._setItems(items);
+    },
+
     _setCashItems(items){
         if(!this._state[this._stateName]._cash) this._state[this._stateName]._cash = {};
         let cashItems = {};
