@@ -1,6 +1,5 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
-import reviewsState from "../state/ReviewsState";
 
 export default (() => ({
         ...UseRequestAdapters,
@@ -21,11 +20,19 @@ export default (() => ({
             if(!data || !data.items) return {};
             return data;
         },
-    async saveReview( data ){
-        const res = await reviewsApi.saveReview(data);
-        if(Object.keys(res).length > 0 && res.items){
-            reviewsState.setItems(res.items);
-        }
+    async saveReview( saveData ){
+            if(!saveData.id || Object.keys(saveData).length < 2 ) return {};
+        // let request = {method:'PUT', ...data}
+        const res = await fetch(baseUrl + '/api/reviews' + '/' + saveData.id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(saveData)
+        });
+        //todo handle server error (500, 502 ...)
+        if(!res) return {};
+        return await res.json()
     },
 
 
