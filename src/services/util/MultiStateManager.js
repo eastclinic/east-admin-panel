@@ -36,12 +36,17 @@ export default (() => ({
         let itemsNew = {};
         let existItems = this._state[this._stateName].items;
         for (const item of items) itemsNew[item.id] = item;
-        existItems.forEach((el, i) => {
-            if(itemsNew[el.id]){
-                existItems[i] = itemsNew[el.id]
-            }
+        for (const item of this._state[this._stateName].items) {
+            existItems.push((itemsNew[item.id]) ? itemsNew[item.id] : item);
 
-        });
+        }
+        //
+        // existItems.forEach((el, i) => {
+        //     if(itemsNew[el.id]){
+        //         existItems[i] = itemsNew[el.id]
+        //     }
+        //
+        // });
         this._state[this._stateName].items = existItems;
 
         return this;
