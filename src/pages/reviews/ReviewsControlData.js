@@ -90,5 +90,5 @@ export const onOpenEdit = async (e) =>{
 
 
 export const updateReview = async (id) =>{
-    await reviewsService.fetchServerData({...dataTableRequestAdapter.requestData(), id:id});
+    await reviewsService.fetchServerData({ id:id });
 }

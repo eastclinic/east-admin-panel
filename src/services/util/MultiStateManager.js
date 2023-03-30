@@ -11,11 +11,10 @@ export default (() => ({
 
     refreshItems(items){
         if(!items)   return this;
-        return this._setCashItems(items)._setItems(items);
+        return this._setCashItems(items)._refreshItems(items);
     },
 
     _setCashItems(items){
-        if(!this._state[this._stateName]._cash) this._state[this._stateName]._cash = {};
         let cashItems = {};
         for (const item of items) cashItems[item.id] = item;
         this._state[this._stateName]._cash = { ...this._state[this._stateName]._cash, ...cashItems};
@@ -23,7 +22,6 @@ export default (() => ({
     },
 
     _setItemsIds(items){
-        if(!this._state[this._stateName].itemsIds) this._state[this._stateName].itemsIds = {};
         let itemsIds = [];
         for (const item of items) itemsIds.push(item.id);
         this._state[this._stateName].itemsIds = itemsIds;
@@ -31,6 +29,21 @@ export default (() => ({
     },
     _setItems(items){
         this._state[this._stateName].items = items;
+
+        return this;
+    },
+    _refreshItems(items){
+        let itemsNew = {};
+        let existItems = this._state[this._stateName].items;
+        for (const item of items) itemsNew[item.id] = item;
+        existItems.forEach((el, i) => {
+            if(itemsNew[el.id]){
+                existItems[i] = itemsNew[el.id]
+            }
+
+        });
+        this._state[this._stateName].items = existItems;
+
         return this;
     },
     setCount(count){
@@ -40,7 +53,7 @@ export default (() => ({
     state(name){
         name = (name) ? name : 'default';
         this._stateName = name;
-        if(!this._state[this._stateName])this._state[this._stateName] = { count : 0, items : [] }
+        if(!this._state[this._stateName]) this._state[this._stateName] = { count : 0, items : [], _cash: {}, itemsIds:{} }
         window.state1 = this._state[this._stateName];
         return this;
     },

@@ -17,13 +17,17 @@ export default (() =>({
 
         const res = await reviewsApi.getReviews(requestData);
         if(Object.keys(res).length > 0 && res.items){
-            reviewsState.setItems(res.items);
-        }
-        if(Object.keys(res).length > 0 && res.itemsUpdated){
-            reviewsState.refreshItems(res.itemsUpdated);
+            //if simply refresh data from server run refreshItems()
+            if(requestData?.id || requestData?.ids){
+                reviewsState.refreshItems(res.items);
+            }else{
+                reviewsState.setItems(res.items);
+                reviewsState.setCount(res.count);
+            }
+
         }
 
-        reviewsState.setCount(res.count);
+
 
         //todo handle error
         return true;
