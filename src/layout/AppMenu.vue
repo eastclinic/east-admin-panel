@@ -8,6 +8,28 @@ const model = ref([
         items: [{ label: 'Reviews', icon: 'pi pi-fw pi-comments', to: '/pages/reviews' },
         ]
     },
+
+    {
+        label: 'Доктора',
+        icon: 'pi pi-fw pi-users',
+        to: '/doctors',
+        items: [
+            {
+                label: 'Главная информация',
+                icon: 'pi pi-fw pi-sign-in',
+                to: '/doctors/info'
+            },
+            {
+                label: 'Научные данные',
+                icon: 'pi pi-fw pi-times-circle',
+                to: '/doctor/science'
+            },
+
+        ]
+    },
+
+
+
     {
         label: 'Home',
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
