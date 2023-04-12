@@ -1,10 +1,17 @@
 <template>
     <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
-        <div class="grid p-fluid">
-            <div class="col-12  lg:col-6 justify-content-center">
+        <div class="grid p-fluid ">
+            <div class="col-12  lg:col-12">
+                <div class="flex flex-wrap">
+                    <div class="flex align-items-center justify-content-center m-2">
+                        <InputSwitch  v-model="props.editData.published" @update:modelValue="editedData.published =$event" />
+                    </div>
+                    <div class="flex align-items-center justify-content-center m-2">
+                        <label >Опубликован</label>
+                    </div>
+                </div>
 
-                    <InputSwitch  :value="props.editData.published" @update:modelValue="editedData.published =$event" />
-                <label >Опубликован</label>
+
         </div>
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
@@ -13,9 +20,9 @@
                 </span>
             </div>
             <div class="col-12 lg:col-6 ">
-                   <span class="p-float-label">
-                    <InputText id="username" type="text" :value="props.editData.author"  @update:modelValue="editedData.author =$event"/>
-                    <label for="username">Username</label>
+                   <span class="p-input-icon-left">
+                       <i class="pi pi-star" />
+                    <InputText type="text" :value="props.editData.rating"  @update:modelValue="editedData.rating =$event"/>
                 </span>
             </div>
 
