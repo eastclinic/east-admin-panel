@@ -33,22 +33,18 @@ export default (() => ({
         return this;
     },
     _refreshItems(items){
+        if(!items || items.length === 0) return this;
         let itemsNew = {};
-        let existItems = this._state[this._stateName].items;
+        let existItems = [];
         for (const item of items) itemsNew[item.id] = item;
-        for (const item of this._state[this._stateName].items) {
-            existItems.push((itemsNew[item.id]) ? itemsNew[item.id] : item);
-
+        if(this._state[this._stateName].items.length === 0 ){
+            this._state[this._stateName].items = Object.values(itemsNew);
+        }else{
+            for (const item of this._state[this._stateName].items) {
+                existItems.push((itemsNew[item.id]) ? itemsNew[item.id] : item);
+            }
+            this._state[this._stateName].items = existItems;
         }
-        //
-        // existItems.forEach((el, i) => {
-        //     if(itemsNew[el.id]){
-        //         existItems[i] = itemsNew[el.id]
-        //     }
-        //
-        // });
-        this._state[this._stateName].items = existItems;
-
         return this;
     },
     setCount(count){

@@ -7,12 +7,17 @@ export default (() => ({
         async getReviews(requestData){
             let request = {method:'GET'}
             let requestUrl = baseUrl + '/api/reviews';
-            if( Object.keys(requestData).length > 0 ){
-                // Create the URL with the parameters
-                const queryParams = new URLSearchParams(requestData);
-                requestUrl += '?'+queryParams;
+            if(requestData.id){
+                requestUrl += '/'+requestData.id;
             }
+            else {
+                if( Object.keys(requestData).length > 0 ){
 
+                    // Create the URL with the parameters
+                    const queryParams = new URLSearchParams(requestData);
+                    requestUrl += '?'+queryParams;
+                }
+            }
             const res = await fetch(requestUrl, request);
             if(!res) return {};
             const data = await res.json()
