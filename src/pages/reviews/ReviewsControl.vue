@@ -51,7 +51,8 @@ onBeforeMount(onBeforeMountInitFilters());
                     <template #loading> Loading customers data. Please wait. </template>
 
                     <Column field="author" header="Автор" style="min-width: 12rem">
-                        <template #body="{ data }">
+                        <template #body="{ data }" >
+                            <Badge v-if="data.is_new"/>
                             {{ data.author }}
                         </template>
                         <template #filter="{ filterModel }">

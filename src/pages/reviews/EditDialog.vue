@@ -1,5 +1,5 @@
 <template>
-    <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
+    <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)" @show="watchedReview">
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -30,7 +30,7 @@
                 <Editor v-model="props.editData.text"  @update:modelValue="editedData.text =$event" editorStyle="min-height: 240px" />
             </div>
             <div class="col-12  lg:col-6 ">
-                <Button label="Сохранить" text :raised="true" @click="saveReview"/>
+                <Button label="Сохранить" text :raised="true" @click="updateReview"/>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
@@ -56,12 +56,23 @@
     const reviewsService = ReviewsService;
 
     const dismissModal = () => emit('update:visible', false)
+    const updateReview = async () => {
+        const res = await saveReview();
+        if(res.ok ) dismissModal();
+        emit('update:review', props.editData.id);
+    }
+
     const saveReview = async () => {
         if(props?.editData?.id) editedData.id = props.editData.id;
-        const res = await reviewsService.saveReview(editedData);
-        if(res.ok ) dismissModal();
-        //todo refresh row from server
-        emit('update:review', props.editData.id);
+        return  await reviewsService.saveReview(editedData);
+    }
+    const watchedReview = async () =>{
+        if(props?.editData?.is_new){
+            console.log(props.editData.isNew)
+            editedData.is_new = false;
+            await saveReview();
+            emit('update:review', props.editData.id);
+        }
     }
 
 
