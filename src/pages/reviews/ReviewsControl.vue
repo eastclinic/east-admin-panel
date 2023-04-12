@@ -3,7 +3,7 @@ import {contextPath, reviews, customer1, filters1, loading1, statuses, represent
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
     onPage, count, countRows,
     onOpenEdit, visibleEditDialog, editData,
-    updateReview
+    updateReview, editingRow
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -36,6 +36,7 @@ onBeforeMount(onBeforeMountInitFilters());
                     :totalRecords="count"
                     editMode="row"
                     @row-edit-init="onOpenEdit"
+
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
@@ -64,6 +65,14 @@ onBeforeMount(onBeforeMountInitFilters());
                         <template #filter="{ filterModel }">
                             <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by rating" />
 
+                        </template>
+                    </Column>
+                    <Column field="published" header="Published" dataType="boolean" style="min-width: 6rem">
+                        <template #body="{ data }">
+                            <InputSwitch id="my-input-switch" v-model="data.published" />
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()" />
                         </template>
                     </Column>
                     <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>

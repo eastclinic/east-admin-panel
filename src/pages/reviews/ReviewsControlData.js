@@ -92,3 +92,6 @@ export const onOpenEdit = async (e) =>{
 export const updateReview = async (id) =>{
     await reviewsService.fetchServerData({ id:id });
 }
+export const editingRow =  (e) =>{
+    console.log(e)
+}

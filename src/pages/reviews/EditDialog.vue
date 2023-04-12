@@ -1,6 +1,11 @@
 <template>
     <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
+            <div class="col-12  lg:col-6 justify-content-center">
+
+                    <InputSwitch  :value="props.editData.published" @update:modelValue="editedData.published =$event" />
+                <label >Опубликован</label>
+        </div>
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
