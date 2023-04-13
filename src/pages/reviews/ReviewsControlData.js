@@ -89,9 +89,15 @@ export const onOpenEdit = async (e) =>{
 }
 
 
-export const updateReview = async (id) =>{
+export const refreshReviewRow = async (id) =>{
+    console.log(id)
     await reviewsService.fetchServerData({ id:id });
 }
+export const refreshReviews = async () =>{
+   // await reviewsService.fetchServerData({...dataTableRequestAdapter.requestData()});
+}
+
+
 export const createItem =  (e) =>{
     visibleEditDialog.value = true;
     editData.value = {};

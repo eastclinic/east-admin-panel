@@ -18,6 +18,8 @@ export default (() => ({
                     requestUrl += '?'+queryParams;
                 }
             }
+            console.log(requestUrl)
+            console.log(request)
             const res = await fetch(requestUrl, request);
             if(!res) return {};
             const data = await res.json()
@@ -25,7 +27,6 @@ export default (() => ({
             return data;
         },
     async saveReview( saveData ){
-        console.log(saveData)
             if(!saveData || Object.keys(saveData).length === 0) return {}
 
         let request = {
@@ -42,12 +43,6 @@ export default (() => ({
             //if not have id - its create new review
             request['method'] = 'POST';
         }
-        if(!saveData.id || Object.keys(saveData).length < 2 ) return {};
-
-
-
-
-
         const res = await fetch(url, request);
         //todo handle server error (500, 502 ...)
         if(!res) return {};

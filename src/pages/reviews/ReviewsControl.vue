@@ -3,7 +3,7 @@ import {contextPath, reviews, customer1, filters1, loading1, statuses, represent
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
     onPage, count, countRows,
     onOpenEdit, visibleEditDialog, editData, createItem,
-    updateReview
+    refreshReviewRow, refreshReviews,
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -18,7 +18,7 @@ onBeforeMount(onBeforeMountInitFilters());
 </script>
 
 <template>
-<EditDialog v-model:visible="visibleEditDialog" :editData="editData" @update:review="updateReview"></EditDialog>
+<EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated:review="refreshReviewRow" @created:review="refreshReviews"></EditDialog>
     <div class="grid">
         <div class="col-12">
             <div class="card">
