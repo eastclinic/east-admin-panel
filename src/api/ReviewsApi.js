@@ -25,15 +25,30 @@ export default (() => ({
             return data;
         },
     async saveReview( saveData ){
-            if(!saveData.id || Object.keys(saveData).length < 2 ) return {};
-        // let request = {method:'PUT', ...data}
-        const res = await fetch(baseUrl + '/api/reviews' + '/' + saveData.id, {
-            method: 'PUT',
+        console.log(saveData)
+            if(!saveData || Object.keys(saveData).length === 0) return {}
+
+        let request = {
+            body: JSON.stringify(saveData),
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(saveData)
-        });
+        };
+        let url = baseUrl + '/api/reviews';
+        if(saveData.id ) {
+            request['method'] = 'PUT';
+            url += '/' + saveData.id;
+        }else {
+            //if not have id - its create new review
+            request['method'] = 'POST';
+        }
+        if(!saveData.id || Object.keys(saveData).length < 2 ) return {};
+
+
+
+
+
+        const res = await fetch(url, request);
         //todo handle server error (500, 502 ...)
         if(!res) return {};
         return await res.json()

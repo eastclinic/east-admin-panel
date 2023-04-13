@@ -1,5 +1,5 @@
 <template>
-    <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)" @show="watchedReview">
+    <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)" @show="reviewNotNew">
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -27,7 +27,7 @@
             </div>
 
             <div class="col-12">
-                <Editor v-model="props.editData.text"  @update:modelValue="editedData.text =$event" editorStyle="min-height: 240px" />
+                <Textarea v-model="props.editData.text" @update:modelValue="editedData.text =$event" rows="5" autoResize  />
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Сохранить" text :raised="true" @click="updateReview"/>
@@ -43,35 +43,34 @@
 </template>
 
 <script setup>
-    import { defineProps, reactive, ref, toRef, defineEmits, computed } from 'vue'
+    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     const props = defineProps({
         visible: Boolean,
         editData:Object
     })
-    const emit = defineEmits(['update:visible', 'update:review'])
+    const emit = defineEmits(['update:visible', 'update:review', 'create:review'])
     const editedData = props.editData;
-    console.log(props.editData)
+
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
 
     const dismissModal = () => emit('update:visible', false)
     const updateReview = async () => {
-        const res = await saveReview();
+        const res = await saveReview(toRaw(editedData));
 
-        emit('update:review', props.editData.id);
+        emit('create:review', props.editData.id);
         if(res.ok ) dismissModal();
     }
 
-    const saveReview = async () => {
+    const saveReview = async (editedData) => {
         if(props?.editData?.id) editedData.id = props.editData.id;
         return  await reviewsService.saveReview(editedData);
     }
-    const watchedReview = async () =>{
+    const reviewNotNew = async () =>{
         if(props?.editData?.is_new){
-            console.log(props.editData.isNew)
             editedData.is_new = false;
-            await saveReview();
+            await saveReview(toRaw(editedData));
             emit('update:review', props.editData.id);
         }
     }
