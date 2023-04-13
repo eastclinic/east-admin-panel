@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-    import { defineProps, reactive, ref, toRef, defineEmits } from 'vue'
+    import { defineProps, reactive, ref, toRef, defineEmits, computed } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     const props = defineProps({
         visible: Boolean,
@@ -51,15 +51,16 @@
     })
     const emit = defineEmits(['update:visible', 'update:review'])
     const editedData = props.editData;
-
-    const header = ref((Object.keys(props.editData).length > 0) ? 'Редактирование отзыва' : 'Создание нового отзыва')
+    console.log(props.editData)
+    const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
 
     const dismissModal = () => emit('update:visible', false)
     const updateReview = async () => {
         const res = await saveReview();
-        if(res.ok ) dismissModal();
+
         emit('update:review', props.editData.id);
+        if(res.ok ) dismissModal();
     }
 
     const saveReview = async () => {

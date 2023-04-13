@@ -2,8 +2,8 @@
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
     onPage, count, countRows,
-    onOpenEdit, visibleEditDialog, editData,
-    updateReview, editingRow
+    onOpenEdit, visibleEditDialog, editData, createItem,
+    updateReview
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -40,6 +40,8 @@ onBeforeMount(onBeforeMountInitFilters());
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
+
+                            <Button type="button" icon="pi pi-plus" label="New" class="p-button-outlined mb-2" @click="createItem" />
                             <Button type="button" icon="pi pi-filter-slash" label="Clear" class="p-button-outlined mb-2" @click="clearFilter1()" />
                             <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />
