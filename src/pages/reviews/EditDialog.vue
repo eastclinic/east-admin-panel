@@ -8,6 +8,7 @@
             @show="showModal"
             @hide="editedData = {}"
     >
+        {{editedData}}
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -24,18 +25,15 @@
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
-                    <InputNumber :value="props.editData.author" @update:modelValue="editedData.author =$event" :min="0" :max="100"/>
+                    <InputText type="text" v-model="editedData.author"/>
                 </span>
             </div>
             <div class="col-12 lg:col-6 ">
-                   <span class="p-input-icon-left">
-                       <i class="pi pi-star" />
-                    <InputText type="text" :value="props.editData.rating"  @update:modelValue="editedData.rating =$event"/>
-                </span>
+                    <InputNumber v-model="editedData.rating" :min="1" :max="100" />
             </div>
 
             <div class="col-12">
-                <Textarea :value="props.editData.text" @update:modelValue="editedData.text =$event" rows="5" autoResize  />
+                <Textarea v-model="editedData.text" rows="5" autoResize  />
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Сохранить" text :raised="true" @click="updateReview"/>
@@ -51,15 +49,14 @@
 </template>
 
 <script setup>
-    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw } from 'vue'
+    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     const props = defineProps({
         visible: Boolean,
         editData:Object
     })
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
-    let editedData = {};
-
+    let  editedData = reactive(props.editData);
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
 
@@ -77,6 +74,10 @@
         }
         dismissModal();
     }
+    onBeforeUpdate(()=>{
+        //todo its may be wrong
+        editedData = reactive({...toRaw(props.editData)});
+    });
 
     const saveReview = async (editedData) => {
         if(props?.editData?.id) editedData.id = props.editData.id;
@@ -94,15 +95,13 @@
             await saveReview(toRaw(editedData));
             emit('updated:review', props.editData.id);
         }
-        //editedData = {};
-        console.log('showModal')
     }
     const dismissModal = () => {
-        editedData = {}
+        // editedData = {};
         emit('update:visible', false)
 
     };
-
+    const value1 = ref(42723);
 
 </script>
 

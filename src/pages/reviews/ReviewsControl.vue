@@ -3,7 +3,7 @@ import {contextPath, reviews, customer1, filters1, loading1, statuses, represent
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
     onPage, count, countRows,
     onOpenEdit, visibleEditDialog, editData, createItem,
-    refreshReviewRow, refreshReviews, onSort
+    refreshReviewRow, refreshReviews, onSort, rating5
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -64,9 +64,9 @@ onBeforeMount(onBeforeMountInitFilters());
                             <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />
                         </template>
                     </Column>
-                    <Column field="author" header="Рейтинг" style="min-width: 12rem">
+                    <Column field="rating" header="Рейтинг" style="min-width: 12rem">
                         <template #body="{ data }">
-                            <Rating v-model="data.rating" readonly :cancel="false" />
+                            {{data.rating}}
                         </template>
                         <template #filter="{ filterModel }">
                             <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by rating" />
