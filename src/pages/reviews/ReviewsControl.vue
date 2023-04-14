@@ -78,6 +78,14 @@ onBeforeMount(onBeforeMountInitFilters());
                             <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()" />
                         </template>
                     </Column>
+                    <Column header="Date" filterField="date" dataType="date" style="min-width: 10rem">
+                        <template #body="{ data }">
+                            {{ formatDate(data.created_at) }}
+                        </template>
+                        <template #filter="{ filterModel }">
+                            <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+                        </template>
+                    </Column>
                     <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
                 </DataTable>
             </div>

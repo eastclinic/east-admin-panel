@@ -71,12 +71,19 @@ export const clearFilter1 = () => {
 };
 
 
-export const formatDate = (value) => {
-    return value.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+export const formatDate = (timestamp) => {
+    if(timestamp){
+        const date = new Date(timestamp * 1000); // умножаем на 1000, чтобы получить миллисекунды
+        return date.toLocaleDateString('ru-RU', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZone: 'Europe/Moscow'
+        });
+    }
+    return timestamp;
 };
 export const onPage = async (e) =>{
 
