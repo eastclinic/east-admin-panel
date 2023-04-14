@@ -57,7 +57,8 @@ const initFilters1 = () => {
         balance: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         activity: { value: [0, 50], matchMode: FilterMatchMode.BETWEEN },
-        verified: { value: null, matchMode: FilterMatchMode.EQUALS }
+        verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+        published: { value: null, matchMode: FilterMatchMode.EQUALS }
     };
 };
 

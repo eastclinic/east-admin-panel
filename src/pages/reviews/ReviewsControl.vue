@@ -1,9 +1,10 @@
 <script setup>
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
-    onPage, count, countRows,
+    onPage, count, countRows,filters,
     onOpenEdit, visibleEditDialog, editData, createItem,
-    refreshReviewRow, refreshReviews, onSort, rating5
+    refreshReviewRow, refreshReviews, onSort, rating5,
+    onFilter
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -30,16 +31,19 @@ onBeforeMount(onBeforeMountInitFilters());
                     :lazy="true"
                     dataKey="id"
                     :rowHover="true"
-                    filterDisplay="menu"
                     responsiveLayout="scroll"
                     @page="onPage"
                     @sort="onSort"
+                    @filter="onFilter"
                     :totalRecords="count"
                     editMode="row"
                     @row-edit-init="onOpenEdit"
                     sortMode="multiple"
                     removableSort
-
+                    :filters="filters1"
+                    v-model:filters="filters1"
+                    filterDisplay="row"
+                    :globalFilterFields="['author', 'rating', 'published']"
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
@@ -73,15 +77,24 @@ onBeforeMount(onBeforeMountInitFilters());
 
                         </template>
                     </Column>
-                    <Column field="published" header="Published" dataType="boolean" style="min-width: 6rem"  sortable>
+                    <Column field="published" header="Verified" dataType="boolean" style="min-width: 6rem">
                         <template #body="{ data }">
-                            <InputSwitch id="my-input-switch" v-model="data.published" />
+                            <i class="pi" :class="{ 'pi-check-circle text-green-500': data.published, 'pi-times-circle text-red-400': !data.published }"></i>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()" />
                         </template>
                     </Column>
-                    <Column header="Date" filterField="date" dataType="date" style="min-width: 10rem" field="date" sortable>
+                    <Column field="published" header="Published" dataType="boolean" style="min-width: 6rem"    sortable>
+                        <template #body="{ data }">
+                            <i class="pi" :class="{ 'pi-check-circle text-green-500': data.published, 'pi-times-circle text-red-400': !data.published }"></i>
+
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()" />
+                        </template>
+                    </Column>
+                    <Column header="Date" filterField="created_at" dataType="date" style="min-width: 10rem" field="created_at" sortable>
                         <template #body="{ data }">
                             {{ formatDate(data.created_at) }}
                         </template>
@@ -106,7 +119,7 @@ onBeforeMount(onBeforeMountInitFilters());
                         dataKey="id"
                         :rowHover="true"
                         v-model:filters="filters1"
-                        filterDisplay="menu"
+                        filterDisplay="row"
                         :loading="loading1"
                         :filters="filters1"
                         responsiveLayout="scroll"
@@ -123,90 +136,7 @@ onBeforeMount(onBeforeMountInitFilters());
                     </template>
                     <template #empty> No customers found. </template>
                     <template #loading> Loading customers data. Please wait. </template>
-                    <Column field="author" header="Автор" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            {{ data.author }}
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />
-                        </template>
-                    </Column>
-                    <Column header="Country" filterField="country.name" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <img src="/demo/images/flag/flag_placeholder.png" :alt="data.country.name" :class="'flag flag-' + data.country.code" width="30" />
-                            <span style="margin-left: 0.5em; vertical-align: middle" class="image-text">{{ data.country.name }}</span>
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by country" />
-                        </template>
-                        <template #filterclear="{ filterCallback }">
-                            <Button type="button" icon="pi pi-times" @click="filterCallback()" class="p-button-secondary"></Button>
-                        </template>
-                        <template #filterapply="{ filterCallback }">
-                            <Button type="button" icon="pi pi-check" @click="filterCallback()" class="p-button-success"></Button>
-                        </template>
-                    </Column>
-                    <Column header="Agent" filterField="representative" :showFilterMatchModes="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 14rem">
-                        <template #body="{ data }">
-                            <img :alt="data.representative.name" :src="contextPath + 'demo/images/avatar/' + data.representative.image" width="32" style="vertical-align: middle" />
-                            <span style="margin-left: 0.5em; vertical-align: middle" class="image-text">{{ data.representative.name }}</span>
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <div class="mb-3 text-bold">Agent Picker</div>
-                            <MultiSelect v-model="filterModel.value" :options="representatives" optionLabel="name" placeholder="Any" class="p-column-filter">
-                                <template #option="slotProps">
-                                    <div class="p-multiselect-representative-option">
-                                        <img :alt="slotProps.option.name" :src="contextPath + 'demo/images/avatar/' + slotProps.option.image" width="32" style="vertical-align: middle" />
-                                        <span style="margin-left: 0.5em; vertical-align: middle" class="image-text">{{ slotProps.option.name }}</span>
-                                    </div>
-                                </template>
-                            </MultiSelect>
-                        </template>
-                    </Column>
-                    <Column header="Date" filterField="date" dataType="date" style="min-width: 10rem">
-                        <template #body="{ data }">
-                            {{ formatDate(data.date) }}
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
-                        </template>
-                    </Column>
-                    <!--                    <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">-->
-                    <!--                        <template #body="{ data }">-->
-                    <!--                            {{ formatCurrency(data.balance) }}-->
-                    <!--                        </template>-->
-                    <!--                        <template #filter="{ filterModel }">-->
-                    <!--                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />-->
-                    <!--                        </template>-->
-                    <!--                    </Column>-->
-                    <Column field="status" header="Status" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <span :class="'customer-badge status-' + data.status">{{ data.status }}</span>
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <Dropdown v-model="filterModel.value" :options="statuses" placeholder="Any" class="p-column-filter" :showClear="true">
-                                <template #value="slotProps">
-                                    <span :class="'customer-badge status-' + slotProps.value" v-if="slotProps.value">{{ slotProps.value }}</span>
-                                    <span v-else>{{ slotProps.placeholder }}</span>
-                                </template>
-                                <template #option="slotProps">
-                                    <span :class="'customer-badge status-' + slotProps.option">{{ slotProps.option }}</span>
-                                </template>
-                            </Dropdown>
-                        </template>
-                    </Column>
-                    <Column field="activity" header="Activity" :showFilterMatchModes="false" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <ProgressBar :value="data.activity" :showValue="false" style="height: 0.5rem"></ProgressBar>
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <Slider v-model="filterModel.value" :range="true" class="m-3"></Slider>
-                            <div class="flex align-items-center justify-content-between px-2">
-                                <span>{{ filterModel.value ? filterModel.value[0] : 0 }}</span>
-                                <span>{{ filterModel.value ? filterModel.value[1] : 100 }}</span>
-                            </div>
-                        </template>
-                    </Column>
+
                     <Column field="verified" header="Verified" dataType="boolean" bodyClass="text-center" style="min-width: 8rem">
                         <template #body="{ data }">
                             <i class="pi" :class="{ 'text-green-500 pi-check-circle': data.verified, 'text-pink-500 pi-times-circle': !data.verified }"></i>

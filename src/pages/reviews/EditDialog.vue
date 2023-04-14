@@ -13,7 +13,7 @@
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
                     <div class="flex align-items-center justify-content-center m-2">
-                        <InputSwitch  :value="props.editData.published" @update:modelValue="editedData.published =$event" />
+                        <InputSwitch v-model="editedData.published"/>
                     </div>
                     <div class="flex align-items-center justify-content-center m-2">
                         <label >Опубликован</label>

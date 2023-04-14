@@ -28,11 +28,16 @@ export default (() => ({
         this._requestData['sort'][field] = order;
         return this;
     },
+    _filter(event){
+        this._requestData['filter'] = ( event.filters ) ? event.filters : 10;
+        return this;
+    },
 
     dtEvent(event){
         this._page(event)
             ._perPage(event)
             ._multiSort(event)
+            ._filter(event);
         return this;
     },
     data(){ return {...this._requestData} },

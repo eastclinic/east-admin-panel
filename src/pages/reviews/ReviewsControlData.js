@@ -62,7 +62,11 @@ export const initFilters1 = () => {
         balance: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         activity: { value: [0, 50], matchMode: FilterMatchMode.BETWEEN },
-        verified: { value: null, matchMode: FilterMatchMode.EQUALS }
+        verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+        published: { value: null, matchMode: FilterMatchMode.EQUALS },
+        author: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        created_at: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] },
+        rating: { value: null, matchMode: FilterMatchMode.EQUALS },
     };
 };
 
@@ -99,7 +103,6 @@ export const refreshReviewRow = async (id) =>{
     await reviewsService.fetchServerData({ id:id });
 }
 export const refreshReviews = async () =>{
-    console.log(dtRequest.data())
    await reviewsService.fetchServerData(dtRequest.data());
 }
 
@@ -114,9 +117,21 @@ export const onSort = async (event) =>{
     dtRequest.dtEvent(event);
     await refreshReviews();
 }
+export const onFilter = async (e) => {
+    dtRequest.dtEvent(e);
+    console.log(e)
+    await refreshReviews();
+};
 
 export const rating5 =  (rating) =>{
     return rating / 20;
 }
 
-
+export const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    'country.name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    representative: { value: null, matchMode: FilterMatchMode.IN },
+    status: { value: null, matchMode: FilterMatchMode.EQUALS },
+    verified: { value: null, matchMode: FilterMatchMode.EQUALS }
+});
