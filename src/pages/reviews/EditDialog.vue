@@ -8,9 +8,6 @@
             @show="showModal"
             @hide="editedData = {}"
     >
-
-        {{props.editData}}
-        {{editedData}}
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -27,7 +24,7 @@
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
-                    <InputText type="text" :value="props.editData.author" @update:modelValue="editedData.author =$event" />
+                    <InputNumber :value="props.editData.author" @update:modelValue="editedData.author =$event" :min="0" :max="100"/>
                 </span>
             </div>
             <div class="col-12 lg:col-6 ">
@@ -82,11 +79,12 @@
     }
 
     const saveReview = async (editedData) => {
-        console.log(editedData)
-        console.log(props.editData)
         if(props?.editData?.id) editedData.id = props.editData.id;
-        if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
-        if(!editedData.reviewable_id) editedData.reviewable_id = 3;
+        else {
+
+            if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
+            if(!editedData.reviewable_id) editedData.reviewable_id = 3;
+        }
 
         return  await reviewsService.saveReview(editedData);
     }

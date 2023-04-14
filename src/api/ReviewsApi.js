@@ -42,10 +42,21 @@ export default (() => ({
             //if not have id - its create new review
             request['method'] = 'POST';
         }
-        const res = await fetch(url, request);
-        //todo handle server error (500, 502 ...)
-        if(!res) return {};
-        return await res.json()
+        try {
+            const res = await fetch(url, request);
+            console.log(request)
+            console.log(url)
+            console.log(res)
+            //todo handle server error (500, 502 ...)
+            if(!res) return {};
+            return await res.json()
+        } catch (error) {
+            // code to handle the error
+            console.log("An error occurred:", error.message);
+        }
+        return {};
+
+
     },
     _buildSearchParams(params, prefix = '') {
         let queryString = '';
