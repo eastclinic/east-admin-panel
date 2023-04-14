@@ -11,7 +11,7 @@ import reviewsState from "../../state/ReviewsState";
 export const { contextPath } = useLayout();
 
 
-
+const dtRequest = dataTableRequestAdapter;
 
 export  const customer1 = ref(null);
 export const filters1 = ref(null);
@@ -86,8 +86,7 @@ export const formatDate = (timestamp) => {
     return timestamp;
 };
 export const onPage = async (e) =>{
-
-    await reviewsService.fetchServerData({...dataTableRequestAdapter.page(e.page+1).requestData()});
+    await reviewsService.fetchServerData(dtRequest.dtEvent(e).requestData());
 }
 
 export const onOpenEdit = async (e) =>{
@@ -97,11 +96,11 @@ export const onOpenEdit = async (e) =>{
 
 
 export const refreshReviewRow = async (id) =>{
-    console.log(id)
     await reviewsService.fetchServerData({ id:id });
 }
 export const refreshReviews = async () =>{
-   // await reviewsService.fetchServerData({...dataTableRequestAdapter.requestData()});
+    console.log(dtRequest.data())
+   await reviewsService.fetchServerData(dtRequest.data());
 }
 
 
@@ -109,5 +108,12 @@ export const createItem =  (e) =>{
     visibleEditDialog.value = true;
     editData.value = {};
 }
+
+export const onSort = async (event) =>{
+    //todo now not work multisort(
+    dtRequest.dtEvent(event);
+    await refreshReviews();
+}
+
 
 

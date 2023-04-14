@@ -79,7 +79,7 @@ export const formatDate = (value) => {
 };
 export const onPage = async (e) =>{
 
-    await reviewsService.fetchServerData({...dataTableRequestAdapter.page(e.page+1).requestData()});
+    await reviewsService.fetchServerData(dataTableRequestAdapter.page(e.page+1).requestData());
 }
 
 export const onOpenEdit = async (e) =>{

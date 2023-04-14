@@ -3,7 +3,7 @@ import {contextPath, reviews, customer1, filters1, loading1, statuses, represent
     customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
     onPage, count, countRows,
     onOpenEdit, visibleEditDialog, editData, createItem,
-    refreshReviewRow, refreshReviews,
+    refreshReviewRow, refreshReviews, onSort
 } from './ReviewsControlData'
 
 import {  onBeforeMount } from 'vue';
@@ -33,9 +33,12 @@ onBeforeMount(onBeforeMountInitFilters());
                     filterDisplay="menu"
                     responsiveLayout="scroll"
                     @page="onPage"
+                    @sort="onSort"
                     :totalRecords="count"
                     editMode="row"
                     @row-edit-init="onOpenEdit"
+                    sortMode="multiple"
+                    removableSort
 
                 >
                     <template #header>
@@ -70,7 +73,7 @@ onBeforeMount(onBeforeMountInitFilters());
 
                         </template>
                     </Column>
-                    <Column field="published" header="Published" dataType="boolean" style="min-width: 6rem">
+                    <Column field="published" header="Published" dataType="boolean" style="min-width: 6rem"  sortable>
                         <template #body="{ data }">
                             <InputSwitch id="my-input-switch" v-model="data.published" />
                         </template>
@@ -78,7 +81,7 @@ onBeforeMount(onBeforeMountInitFilters());
                             <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()" />
                         </template>
                     </Column>
-                    <Column header="Date" filterField="date" dataType="date" style="min-width: 10rem">
+                    <Column header="Date" filterField="date" dataType="date" style="min-width: 10rem" field="date" sortable>
                         <template #body="{ data }">
                             {{ formatDate(data.created_at) }}
                         </template>
