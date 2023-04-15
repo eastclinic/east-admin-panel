@@ -1,5 +1,6 @@
 import {defineProps, ref, onMounted} from "vue";
-import dtRequest from "../../api/apiRequestAdapters/DataTableRequestAdapter";
+import dtRequestCols from "../../api/apiRequestAdapters/DataTableRequestAdapter";
+import dtRequestRows from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
 export default {
     props: {
@@ -9,28 +10,24 @@ export default {
     setup(props){
 
 
-
-
-        const rowData = ref([
+        const rowData2 = ref([
             {id:1, text:'Консультация психолога'},
             {id:2, text:'Остеопатия'},
             {id:3, text:'Консультация врача первичного приема'},
             {id:4, text:'Консультация невролога'},
             {id:5, text:'Консультация вертебролога'},
         ]);
-        //await props.columnsService.fetchServerData(dtRequest.dtEvent(e).requestData());
-        onMounted(async () => await props.columnsService.fetchServerData(dtRequest.requestData()))
-        const colData22 = ref([
-            {id:1, text:'Абраменко А А'},
-            {id:2, text:'Хайдзан Чао'},
-            {id:3, text:'Митрофанов'},
-            {id:4, text:'Денисов'},
-            {id:5, text:'Симачевский'},
-        ]);
+
+
+        onMounted(async () => {
+            await props.columnsService.fetchServerData(dtRequestCols.requestData());
+            await props.rowsService.fetchServerData(dtRequestRows.requestData());
+        })
 
 
         const colData = ref(props.columnsService.getItemsIdText())
-        // console.log(cold2)
+        const rowData = ref(props.rowsService.getItemsIdText())
+
 
         const bindsData = ref({
             1:{  1:{id:1, unit:1, tag:1},   4:{id:14, unit:1, tag:4}, },

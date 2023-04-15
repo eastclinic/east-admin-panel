@@ -36,15 +36,6 @@ export default {
         if( !condition ) return this.state.getItems();
     },
     getItemsIdText(){
-        // const items = this.state.getItems();
-        // console.log(items)
-        // const arraySum = computed(() => {
-        //     if(items.value && items.value.length > 0){
-        //         console.log(items.value)
-        //         return items;
-        //     }else return items;
-        // });
-        //     console.log(arraySum)
         return computed(() => this.state.getItems().value.map(i => { return{id:i.id, text:i.fullname}}));
     },
 

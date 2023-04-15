@@ -1,6 +1,7 @@
 
 import healthServicesState from '@/state/HealthServicesState.js'
 import healthRootServicesApi from '../../api/health/HealthRootServicesApi'
+import {computed} from "vue";
 
 
 export default (() =>({
@@ -15,7 +16,7 @@ export default (() =>({
 
         if( healthServicesState.requestData() )  requestData = { ...requestData, ...healthServicesState.requestData() };
 
-        const res = await healthRootServicesApi.getReviews(requestData);
+        const res = await healthRootServicesApi.getItems(requestData);
         if(Object.keys(res).length > 0 && res.items){
             //if simply refresh data from server run refreshItems()
             if(requestData?.id || requestData?.ids){
@@ -42,6 +43,9 @@ export default (() =>({
     rootServices(condition){
         //if( !condition )
             return this.state.getItems();
+    },
+    getItemsIdText(){
+        return computed(() => this.state.getItems().value.map(i => { return{id:i.id, text:i.fullname}}));
     },
 
     count(){   return this.state.count();  },

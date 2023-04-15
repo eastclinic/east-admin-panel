@@ -1,12 +1,13 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
+import urlBuilder from '@/services/util/BuildUrlWithQueryParams.js';
 
 export default (() => ({
         ...UseRequestAdapters,
         _requestData : {},
-        async getReviews(requestData){
+        async getItems(requestData){
             let request = {method:'GET'}
-            let requestUrl = baseUrl + '/api/reviews';
+            let requestUrl = baseUrl + '/api/health/services';
             if(requestData.id){
                 requestUrl += '/'+requestData.id;
             }
@@ -15,15 +16,20 @@ export default (() => ({
 
                     // Create the URL with the parameters
                     //const queryParams = this._buildSearchParams(requestData);
-                    requestUrl = this._buildURL(requestUrl, requestData)
+                    requestUrl = urlBuilder._buildURL(requestUrl, requestData)
                     //requestUrl += '?'+queryParams;
                 }
             }
-            const res = await fetch(requestUrl, request);
-            if(!res) return {};
-            const data = await res.json()
-            if(!data || !data.items) return {};
-            return data;
+
+            try {
+                const res = await fetch(requestUrl, request);
+                if(!res) return {};
+                const data = await res.json()
+                if(!data || !data.items) return {};
+                return data;
+            }catch (e) {
+                console.log(e)
+            }
         },
     async saveReview( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}
@@ -34,7 +40,7 @@ export default (() => ({
                 'Content-Type': 'application/json'
             },
         };
-        let url = baseUrl + '/api/reviews';
+        let url = baseUrl + '/api/health/services';
         if(saveData.id ) {
             request['method'] = 'PUT';
             url += '/' + saveData.id;
@@ -58,27 +64,5 @@ export default (() => ({
 
 
     },
-    _buildSearchParams(params, prefix = '') {
-        let queryString = '';
-        for (const [key, value] of Object.entries(params)) {
-            const newPrefix = prefix ? `${prefix}[${key}]` : key;
-            if (value instanceof Object) {
-                queryString += this._buildSearchParams(value, newPrefix);
-            } else if (Array.isArray(value)) {
-                for (const item of value) {
-                    queryString += `${newPrefix}[]=${item}&`;
-                }
-            } else {
-                queryString += `${newPrefix}=${value}&`;
-            }
-        }
-        return (queryString.endsWith('&')) ? queryString.slice(0, -1) : queryString;
-    },
 
-    _buildURL(baseURL, params) {
-        const searchParams = this._buildSearchParams(params);
-        const url = new URL(baseURL);
-        url.search = searchParams;
-        return url.toString();
-    }
     }))();

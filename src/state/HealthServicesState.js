@@ -1,14 +1,11 @@
-import { reactive } from 'vue';
 
-import MultiStateManager from '../services/util/MultiStateManager.js'
+import MultiStateManager from '@/services/util/MultiStateManager.js'
 //init state
-const HealthServicesState = {
-    _state : reactive({}),
+const state = {
     ...MultiStateManager,
-
 };
-HealthServicesState.state();
+state.state();
 
 
 
-export default HealthServicesState;
+export default state;
