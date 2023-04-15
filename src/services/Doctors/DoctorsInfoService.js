@@ -1,21 +1,21 @@
 
-import reviewsState from '../../state/ReviewsState.js'
-import reviewsApi from '../../api/ReviewsApi'
+import doctorsState from '../../state/DoctorsState.js'
+import doctorsApi from '../../api/DoctorsApi'
 
 
 export default {
-    state: reviewsState,
+    state: doctorsState,
 
     //actions
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
-        if( requestAdapter )    reviewsApi.withRequestData(requestAdapter.toArray());
-        if( reviewsState.requestData() )  reviewsApi.withRequestData(reviewsState.requestData());
+        if( requestAdapter )    doctorsApi.withRequestData(requestAdapter.toArray());
+        if( doctorsState.requestData() )  doctorsApi.withRequestData(doctorsState.requestData());
 
-        const res = await reviewsApi.getReviews();
+        const res = await doctorsState.getReviews();
         if(Object.keys(res).length > 0 && res.items){
-            reviewsState.setItems(res.items);
+            doctorsState.setItems(res.items);
         }
         //todo handle error
         return this;
@@ -23,7 +23,7 @@ export default {
 
 
     //getters
-    doctors(condition){
+    items(condition){
         if( !condition ) return this.state.getItems();
     },
 

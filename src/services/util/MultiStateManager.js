@@ -3,6 +3,7 @@ import { ref, reactive, computed, toRef } from 'vue';
 export default (() => ({
     _stateName:'default',
     _requestData:{},
+    _state : reactive({}),
     //mutations
     setItems(items){
         if(!items)   return this;

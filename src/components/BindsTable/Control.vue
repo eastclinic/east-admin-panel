@@ -14,12 +14,18 @@
     </DataTable>
 </template>
 
-<script setup>
-    import { colData, rowData, bindsData } from './ControlData'
+<script lang="ts">
+    import  ControlData  from './ControlData'
 
-    import {  onBeforeMount } from 'vue';
-    //import EditDialog from "./EditDialog.vue";
-
+    export default {
+        props: {
+            columnsService: Object,
+            rowsService: Object
+        },
+        setup(props) {
+            return ControlData.setup(props);
+        },
+    };
 
 </script>
 

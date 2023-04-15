@@ -1,10 +1,9 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
-import BuildUrlWithQueryParams from '@/services/util/BuildUrlWithQueryParams.js';
+import urlBuilder from '@/services/util/BuildUrlWithQueryParams.js';
 
 export default (() => ({
         ...UseRequestAdapters,
-        ...BuildUrlWithQueryParams,
         _requestData : {},
         async getReviews(requestData){
             let request = {method:'GET'}
@@ -17,7 +16,7 @@ export default (() => ({
 
                     // Create the URL with the parameters
                     //const queryParams = this._buildSearchParams(requestData);
-                    requestUrl = this._buildURL(requestUrl, requestData)
+                    requestUrl = urlBuilder._buildURL(requestUrl, requestData)
                     //requestUrl += '?'+queryParams;
                 }
             }

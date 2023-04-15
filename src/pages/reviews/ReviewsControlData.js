@@ -1,7 +1,7 @@
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
-import ReviewsService from "../../services/Reviews/ReviewsService";
+import reviewsService from "../../services/Reviews/ReviewsService";
 import dataTableRequestAdapter from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
 import { ref, reactive } from 'vue';
@@ -25,7 +25,6 @@ export const representatives = ref([]);
 
 export const customerService = new CustomerService();
 
-const reviewsService = ReviewsService;
 export const reviews = reviewsService.reviews();
 export const count = reviewsService.count();
 export const countRows = 10;

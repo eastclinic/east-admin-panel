@@ -1,13 +1,19 @@
-<template>
-    <BindsTable></BindsTable>
-</template>
+
 
 <script setup>
+    import doctorsService from "@/services/Doctors/DoctorsInfoService";
 
-    import {  onBeforeMount } from 'vue';
     import BindsTable from "@/components/BindsTable/Control.vue";
 
 </script>
+
+<template>
+    <BindsTable
+            :columnsService="doctorsService"
+            :rowsService="doctorsService"
+    ></BindsTable>
+</template>
+
 
 <style scoped>
 
