@@ -4,10 +4,22 @@ import AppLayout from '@/layout/AppLayout.vue';
 const router = createRouter({
     history: createWebHashHistory(),
     routes: [
+
+
         {
             path: '/',
             component: AppLayout,
             children: [
+                {
+                    path: '/pages/reviews',
+                    name: 'ReviewsControl',
+                    component: () => import('@/pages/reviews/ReviewsControl.vue')
+                },
+                {
+                    path: '/doctors/info',
+                    name: 'DoctorsInfoControl',
+                    component: () => import('@/pages/doctors/info/Control.vue')
+                },
                 {
                     path: '/',
                     name: 'dashboard',
