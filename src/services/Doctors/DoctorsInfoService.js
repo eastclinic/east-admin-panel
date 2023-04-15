@@ -1,4 +1,4 @@
-
+import {toRaw, ref, computed} from "vue";
 import doctorsState from '../../state/DoctorsState.js'
 import doctorsApi from '../../api/DoctorsApi'
 
@@ -7,26 +7,46 @@ export default {
     state: doctorsState,
 
     //actions
-    //todo set definition requestAdapter type
-    async fetchServerData(requestAdapter){
+    async fetchServerData(requestData){
         //handle data from request adapters
-        if( requestAdapter )    doctorsApi.withRequestData(requestAdapter.toArray());
-        if( doctorsState.requestData() )  doctorsApi.withRequestData(doctorsState.requestData());
+        requestData = (requestData) ? requestData : {};
 
-        const res = await doctorsState.getReviews();
+        if( this.state.requestData() )  requestData = { ...requestData, ...doctorsState.requestData() };
+
+        const res = await doctorsApi.getItems(requestData);
         if(Object.keys(res).length > 0 && res.items){
-            doctorsState.setItems(res.items);
-        }
-        //todo handle error
-        return this;
-    },
+            //if simply refresh data from server run refreshItems()
+            if(requestData?.id || requestData?.ids){
+                doctorsState.refreshItems(res.items);
+            }else{
+                doctorsState.setItems(res.items);
+                doctorsState.setCount(res.count);
+            }
 
+        }
+
+
+
+        //todo handle error
+        return true;
+    },
 
     //getters
     items(condition){
         if( !condition ) return this.state.getItems();
     },
-
+    getItemsIdText(){
+        // const items = this.state.getItems();
+        // console.log(items)
+        // const arraySum = computed(() => {
+        //     if(items.value && items.value.length > 0){
+        //         console.log(items.value)
+        //         return items;
+        //     }else return items;
+        // });
+        //     console.log(arraySum)
+        return computed(() => this.state.getItems().value.map(i => { return{id:i.id, text:i.fullname}}));
+    },
 
 
 }

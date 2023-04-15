@@ -5,7 +5,7 @@ import urlBuilder from '@/services/util/BuildUrlWithQueryParams.js';
 export default (() => ({
         ...UseRequestAdapters,
         _requestData : {},
-        async getDoctors(requestData){
+        async getItems(requestData){
             let request = {method:'GET'}
             let requestUrl = baseUrl + '/api/doctors';
             if(requestData.id){
@@ -26,7 +26,7 @@ export default (() => ({
             if(!data || !data.items) return {};
             return data;
         },
-    async saveDoctor( saveData ){
+    async saveItem( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}
 
         let request = {

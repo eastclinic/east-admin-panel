@@ -1,16 +1,16 @@
 import {defineProps, ref, onMounted} from "vue";
+import dtRequest from "../../api/apiRequestAdapters/DataTableRequestAdapter";
+
 export default {
+    props: {
+        columnsService: {  type: Object,  required: true, },
+        rowsService: Object
+    },
     setup(props){
 
 
 
-        const colData = ref([
-            {id:1, text:'Абраменко А А'},
-            {id:2, text:'Хайдзан Чао'},
-            {id:3, text:'Митрофанов'},
-            {id:4, text:'Денисов'},
-            {id:5, text:'Симачевский'},
-        ]);
+
         const rowData = ref([
             {id:1, text:'Консультация психолога'},
             {id:2, text:'Остеопатия'},
@@ -18,7 +18,19 @@ export default {
             {id:4, text:'Консультация невролога'},
             {id:5, text:'Консультация вертебролога'},
         ]);
-        console.log(props)
+        //await props.columnsService.fetchServerData(dtRequest.dtEvent(e).requestData());
+        onMounted(async () => await props.columnsService.fetchServerData(dtRequest.requestData()))
+        const colData22 = ref([
+            {id:1, text:'Абраменко А А'},
+            {id:2, text:'Хайдзан Чао'},
+            {id:3, text:'Митрофанов'},
+            {id:4, text:'Денисов'},
+            {id:5, text:'Симачевский'},
+        ]);
+
+
+        const colData = ref(props.columnsService.getItemsIdText())
+        // console.log(cold2)
 
         const bindsData = ref({
             1:{  1:{id:1, unit:1, tag:1},   4:{id:14, unit:1, tag:4}, },
