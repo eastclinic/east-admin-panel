@@ -21,6 +21,11 @@ const router = createRouter({
                     component: () => import('@/pages/doctors/info/Control.vue')
                 },
                 {
+                    path: '/health/binds/doctors-services',
+                    name: 'BindsDoctorsServices',
+                    component: () => import('@/pages/health/binds/DoctorsServices.vue')
+                },
+                {
                     path: '/',
                     name: 'dashboard',
                     component: () => import('@/views/Dashboard.vue')

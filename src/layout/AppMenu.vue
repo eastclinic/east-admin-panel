@@ -19,16 +19,34 @@ const model = ref([
                 icon: 'pi pi-fw pi-sign-in',
                 to: '/doctors/info'
             },
-            {
-                label: 'Научные данные',
-                icon: 'pi pi-fw pi-times-circle',
-                to: '/doctor/science'
-            },
+            // {
+            //     label: 'Научные данные',
+            //     icon: 'pi pi-fw pi-times-circle',
+            //     to: '/doctor/science'
+            // },
 
         ]
     },
 
+    {
+        label: 'Health',
+        icon: 'pi pi-fw pi-heart',
+        to: '/health',
+        items: [
+            {
+                label: 'Привязки',
+                icon: 'pi pi-fw pi-arrows-v',
+                items: [
+                    {
+                        label: 'Доктор-Услуга',
+                        icon: 'pi pi-fw pi-sign-in',
+                        to: '/health/binds/doctors-services'
+                    },
+                ]
+            },
 
+        ]
+    },
 
     {
         label: 'Home',
