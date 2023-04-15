@@ -23,7 +23,7 @@ export default {
 
 
     //getters
-    reviews(condition){
+    doctors(condition){
         if( !condition ) return this.state.getItems();
     },
 

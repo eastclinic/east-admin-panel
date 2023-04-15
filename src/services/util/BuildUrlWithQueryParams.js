@@ -1,0 +1,25 @@
+export default (() => ({
+        _buildSearchParams(params, prefix = '') {
+                let queryString = '';
+                for (const [key, value] of Object.entries(params)) {
+                        const newPrefix = prefix ? `${prefix}[${key}]` : key;
+                        if (value instanceof Object) {
+                                queryString += this._buildSearchParams(value, newPrefix);
+                        } else if (Array.isArray(value)) {
+                                for (const item of value) {
+                                        queryString += `${newPrefix}[]=${item}&`;
+                                }
+                        } else {
+                                queryString += `${newPrefix}=${value}&`;
+                        }
+                }
+                return (queryString.endsWith('&')) ? queryString.slice(0, -1) : queryString;
+        },
+
+        _buildURL(baseURL, params) {
+                const searchParams = this._buildSearchParams(params);
+                const url = new URL(baseURL);
+                url.search = searchParams;
+                return url.toString();
+        }
+    }))();

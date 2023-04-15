@@ -6,9 +6,9 @@ export default (() => ({
         ...UseRequestAdapters,
         ...BuildUrlWithQueryParams,
         _requestData : {},
-        async getReviews(requestData){
+        async getDoctors(requestData){
             let request = {method:'GET'}
-            let requestUrl = baseUrl + '/api/reviews';
+            let requestUrl = baseUrl + '/api/doctors';
             if(requestData.id){
                 requestUrl += '/'+requestData.id;
             }
@@ -27,7 +27,7 @@ export default (() => ({
             if(!data || !data.items) return {};
             return data;
         },
-    async saveReview( saveData ){
+    async saveDoctor( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}
 
         let request = {
@@ -36,7 +36,7 @@ export default (() => ({
                 'Content-Type': 'application/json'
             },
         };
-        let url = baseUrl + '/api/reviews';
+        let url = baseUrl + '/api/doctors';
         if(saveData.id ) {
             request['method'] = 'PUT';
             url += '/' + saveData.id;
@@ -46,9 +46,6 @@ export default (() => ({
         }
         try {
             const res = await fetch(url, request);
-            console.log(request)
-            console.log(url)
-            console.log(res)
             //todo handle server error (500, 502 ...)
             if(!res) return {};
             return await res.json()
