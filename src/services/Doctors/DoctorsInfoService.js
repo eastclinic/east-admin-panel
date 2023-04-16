@@ -36,6 +36,7 @@ export default {
         if( !condition ) return this.state.getItems();
     },
     getItemsIdText(){
+        console.log(this.state.getItems())
         return computed(() => this.state.getItems().value.map(i => { return{id:i.id, text:i.fullname}}));
     },
 

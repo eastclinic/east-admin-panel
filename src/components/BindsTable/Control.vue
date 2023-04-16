@@ -1,4 +1,6 @@
 <template>
+    {{colData}}
+    {{rowData}}
     <DataTable :value="rowData" tableStyle="min-width: 50rem" >
 
         <Column field="text" header="Услуга" style="min-width: 12rem">

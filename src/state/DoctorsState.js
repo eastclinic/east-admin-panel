@@ -2,11 +2,10 @@
 
 import MultiStateManager from '@/services/util/MultiStateManager.js'
 //init state
-const state = {
+class DoctorsState extends MultiStateManager{
     //_state : reactive({}),
-    ...MultiStateManager,
-
-};
+}
+const state = new DoctorsState();
 state.state();
 
 

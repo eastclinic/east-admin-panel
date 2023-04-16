@@ -1,9 +1,10 @@
 
 import MultiStateManager from '@/services/util/MultiStateManager.js'
 //init state
-const state = {
-    ...MultiStateManager,
-};
+class HealthServicesState extends MultiStateManager{
+    //_state : reactive({}),
+}
+const state = new HealthServicesState();
 state.state();
 
 

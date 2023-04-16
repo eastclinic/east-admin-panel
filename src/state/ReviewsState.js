@@ -1,14 +1,12 @@
-import { reactive } from 'vue';
 
-import MultiStateManager from '../services/util/MultiStateManager.js'
+import MultiStateManager from '@/services/util/MultiStateManager.js'
 //init state
-const ReviewsState = {
-    _state : reactive({}),
-    ...MultiStateManager,
-
-};
-ReviewsState.state();
-
+class ReviewsState extends MultiStateManager{
+    //_state : reactive({}),
+}
+const state = new ReviewsState();
+state.state();
 
 
-export default ReviewsState;
+
+export default state;

@@ -45,7 +45,7 @@ export default (() =>({
             return this.state.getItems();
     },
     getItemsIdText(){
-        return computed(() => this.state.getItems().value.map(i => { return{id:i.id, text:i.fullname}}));
+        return computed(() => this.state.getItems().value.map(i => { return{id:i.id, text:i.name}}));
     },
 
     count(){   return this.state.count();  },
