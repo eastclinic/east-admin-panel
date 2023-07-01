@@ -31,6 +31,8 @@ export default {
         // console.log(props.columnsService)
         // console.log(props.rowsService)
 
+
+
         const bindsData = ref({
             1:{  1:{id:1, unit:1, tag:1},   4:{id:14, unit:1, tag:4}, },
             2:{
