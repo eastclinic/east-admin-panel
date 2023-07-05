@@ -89,7 +89,7 @@
 <script setup>
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
-    import AttachFiles from "@/pages/reviews/AttachFiles.vue";
+    import AttachFiles from "@/components/AttachFiles.vue";
     const props = defineProps({
         visible: Boolean,
         editData:Object
@@ -136,7 +136,7 @@
         if(Object.keys(attachFiles).length > 0) {
           editedData.attach = attachFiles;
         }
-
+        console.log({...editedData})
 
         return  await reviewsService.saveReview(editedData);
     }
