@@ -90,6 +90,7 @@
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
+    import FilesService from "../../services/Files/FilesService";
     const props = defineProps({
         visible: Boolean,
         editData:Object
@@ -114,8 +115,21 @@
         }
         dismissModal();
     };
-    const updateAttach = (files) => {
-      attachFiles = files;
+    const updateAttach = async (files) => {
+        const requestData = (editedData.id) ? {id : editedData.id} : {};
+        if(editedData.id) requestData.id = editedData.id;
+        //const res = await FilesService.filesUpload(files, requestData);
+
+        console.log(editedData)
+        // if(res.ok ) {
+        //     if(editedData.id){
+        //         //emit('updated:review', editedData.id);
+        //     }else{
+        //         //emit('created:review');
+        //     }
+        //
+        // }
+      // attachFiles = files;
     };
     const removeContent = (index) => {
       console.log('rem')
@@ -125,6 +139,8 @@
         //todo its may be wrong
         editedData = reactive({...toRaw(props.editData)});
     });
+
+
 
     const saveReview = async (editedData) => {
         if(props?.editData?.id) editedData.id = props.editData.id;

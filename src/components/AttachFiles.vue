@@ -1,5 +1,8 @@
 <script setup>
-import {defineEmits, defineProps, reactive, ref, watch} from 'vue';
+  import {defineEmits, defineProps, reactive, ref, toRaw, watch} from 'vue';
+
+
+
   const uploadInput = ref([]);
   const selectedFiles = reactive([]);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
@@ -9,14 +12,27 @@ import {defineEmits, defineProps, reactive, ref, watch} from 'vue';
   const clickOnUpload = () => {
     uploadInput.value.click();
   }
-  const handleFileUpload = (event) => {
-    const files = event.target.files;
 
-    for (let i = 0; i < files.length; i++) {
-      files[i].blobPath = URL.createObjectURL(files[i]);
-      selectedFiles.push(files[i]);
+
+  const updateReview = async () => {
+    const res = await saveReview(toRaw(editedData));
+
+
+    if(res.ok ) {
+      if(editedData.id){
+        emit('updated:review', editedData.id);
+      }else{
+        emit('created:review');
+      }
+
     }
-    emit('update:attachFiles', selectedFiles);
+    dismissModal();
+  };
+
+  const handleFilesUpload = async (event) => {
+    // const files = event.target.files;
+
+    emit('update:attachFiles', event.target.files);
     console.log(selectedFiles)
   };
   const removeFile = (index) => {
@@ -54,7 +70,7 @@ import {defineEmits, defineProps, reactive, ref, watch} from 'vue';
       </div>
 
 
-      <input style="display: none" ref="uploadInput" @change="handleFileUpload" type="file" accept="video/*, image/*" multiple />
+      <input style="display: none" ref="uploadInput" @change="handleFilesUpload" type="file" accept="video/*, image/*" multiple />
     </div>
     <div @click="clickOnUpload" class="attach-files__item add">
       <div  class="pi pi-upload upload-button"></div>
