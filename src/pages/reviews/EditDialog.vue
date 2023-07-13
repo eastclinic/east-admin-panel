@@ -116,9 +116,10 @@
         dismissModal();
     };
     const updateAttach = async (files) => {
-        const requestData = (editedData.id) ? {id : editedData.id} : {};
-        if(editedData.id) requestData.id = editedData.id;
-        //const res = await FilesService.filesUpload(files, requestData);
+        const requestData = (editedData.id) ? {id : editedData.id, contentable_type:'review'} : {};
+        const res = await ReviewsService.saveContent(files, requestData);
+        // const res = await FilesService.filesUpload(files);
+
 
         console.log(editedData)
         // if(res.ok ) {
@@ -154,7 +155,7 @@
         }
         console.log({...editedData})
 
-        return  await reviewsService.saveReview(editedData);
+        return  await ReviewsService.saveReview(editedData);
     }
     const showModal = async () =>{
         if(props?.editData?.is_new){

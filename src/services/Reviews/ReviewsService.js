@@ -1,6 +1,7 @@
 
 import reviewsState from '../../state/ReviewsState.js'
 import reviewsApi from '../../api/ReviewsApi'
+import FilesApi from "../../api/FilesApi";
 
 
 export default (() =>({
@@ -41,6 +42,11 @@ export default (() =>({
     //getters
     reviews(condition){
         if( !condition ) return this.state.getItems();
+    },
+
+    //actions
+    async saveContent( files, requestData ){
+        return  await reviewsApi.fileUpload( files, requestData );
     },
 
     count(){   return this.state.count();  },

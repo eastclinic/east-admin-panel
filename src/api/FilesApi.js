@@ -3,7 +3,7 @@ import baseUrl from '@/api/config.js';
 
 export default (() => ({
 
-    async fileUpload( fileList, requestData ){
+    async fileUpload( fileList ){
             if(!fileList || fileList.length === 0) return {}
         const formData = new FormData();
 
