@@ -111,7 +111,13 @@ export default (() => ({
 
 
     },
+    getContentUrl(){
+            return baseUrl + '/api/reviews/content';
+    },
 
+    getContentRequestMethod(){
+        return 'POST';
+    },
 
 
     }))();

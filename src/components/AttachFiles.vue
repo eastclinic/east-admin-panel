@@ -1,14 +1,28 @@
 <script setup>
   import {defineEmits, defineProps, reactive, ref, toRaw, watch} from 'vue';
+  import ReviewsService from "../services/Reviews/ReviewsService";
+  import FilesService from "../services/Files/FilesService";
 
 
 
   const uploadInput = ref([]);
-  const selectedFiles = reactive([]);
+  const selectedFiles = reactive({});
+  const uploadProgress = ref(null);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
   const props = defineProps({
-    files: Object
+    files: Object,
+    server:{
+      type: Object,
+      required: true,
+      validator: function (settings) {
+        if(!settings.url)  return false;
+
+        return true;
+      },
+    },
   });
+
+
   const clickOnUpload = () => {
     uploadInput.value.click();
   }
@@ -32,14 +46,48 @@
   const handleFilesUpload = async (event) => {
     // const files = event.target.files;
 
-    emit('update:attachFiles', event.target.files);
-    console.log(selectedFiles)
+    const filesSelected = event.target.files;
+    const files = event.target.files;
+
+    for (let i = 0; i < filesSelected.length; i++) {
+      filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
+      selectedFiles[filesSelected[i].blobPath] = filesSelected[i];
+
+    }
+    // console.log(selectedFiles)
+    const res = await FilesService.filesUpload(event.target.files, {
+      ...props.server,
+              onUploadProgress: fileId =>progressEvent => {
+
+                selectedFiles[fileId]['loadPersent'] = progressEvent.loaded * 100 / progressEvent.total;
+
+                console.log(selectedFiles[fileId])
+                // if (progressEvent.loaded === progressEvent.total) {
+                //   this.progress.current++
+                // }
+                // // save the individual file's progress percentage in object
+                // this.fileProgress[file.name] = progressEvent.loaded * 100 / progressEvent.total
+                // // sum up all file progress percentages to calculate the overall progress
+                // let totalPercent = this.fileProgress ? Object.values(this.fileProgress).reduce((sum, num) => sum + num, 0) : 0
+                // // divide the total percentage by the number of files
+                // this.progress.percent = parseInt(Math.round(totalPercent / this.progress.total))
+              }
+
+    }
+    )
+
+
+
+
+
+    //emit('update:attachFiles', event.target.files);
+
   };
   const removeFile = (index) => {
     const file = selectedFiles[index];
     URL.revokeObjectURL(file.blobPath);
     selectedFiles.splice(index, 1);
-    emit('update:attachFiles', selectedFiles);
+    //emit('update:attachFiles', selectedFiles);
   };
   const removeContent = (index) => {
     emit('delete:content', index);
@@ -55,18 +103,21 @@
     <div class="attach-files">
       <div v-for="(file, index) in files" class="attach-files__item thumb">
         <div @click="removeContent(index)" class="pi pi-times delete-button"></div>
-        <img v-if="/(jpg|png|jpeg|webp)$/.test(file.url)" :src="file.url"  :key="index">
+
+        <img v-if="/(jpg|png|jpeg|webp)$/.test(file.url)" :src="'http://127.0.0.1:8000'+file.url"  :key="index">
         <video height="100" v-if="/(mp4)$/.test(file.url)">
           <source :src="file.url">
         </video>
       </div>
       <div v-if="Object.keys(selectedFiles).length > 0" v-for="(file, index) in selectedFiles" class="attach-files__item thumb">
+
         <div @click="removeFile(index)" class="pi pi-times delete-button"></div>
-        <div class="pi pi-ellipsis-h load-button"></div>
+        <div class="pi pi-ellipsis-h load-button"> {{file.loadPersent}}</div>
         <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">
         <video height="100" v-if="file.type.startsWith('video')">
           <source :src="file.blobPath">
         </video>
+
       </div>
 
 

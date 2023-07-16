@@ -47,7 +47,7 @@
 <!--              </div>-->
 <!--          </div>-->
             <div class="col-12">
-              <AttachFiles :files="editedData.content" @delete:content="removeContent" @update:attachFiles="updateAttach"/>
+              <AttachFiles :files="editedData.content" @delete:content="removeContent" @update:attachFiles="updateAttach" :server="attachFilesServerSettings"/>
 <!--              <FileUpload  name="attach[]" :auto="true" :url="'./api/reviews/' + editedData.id" @upload="onUpload" :multiple="true" accept="video/*, image/*" >-->
 <!--                <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">-->
 <!--                  <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">-->
@@ -91,6 +91,8 @@
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
     import FilesService from "../../services/Files/FilesService";
+
+
     const props = defineProps({
         visible: Boolean,
         editData:Object
@@ -100,6 +102,14 @@
     let  editedData = reactive(props.editData);
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
+    const attachFilesServerSettings = computed(() => {return {
+        url:ReviewsService.getApiContentUrl(),
+            method : ReviewsService.getApiContentRequestMethod(),
+            requestData:{
+            id : props.editData.id,
+                contentable_type:'review'
+        }
+    }});
 
     const updateReview = async () => {
         const res = await saveReview(toRaw(editedData));

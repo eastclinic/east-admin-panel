@@ -5,8 +5,8 @@ import FilesApi from '../../api/FilesApi'
 export default (() =>({
 
     //actions
-    async filesUpload( files ){
-        return  await FilesApi.fileUpload( files );
+    async filesUpload( files, requestInfo ){
+        return  await FilesApi.fileUpload( files, requestInfo);
     },
 
 
