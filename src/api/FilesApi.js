@@ -21,18 +21,18 @@ export default (() => ({
         let data = {};
         try {
              await axios.request({
-                method: requestData.method,
+                method: 'POST',
                 url: requestData.url,
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
                 onUploadProgress: requestData.onUploadProgress
             }).then(response => {
-                if(response?.data?.data?.[0]) data = response.data.data[0];
+                if(response?.data?.data?.[0]) data.data = response.data.data[0];
                 //return response.data;
             })
                 .catch(error => {
                     if(error?.response?.data?.errors){
-                        data = error.response.data.errors;
+                        data.errors = error.response.data.errors;
                     }
                 });
 
@@ -48,4 +48,13 @@ export default (() => ({
 
 },
 
+    async fileDelete( id, requestData ){
+        axios.delete(requestData.url+'/'+id)
+            .then(() => {
+                // Optionally, emit an event or update the review list after successful deletion
+            })
+            .catch((error) => {
+                // Handle the error appropriately
+            });
+    }
     }))();

@@ -51,7 +51,6 @@ export default (() =>({
     },
 
     count(){   return this.state.count();  },
-    getApiContentUrl(){   return reviewsApi.getContentUrl();  },
-    getApiContentRequestMethod(){   return reviewsApi.getContentRequestMethod();  },
+    getApiContentUrl(){   return reviewsApi.contentUrl();  },
 
 }))();

@@ -22,6 +22,12 @@
     },
   });
 
+  const files2 = reactive({});
+  for (let i = 0; i < props.files.length; i++) {
+    selectedFiles[ props.files[i].id] = reactive({...props.files[i]})
+  }
+  console.log(files2)
+  FilesService.setRequestInfo(props.server);
 
   const clickOnUpload = () => {
     uploadInput.value.click();
@@ -50,43 +56,58 @@
     const files = event.target.files;
 
     for (let i = 0; i < filesSelected.length; i++) {
-      filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
+      //filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
+      //console.log(filesSelected[i])
       const fileId = filesSelected[i].blobPath;
-      selectedFiles[fileId] = reactive(filesSelected[i]);
-      selectedFiles[fileId]['loadPersent'] = ref(0);
-      selectedFiles[fileId]['errors'] = ref({});
-
+      selectedFiles[i] = reactive({
+        type: filesSelected[i].type,
+        blobPath: URL.createObjectURL(filesSelected[i]),
+        loadPersent: 0,
+        errors: {},
+        data:{},
+        id:0,
+        url:''
+      });
+    }
+    for (let i = 0; i < filesSelected.length; i++) {
       let res = await FilesService.fileUpload(filesSelected[i], {
         ...props.server,
         onUploadProgress:  progressEvent => {
           console.log(progressEvent)
-          selectedFiles[fileId]['loadPersent'].value = Math.round(progressEvent.loaded * 100 / progressEvent.total);
-          console.log(selectedFiles)
-          // save the individual file's progress percentage in object
-          // this.fileProgress[file.name] = progressEvent.loaded * 100 / progressEvent.total
-          // sum up all file progress percentages to calculate the overall progress
-          // let totalPercent = this.fileProgress ? Object.values(this.fileProgress).reduce((sum, num) => sum + num, 0) : 0
-          // // divide the total percentage by the number of files
-          // this.progress.percent = parseInt(Math.round(totalPercent / this.progress.total))
-          // uploadProgress.value =
+          selectedFiles[i].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+          //todo save all upload progress
         }
       })
-      console.log(res)
-
+      if(res.data && selectedFiles[i]){
+        selectedFiles[i].data = res.data
+        selectedFiles[i].data.id = res.data.id;
+        selectedFiles[i].data.url = res.data.url;
+      }else if(res.errors && selectedFiles[i]){
+        selectedFiles[i].errors = res.errors
+      }
 
     }
 
     console.log('all files upload!')
     //emit('update:attachFiles', event.target.files);
   }
-  const removeFile = (index) => {
-    const file = selectedFiles[index];
+  const  removeFile = async(file) => {
+
+    if(file.id){
+      await removeContent(file.id)
+    }
+
     URL.revokeObjectURL(file.blobPath);
-    selectedFiles.splice(index, 1);
+    //delete selectedFiles[index];
+    // selectedFiles.splice(index, 1);
     //emit('update:attachFiles', selectedFiles);
   };
-  const removeContent = (index) => {
-    emit('delete:content', index);
+  const  removeContent = async(id) => {
+    debugger
+    //await FilesService.fileDelete(id);
+    // debugger
+
+    //emit('delete:content', index);
   };
   watch(props.files, () => {
     // Обработка изменений в selectedFiles
@@ -98,22 +119,25 @@
   <div class="flex">
 
     <div class="attach-files">
-      <div v-for="(file, index) in files" class="attach-files__item thumb">
-        <div @click="removeContent(index)" class="pi pi-times delete-button"></div>
+<!--      <div v-for="(file, index) in files2" class="attach-files__item thumb">-->
+<!--        <div @click="removeFile(file)" class="pi pi-times delete-button"></div>-->
 
-        <img v-if="/(jpg|png|jpeg|webp)$/.test(file.url)" :src="'http://127.0.0.1:8000'+file.url"  :key="index">
-        <video height="100" v-if="/(mp4)$/.test(file.url)">
-          <source :src="file.url">
-        </video>
-      </div>
+<!--        <img v-if="/(jpg|png|jpeg|webp)$/.test(file.url)" :src="'http://127.0.0.1:8000'+file.url"  :key="index">-->
+<!--        <video height="100" v-if="/(mp4)$/.test(file.url)">-->
+<!--          <source :src="file.url">-->
+<!--        </video>-->
+<!--      </div>-->
       <div v-if="Object.keys(selectedFiles).length > 0" v-for="(file, index) in selectedFiles" class="attach-files__item thumb">
 
-        <div @click="removeFile(index)" class="pi pi-times delete-button"></div>
-        <div class="pi pi-ellipsis-h load-button"> {{file.loadPersent}}  {{file.errors}}</div>
-        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">
-        <video height="100" v-if="file.type.startsWith('video')">
-          <source :src="file.blobPath">
-        </video>
+        <div @click="removeFile(file)" class="pi pi-times delete-button"></div>
+        <div class="pi pi-ellipsis-h load-button"> </div>
+
+        <img :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index">
+
+<!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
+<!--        <video height="100" v-if="file.type.startsWith('video')">-->
+<!--          <source :src="file.blobPath">-->
+<!--        </video>-->
 
       </div>
 

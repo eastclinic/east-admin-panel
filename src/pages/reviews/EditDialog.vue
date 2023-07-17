@@ -104,7 +104,6 @@
     const reviewsService = ReviewsService;
     const attachFilesServerSettings = computed(() => {return {
         url:ReviewsService.getApiContentUrl(),
-            method : ReviewsService.getApiContentRequestMethod(),
             requestData:{
             id : props.editData.id,
                 contentable_type:'review'
