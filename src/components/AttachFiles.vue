@@ -51,26 +51,23 @@
 
     for (let i = 0; i < filesSelected.length; i++) {
       filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
-      selectedFiles[filesSelected[i].blobPath] = filesSelected[i];
-
+      selectedFiles[filesSelected[i].blobPath] = reactive(filesSelected[i]);
+      selectedFiles[filesSelected[i].blobPath]['loadPersent'] = ref(0);
     }
     // console.log(selectedFiles)
     const res = await FilesService.filesUpload(event.target.files, {
       ...props.server,
-              onUploadProgress: fileId =>progressEvent => {
+              onUploadProgress: fileId => progressEvent => {
 
-                selectedFiles[fileId]['loadPersent'] = progressEvent.loaded * 100 / progressEvent.total;
+                selectedFiles[fileId]['loadPersent'].value = Math.round(progressEvent.loaded * 100 / progressEvent.total);
 
-                console.log(selectedFiles[fileId])
-                // if (progressEvent.loaded === progressEvent.total) {
-                //   this.progress.current++
-                // }
-                // // save the individual file's progress percentage in object
+                // save the individual file's progress percentage in object
                 // this.fileProgress[file.name] = progressEvent.loaded * 100 / progressEvent.total
-                // // sum up all file progress percentages to calculate the overall progress
+                // sum up all file progress percentages to calculate the overall progress
                 // let totalPercent = this.fileProgress ? Object.values(this.fileProgress).reduce((sum, num) => sum + num, 0) : 0
                 // // divide the total percentage by the number of files
                 // this.progress.percent = parseInt(Math.round(totalPercent / this.progress.total))
+                // uploadProgress.value =
               }
 
     }
@@ -100,6 +97,7 @@
 
 <template>
   <div class="flex">
+
     <div class="attach-files">
       <div v-for="(file, index) in files" class="attach-files__item thumb">
         <div @click="removeContent(index)" class="pi pi-times delete-button"></div>
@@ -112,7 +110,7 @@
       <div v-if="Object.keys(selectedFiles).length > 0" v-for="(file, index) in selectedFiles" class="attach-files__item thumb">
 
         <div @click="removeFile(index)" class="pi pi-times delete-button"></div>
-        <div class="pi pi-ellipsis-h load-button"> {{file.loadPersent}}</div>
+        <div class="pi pi-ellipsis-h load-button">{{file.loadPersent}} </div>
         <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">
         <video height="100" v-if="file.type.startsWith('video')">
           <source :src="file.blobPath">
