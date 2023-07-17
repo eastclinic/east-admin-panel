@@ -51,35 +51,34 @@
 
     for (let i = 0; i < filesSelected.length; i++) {
       filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
-      selectedFiles[filesSelected[i].blobPath] = reactive(filesSelected[i]);
-      selectedFiles[filesSelected[i].blobPath]['loadPersent'] = ref(0);
+      const fileId = filesSelected[i].blobPath;
+      selectedFiles[fileId] = reactive(filesSelected[i]);
+      selectedFiles[fileId]['loadPersent'] = ref(0);
+      selectedFiles[fileId]['errors'] = ref({});
+
+      let res = await FilesService.fileUpload(filesSelected[i], {
+        ...props.server,
+        onUploadProgress:  progressEvent => {
+          console.log(progressEvent)
+          selectedFiles[fileId]['loadPersent'].value = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+          console.log(selectedFiles)
+          // save the individual file's progress percentage in object
+          // this.fileProgress[file.name] = progressEvent.loaded * 100 / progressEvent.total
+          // sum up all file progress percentages to calculate the overall progress
+          // let totalPercent = this.fileProgress ? Object.values(this.fileProgress).reduce((sum, num) => sum + num, 0) : 0
+          // // divide the total percentage by the number of files
+          // this.progress.percent = parseInt(Math.round(totalPercent / this.progress.total))
+          // uploadProgress.value =
+        }
+      })
+      console.log(res)
+
+
     }
-    // console.log(selectedFiles)
-    const res = await FilesService.filesUpload(event.target.files, {
-      ...props.server,
-              onUploadProgress: fileId => progressEvent => {
 
-                selectedFiles[fileId]['loadPersent'].value = Math.round(progressEvent.loaded * 100 / progressEvent.total);
-
-                // save the individual file's progress percentage in object
-                // this.fileProgress[file.name] = progressEvent.loaded * 100 / progressEvent.total
-                // sum up all file progress percentages to calculate the overall progress
-                // let totalPercent = this.fileProgress ? Object.values(this.fileProgress).reduce((sum, num) => sum + num, 0) : 0
-                // // divide the total percentage by the number of files
-                // this.progress.percent = parseInt(Math.round(totalPercent / this.progress.total))
-                // uploadProgress.value =
-              }
-
-    }
-    )
-
-
-
-
-
+    console.log('all files upload!')
     //emit('update:attachFiles', event.target.files);
-
-  };
+  }
   const removeFile = (index) => {
     const file = selectedFiles[index];
     URL.revokeObjectURL(file.blobPath);
@@ -110,7 +109,7 @@
       <div v-if="Object.keys(selectedFiles).length > 0" v-for="(file, index) in selectedFiles" class="attach-files__item thumb">
 
         <div @click="removeFile(index)" class="pi pi-times delete-button"></div>
-        <div class="pi pi-ellipsis-h load-button">{{file.loadPersent}} </div>
+        <div class="pi pi-ellipsis-h load-button"> {{file.loadPersent}}  {{file.errors}}</div>
         <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">
         <video height="100" v-if="file.type.startsWith('video')">
           <source :src="file.blobPath">

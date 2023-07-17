@@ -5,42 +5,44 @@ axios
 
 export default (() => ({
 
-    async fileUpload( fileList, requestData ){
-    if(!fileList || fileList.length === 0) return {}
+    async fileUpload( file, requestData ){
+    //if(!fileList || fileList.length === 0) return {}
 
-
-
-    for (let i = 0; i < fileList.length; i++) {
-        // console.log(fileList[i])
+// console.log(fileList[i])
         const formData = new FormData();
-        formData.append('files[]', fileList[i]);
+        formData.append('files[]', file);
 
-    if(requestData.requestData){
-        Object.keys(requestData.requestData).forEach((field)=>{
-            formData.append(field, requestData.requestData[field]);
-        });
-    }
-
-
-    try {
-        axios.request({
-            method: requestData.method,
-            url: requestData.url,
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" },
-            onUploadProgress: requestData.onUploadProgress(fileList[i].blobPath)
-        })  .then(response => {
-            return response.data;
-        })
-            .catch(error => {
-                console.error(error);
+        if(requestData.requestData){
+            Object.keys(requestData.requestData).forEach((field)=>{
+                formData.append(field, requestData.requestData[field]);
             });
+        }
 
-    } catch (error) {
-        // code to handle the error
-        console.log("An error occurred:", error.message);
-    }
-    }
+        let data = {};
+        try {
+             await axios.request({
+                method: requestData.method,
+                url: requestData.url,
+                data: formData,
+                headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress: requestData.onUploadProgress
+            }).then(response => {
+                if(response?.data?.data?.[0]) data = response.data.data[0];
+                //return response.data;
+            })
+                .catch(error => {
+                    if(error?.response?.data?.errors){
+                        data = error.response.data.errors;
+                    }
+                });
+
+             return data;
+
+        } catch (error) {
+            // code to handle the error
+            console.log("An error occurred:", error.message);
+        }
+
     return {};
 
 
