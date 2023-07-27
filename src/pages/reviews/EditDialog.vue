@@ -48,23 +48,7 @@
 <!--          </div>-->
             <div class="col-12">
               <AttachFiles :files="editedData.content" @delete:content="removeContent" @update:attachFiles="updateAttach" :server="attachFilesServerSettings"/>
-<!--              <FileUpload  name="attach[]" :auto="true" :url="'./api/reviews/' + editedData.id" @upload="onUpload" :multiple="true" accept="video/*, image/*" >-->
-<!--                <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">-->
-<!--                  <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">-->
-<!--                    <div class="flex gap-2">-->
-<!--                      <Button style="width: 42px" @click="chooseCallback()" icon="pi pi-images" rounded outlined></Button>-->
-<!--                      <Button style="width: 42px" @click="uploadEvent(uploadCallback, files)" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>-->
-<!--                      <Button style="width: 42px" @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>-->
-<!--                    </div>-->
-<!--&lt;!&ndash;                    <ProgressBar :value="totalSizePercent" :showValue="false" :class="['md:w-20rem h-1rem w-full md:ml-auto', { 'exceeded-progress-bar': totalSizePercent > 100 }]"&ndash;&gt;-->
-<!--&lt;!&ndash;                    ><span class="white-space-nowrap">{{ totalSize }}B / 1Mb</span></ProgressBar&ndash;&gt;-->
-<!--&lt;!&ndash;                    >&ndash;&gt;-->
-<!--                  </div>-->
-<!--                </template>-->
-<!--                <template #empty>-->
-<!--                  <p>Drag and drop files to here to upload.</p>-->
-<!--                </template>-->
-<!--              </FileUpload>-->
+
             </div>
             <div class="col-12">
                 <Textarea v-model="editedData.text" rows="5" autoResize  />

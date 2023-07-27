@@ -2,7 +2,10 @@
   import {defineEmits, defineProps, reactive, ref, toRaw, watch} from 'vue';
   import ReviewsService from "../services/Reviews/ReviewsService";
   import FilesService from "../services/Files/FilesService";
+  import toastService from '../services/Toast'
+  import { useToast } from 'primevue/usetoast';
 
+  const toast = useToast();
 
 
   const uploadInput = ref([]);
@@ -78,13 +81,28 @@
           //todo save all upload progress
         }
       })
+
       if(res.data && selectedFiles[i]){
         selectedFiles[i].data = res.data
         selectedFiles[i].data.id = res.data.id;
         selectedFiles[i].data.url = res.data.url;
+
+          toastService.duration(3000).success('Load image', 'Файл загружен')
       }else if(res.errors && selectedFiles[i]){
-        selectedFiles[i].errors = res.errors
+          // selectedFiles[i].errors = [];
+          for ( const error in res.errors){
+              if(Array.isArray(res.errors[error])){
+                  for ( const key in res.errors[error]){
+                      toastService.duration(5000).error('Load image', res.errors[error][key])
+                  }
+
+              }
+          }
+          delete selectedFiles[i];
+
       }
+
+        //console.log(selectedFiles)
 
     }
 
@@ -128,7 +146,6 @@
 <!--        </video>-->
 <!--      </div>-->
       <div v-if="Object.keys(selectedFiles).length > 0" v-for="(file, index) in selectedFiles" class="attach-files__item thumb">
-
         <div @click="removeFile(file)" class="pi pi-times delete-button"></div>
         <div class="pi pi-ellipsis-h load-button"> </div>
 
@@ -191,8 +208,8 @@
       }
     }
     &__item {
-      width: 100px;
-      height: 100px;
+      width: 240px;
+      height: 240px;
       position: relative;
       display: flex;
       flex-shrink: 0;
