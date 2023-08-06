@@ -86,11 +86,12 @@
     let  editedData = reactive(props.editData);
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
+    //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
+
     const attachFilesServerSettings = computed(() => {return {
         url:ReviewsService.getApiContentUrl(),
             requestData:{
-            id : props.editData.id,
-                contentable_type:'review'
+                reviewId : (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000,
         }
     }});
 
