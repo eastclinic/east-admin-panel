@@ -91,7 +91,7 @@
     const attachFilesServerSettings = computed(() => {return {
         url:ReviewsService.getApiContentUrl(),
             requestData:{
-                reviewId : (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000,
+                reviewId : (props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
         }
     }});
 
