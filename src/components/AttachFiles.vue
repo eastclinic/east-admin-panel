@@ -80,7 +80,7 @@
 
               }
           }
-          delete uploadFiles[i];
+          attachFiles.value.splice(aIndex, 1);
       }
     }
 
@@ -89,14 +89,9 @@
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
-      console.log([...attachFiles.value]);
-      const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
-      console.log(i)
+      const i = attachFiles.value.findIndex(aFile => aFile.id === id)
       if(i === -1) return false;
       attachFiles.value.splice(i, 1);
-      console.log(file)
-      console.log([...attachFiles.value]);
-
       const res = await FilesService.fileDelete(file);
       if(res && res.ok && res.message){
 
