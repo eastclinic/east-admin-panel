@@ -9,7 +9,7 @@
 
 
   const uploadInput = ref([]);
-  const selectedFiles = reactive({});
+  let attachFiles = ref([]);
   const uploadProgress = ref(null);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
   const props = defineProps({
@@ -27,7 +27,7 @@
   });
 
   for (let i = 0; i < props.files.length; i++) {
-    selectedFiles[ i ] = reactive({...props.files[i]})
+      attachFiles.value.push(reactive({...props.files[i]}));
   }
   FilesService.setRequestInfo(props.server);
 
@@ -38,40 +38,40 @@
   const handleFilesUpload = async (event) => {
     // const files = event.target.files;
 
-    const filesSelected = event.target.files;
-    const files = event.target.files;
+    const uploadFiles = event.target.files;
 
-    for (let i = 0; i < filesSelected.length; i++) {
+    for (let i = 0; i < uploadFiles.length; i++) {
       //filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
       //console.log(filesSelected[i])
-      const fileId = filesSelected[i].blobPath;
-      selectedFiles[i] = reactive({
-        type: filesSelected[i].type,
-        blobPath: URL.createObjectURL(filesSelected[i]),
+      const fileId = uploadFiles[i].blobPath;
+      // const idTemp = Math.random().toString(36).substring(2,7);
+      attachFiles.value.push( reactive({
+        type: uploadFiles[i].type,
+        blobPath: URL.createObjectURL(uploadFiles[i]),  //temp path for show image
         loadPersent: 0,
         errors: {},
         data:{},
-        id:0,
+        id:0,   //random temp id
         url:''
-      });
+      }));
+        uploadFiles[i].attachFileIndex = attachFiles.value.length-1;
     }
-    for (let i = 0; i < filesSelected.length; i++) {
-      let res = await FilesService.fileUpload(filesSelected[i], {
+    for ( const i in uploadFiles ) {
+      let aIndex =  uploadFiles[i].attachFileIndex;
+      if(!attachFiles.value[aIndex]) continue;
+      let res = await FilesService.fileUpload(uploadFiles[i], {
         onUploadProgress:  progressEvent => {
-          console.log(progressEvent)
-          selectedFiles[i].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+            attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
           //todo save all upload progress
         }
       })
 
-      if(res.data && selectedFiles[i]){
-        selectedFiles[i].data = res.data
-        selectedFiles[i].id = res.data.id;
-        selectedFiles[i].url = res.data.url;
-
+      if(res.data ){
+          attachFiles.value[aIndex].data = res.data
+          attachFiles.value[aIndex].id = res.data.id;
+          attachFiles.value[aIndex].url = res.data.url;
           toastService.duration(3000).success('Load image', 'Файл загружен')
-      }else if(res.errors && selectedFiles[i]){
-          // selectedFiles[i].errors = [];
+      }else if(res.errors ){
           for ( const error in res.errors){
               if(Array.isArray(res.errors[error])){
                   for ( const key in res.errors[error]){
@@ -80,51 +80,43 @@
 
               }
           }
-          delete selectedFiles[i];
-
+          delete uploadFiles[i];
       }
-
-        console.log(selectedFiles[i])
-
     }
 
     console.log('all files upload!')
     //emit('update:attachFiles', event.target.files);
   }
   const  removeFile = async(file) => {
-      if( file.id){
-          let removedFile = null;
-          for(const key in selectedFiles){
-              if( selectedFiles[key]['id'] === file.id ){
-                  removedFile = selectedFiles[key];
-                  delete selectedFiles[key];
-                  break;
-              }
-          }
-
-          //save removed file, for use if we need
-          if(removedFile){
-              console.log(removedFile)
-          }
-          await removeContent(file)
-      }
-      emit('delete:content', file);
-  };
-  const  removeContent = async(file) => {
       if(!file.id)  return false;
+      console.log([...attachFiles.value]);
+      const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
+      console.log(i)
+      if(i === -1) return false;
+      attachFiles.value.splice(i, 1);
+      console.log(file)
+      console.log([...attachFiles.value]);
 
-    const res = await FilesService.fileDelete(file);
-    if(res && res.ok && res.message){
-        toastService.success('Удаление файла', res.message)
-        return true;
+      const res = await FilesService.fileDelete(file);
+      if(res && res.ok && res.message){
 
-    }
+          toastService.success('Удаление файла', res.message)
+          return true;
 
+      }
+      // emit('delete:content', file);
   };
+
   watch(props.files, () => {
     // Обработка изменений в selectedFiles
     console.log(props.files);
   });
+  //
+  // const files = computed(() => {
+  //     console.log(attachFiles)
+  //     return attachFiles.reverse()
+  // });
+
 </script>
 
 <template>
@@ -139,8 +131,9 @@
 <!--          <source :src="file.url">-->
 <!--        </video>-->
 <!--      </div>-->
-      <div v-if="Object.keys(selectedFiles).length > 0" v-for="(file, index) in selectedFiles" class="attach-files__item thumb">
-        <div @click="removeFile(file)" class="pi pi-times delete-button"></div>
+
+      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb">
+        <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
         <div class="pi pi-ellipsis-h load-button"> </div>
 
         <img :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index">

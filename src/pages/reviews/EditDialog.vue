@@ -53,8 +53,7 @@
                            :server="{
                                url:ReviewsService.getApiContentUrl(),
                                requestData:{
-                                   id : props.editData.id
-                               , contentable_type:'review'}}"
+                                   reviewId : props.editData.id   }}"
               />
 
             </div>
