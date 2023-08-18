@@ -17,6 +17,7 @@
     server:{
       type: Object,
       required: true,
+        default:{},
       validator: function (settings) {
         if(!settings.url)  return false;
 
@@ -25,32 +26,14 @@
     },
   });
 
-  const files2 = reactive({});
   for (let i = 0; i < props.files.length; i++) {
-    selectedFiles[ props.files[i].id] = reactive({...props.files[i]})
+    selectedFiles[ i ] = reactive({...props.files[i]})
   }
-  console.log(files2)
   FilesService.setRequestInfo(props.server);
 
   const clickOnUpload = () => {
     uploadInput.value.click();
   }
-
-
-  const updateReview = async () => {
-    const res = await saveReview(toRaw(editedData));
-
-
-    if(res.ok ) {
-      if(editedData.id){
-        emit('updated:review', editedData.id);
-      }else{
-        emit('created:review');
-      }
-
-    }
-    dismissModal();
-  };
 
   const handleFilesUpload = async (event) => {
     // const files = event.target.files;
@@ -74,7 +57,6 @@
     }
     for (let i = 0; i < filesSelected.length; i++) {
       let res = await FilesService.fileUpload(filesSelected[i], {
-        ...props.server,
         onUploadProgress:  progressEvent => {
           console.log(progressEvent)
           selectedFiles[i].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
@@ -84,8 +66,8 @@
 
       if(res.data && selectedFiles[i]){
         selectedFiles[i].data = res.data
-        selectedFiles[i].data.id = res.data.id;
-        selectedFiles[i].data.url = res.data.url;
+        selectedFiles[i].id = res.data.id;
+        selectedFiles[i].url = res.data.url;
 
           toastService.duration(3000).success('Load image', 'Файл загружен')
       }else if(res.errors && selectedFiles[i]){
@@ -102,7 +84,7 @@
 
       }
 
-        //console.log(selectedFiles)
+        console.log(selectedFiles[i])
 
     }
 
@@ -110,22 +92,34 @@
     //emit('update:attachFiles', event.target.files);
   }
   const  removeFile = async(file) => {
+      if( file.id){
+          let removedFile = null;
+          for(const key in selectedFiles){
+              if( selectedFiles[key]['id'] === file.id ){
+                  removedFile = selectedFiles[key];
+                  delete selectedFiles[key];
+                  break;
+              }
+          }
 
-    if(file.id){
-      await removeContent(file.id)
+          //save removed file, for use if we need
+          if(removedFile){
+              console.log(removedFile)
+          }
+          await removeContent(file)
+      }
+      emit('delete:content', file);
+  };
+  const  removeContent = async(file) => {
+      if(!file.id)  return false;
+
+    const res = await FilesService.fileDelete(file);
+    if(res && res.ok && res.message){
+        toastService.success('Удаление файла', res.message)
+        return true;
+
     }
 
-    URL.revokeObjectURL(file.blobPath);
-    //delete selectedFiles[index];
-    // selectedFiles.splice(index, 1);
-    //emit('update:attachFiles', selectedFiles);
-  };
-  const  removeContent = async(id) => {
-    debugger
-    //await FilesService.fileDelete(id);
-    // debugger
-
-    //emit('delete:content', index);
   };
   watch(props.files, () => {
     // Обработка изменений в selectedFiles

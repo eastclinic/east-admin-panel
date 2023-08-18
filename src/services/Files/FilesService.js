@@ -11,12 +11,12 @@ export default (() =>({
     },
 
 
-    async fileDelete( id ){
-        return  await FilesApi.fileDelete( id, this.requestInfo);
+    async fileDelete( file ){
+        return  await FilesApi.fileDelete( file, this.requestInfo);
     },
 
     setRequestInfo(requestInfo){
-        this.requestInfo = requestInfo;
+        this.requestInfo = {...this.requestInfo, ...requestInfo};
         return this;
     },
 

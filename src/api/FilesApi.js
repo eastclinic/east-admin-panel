@@ -1,6 +1,5 @@
 import baseUrl from '@/api/config.js';
 import axios from "axios";
-axios
 
 
 export default (() => ({
@@ -48,13 +47,12 @@ export default (() => ({
 
 },
 
-    async fileDelete( id, requestData ){
-        axios.delete(requestData.url+'/'+id)
-            .then(() => {
-                // Optionally, emit an event or update the review list after successful deletion
-            })
-            .catch((error) => {
-                // Handle the error appropriately
-            });
+    async fileDelete( file, requestData ){
+        if(!file.id) return {};
+        const res =  await fetch(requestData.url+'/'+file.id, {
+            method:'DELETE'
+        });
+        if(!res) return {};
+        return  await res.json()
     }
     }))();

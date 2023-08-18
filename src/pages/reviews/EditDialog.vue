@@ -47,7 +47,15 @@
 <!--              </div>-->
 <!--          </div>-->
             <div class="col-12">
-              <AttachFiles :files="editedData.content" @delete:content="removeContent" @update:attachFiles="updateAttach" :server="attachFilesServerSettings"/>
+              <AttachFiles :files="editedData.content"
+                           @delete:content="removeContent"
+                           @update:attachFiles="updateAttach"
+                           :server="{
+                               url:ReviewsService.getApiContentUrl(),
+                               requestData:{
+                                   id : props.editData.id
+                               , contentable_type:'review'}}"
+              />
 
             </div>
             <div class="col-12">

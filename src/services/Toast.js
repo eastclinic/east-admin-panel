@@ -9,7 +9,6 @@ export default {
         app.config.globalProperties.$toast.add({severity: ToastSeverity.INFO, summary: title, detail: body, life: this.lifeTime});
     },
     error(title, body){
-        console.log('error')
         app.config.globalProperties.$toast.add({severity: ToastSeverity.ERROR, summary: title, detail: body, life: this.lifeTime});
     },
     warning(title, body) {
