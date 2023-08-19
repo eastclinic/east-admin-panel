@@ -85,11 +85,11 @@
     }
 
     console.log('all files upload!')
-    //emit('update:attachFiles', event.target.files);
+    emit('update:attachFiles', selectedFiles);
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
-      const i = attachFiles.value.findIndex(aFile => aFile.id === id)
+      const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
       if(i === -1) return false;
       attachFiles.value.splice(i, 1);
       const res = await FilesService.fileDelete(file);

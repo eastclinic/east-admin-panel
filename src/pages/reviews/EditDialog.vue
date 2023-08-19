@@ -118,7 +118,10 @@
     };
     const updateAttach = async (files) => {
         const requestData = (editedData.id) ? {id : editedData.id, contentable_type:'review'} : {};
-        const res = await ReviewsService.saveContent(files, requestData);
+
+
+        console.log(files)
+        //const res = await ReviewsService.saveContent(files, requestData);
         // const res = await FilesService.filesUpload(files);
 
 
