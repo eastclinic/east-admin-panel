@@ -85,7 +85,7 @@
     }
 
     console.log('all files upload!')
-    //emit('update:attachFiles', event.target.files);
+    emit('update:attachFiles', selectedFiles);
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
