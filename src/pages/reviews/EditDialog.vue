@@ -1,4 +1,5 @@
 <template>
+    <ConfirmDialog></ConfirmDialog>
     <Dialog :visible="props.visible" modal
             :header="header"
             :style="{ width: '50vw' }"
@@ -8,7 +9,6 @@
             @show="showModal"
             @hide="editedData = {}"
     >
-        {{editedData}}
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -64,7 +64,7 @@
                 <Button label="Сохранить" text :raised="true" @click="updateReview"/>
             </div>
             <div class="col-12  lg:col-6 ">
-                <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="emit('update:visible', false)"/>
+                <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
             </div>
 <!--          <div class="col-12  lg:col-6 ">-->
 <!--            <img v-for="item in props.editData.content" :src="item.url">-->
@@ -78,19 +78,29 @@
 </template>
 
 <script setup>
+
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
     import FilesService from "../../services/Files/FilesService";
+    import { useConfirm } from "primevue/useconfirm";
+    import toastService from '@/services/Toast'
+    import { useToast } from 'primevue/usetoast';
+
+    const toast = useToast();
 
 
+
+    const confirm = useConfirm();
     const props = defineProps({
         visible: Boolean,
         editData:Object
     })
-    let attachFiles = {};
+    const dataUpdated = ref(false);
+
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
     let  editedData = reactive(props.editData);
+    let attachFiles = ref([]);
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
     //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
@@ -103,41 +113,33 @@
     }});
 
     const updateReview = async () => {
-        const res = await saveReview(toRaw(editedData));
 
 
-        if(res.ok ) {
-            if(editedData.id){
-            emit('updated:review', editedData.id);
-        }else{
-            emit('created:review');
-        }
 
+        if(JSON.stringify(editedData) !== JSON.stringify(props.editData) || dataUpdated.value){
+            const res = await saveReview(toRaw(editedData));
+            if(res.ok ) {
+                if(editedData.id){
+                    toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
+                    emit('updated:review', editedData.id);
+
+                }else{
+                    toastService.duration(3000).success('Отзыв', 'Отзыв создан')
+                    emit('created:review');
+                }
+
+            }
+            dataUpdated.value = false;
         }
         dismissModal();
     };
     const updateAttach = async (files) => {
-        const requestData = (editedData.id) ? {id : editedData.id, contentable_type:'review'} : {};
-
-
         console.log(files)
-        //const res = await ReviewsService.saveContent(files, requestData);
-        // const res = await FilesService.filesUpload(files);
+        attachFiles.value = files;
+        dataUpdated.value = true;
 
-
-        console.log(editedData)
-        // if(res.ok ) {
-        //     if(editedData.id){
-        //         //emit('updated:review', editedData.id);
-        //     }else{
-        //         //emit('created:review');
-        //     }
-        //
-        // }
-      // attachFiles = files;
     };
     const removeContent = (index) => {
-      console.log('rem')
       editedData.content.splice(index, 1);
     };
     onBeforeUpdate(()=>{
@@ -154,10 +156,7 @@
             if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
             if(!editedData.reviewable_id) editedData.reviewable_id = 3;
         }
-        if(Object.keys(attachFiles).length > 0) {
-          editedData.attach = attachFiles;
-        }
-        console.log({...editedData})
+        editedData.content = toRaw( attachFiles.value );
 
         return  await ReviewsService.saveReview(editedData);
     }
@@ -169,11 +168,24 @@
         }
     }
     const dismissModal = () => {
-        // editedData = {};
-        emit('update:visible', false)
+        if(dataUpdated.value) {
+            confirm.require({
+                message: 'Закрыть диалог и отменить изменения?',
+                header: 'Отмена',
+                icon: 'pi pi-exclamation-triangle',
+                accept: () => {
+                    emit('update:visible', false);
+                },
+                reject: () => {         }
+            });
+        }else{ emit('update:visible', false);}
+    };
+
+
+    const confirmDiscardChangeData = () => {
 
     };
-    const value1 = ref(42723);
+
 
 </script>
 

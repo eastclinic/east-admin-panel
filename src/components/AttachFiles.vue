@@ -67,9 +67,10 @@
       })
 
       if(res.data ){
-          attachFiles.value[aIndex].data = res.data
-          attachFiles.value[aIndex].id = res.data.id;
-          attachFiles.value[aIndex].url = res.data.url;
+          attachFiles.value[aIndex] = {...res.data}
+          // attachFiles.value[aIndex].data = res.data
+          // attachFiles.value[aIndex].id = res.data.id;
+          // attachFiles.value[aIndex].url = res.data.url;
           toastService.duration(3000).success('Load image', 'Файл загружен')
       }else if(res.errors ){
           for ( const error in res.errors){
@@ -85,22 +86,31 @@
     }
 
     console.log('all files upload!')
-    emit('update:attachFiles', selectedFiles);
+    emit('update:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
       const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
       if(i === -1) return false;
-      attachFiles.value.splice(i, 1);
-      const res = await FilesService.fileDelete(file);
-      if(res && res.ok && res.message){
+      //if file.confirm ===  1 temporally deactivate file only on front
 
-          toastService.success('Удаление файла', res.message)
-          return true;
+      if(!file.confirm){
+          attachFiles.value.splice(i, 1);
+          const res = await FilesService.fileDelete(file);
+          if(res && res.ok && res.message){
+              toastService.success('Удаление файла', res.message)
+              return true;
+          }
 
+      }else{
+          attachFiles.value[i].isDeleted = true;
+          emit('update:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
       }
       // emit('delete:content', file);
   };
+  const fileDeleted = (file) =>{
+      return (file.isDeleted) ? {opacity:0.3}:{}
+  }
 
   watch(props.files, () => {
     // Обработка изменений в selectedFiles
@@ -131,7 +141,7 @@
         <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
         <div class="pi pi-ellipsis-h load-button"> </div>
 
-        <img :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index">
+        <img :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
 <!--        <video height="100" v-if="file.type.startsWith('video')">-->
