@@ -25,10 +25,12 @@
       },
     },
   });
+if(props.files?.length > 0){
+    for (let i = 0; i < props.files.length; i++) {
+        attachFiles.value.push(reactive({...props.files[i]}));
+    }
+}
 
-  for (let i = 0; i < props.files.length; i++) {
-      attachFiles.value.push(reactive({...props.files[i]}));
-  }
   FilesService.setRequestInfo(props.server);
 
   const clickOnUpload = () => {

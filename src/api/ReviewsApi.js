@@ -44,9 +44,6 @@ export default (() => ({
         }
         try {
             const res = await fetch(url, request);
-            console.log(request)
-            console.log(url)
-            console.log(res)
             //todo handle server error (500, 502 ...)
             if(!res) return {};
             return await res.json()

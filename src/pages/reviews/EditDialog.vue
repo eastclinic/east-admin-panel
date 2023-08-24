@@ -9,7 +9,6 @@
             @show="showModal"
             @hide="editedData = {}"
     >
-        {{editedData}}
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -48,13 +47,11 @@
 <!--              </div>-->
 <!--          </div>-->
             <div class="col-12">
-              <AttachFiles :files="editedData.content"
+              <AttachFiles
+                      :files="editedData.content"
                            @delete:content="removeContent"
                            @update:attachFiles="updateAttach"
-                           :server="{
-                               url:ReviewsService.getApiContentUrl(),
-                               requestData:{
-                                   reviewId : props.editData.id   }}"
+                           :server="attachFilesServerSettings"
               />
 
             </div>
@@ -62,7 +59,7 @@
                 <Textarea v-model="editedData.text" rows="5" autoResize  />
             </div>
             <div class="col-12  lg:col-6 ">
-                <Button label="Сохранить" text :raised="true" @click="updateReview"/>
+                <Button label="Сохранить" text :raised="true" @click="saveReview"/>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
@@ -105,6 +102,7 @@
     const reviewsService = ReviewsService;
     //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
 
+    const tempReviewId = computed(()=> (props.editData?.id) ? props.editData.id : Math.floor(Math.random() + Date.now() / 1000 | 0))
     const attachFilesServerSettings = computed(() => {return {
         url:ReviewsService.getApiContentUrl(),
             requestData:{
@@ -112,12 +110,12 @@
         }
     }});
 
-    const updateReview = async () => {
+    const saveReview = async () => {
 
 
 
         if(JSON.stringify(editedData) !== JSON.stringify(props.editData)){
-            const res = await saveReview(toRaw(editedData));
+            const res = await saveReviewToServer(toRaw(editedData));
             if(res.ok ) {
                 if(editedData.id){
                     toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
@@ -148,12 +146,13 @@
 
 
 
-    const saveReview = async (editedData) => {
+    const saveReviewToServer = async (editedData) => {
         if(props?.editData?.id) editedData.id = props.editData.id;
         else {
 
             if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
             if(!editedData.reviewable_id) editedData.reviewable_id = 3;
+            editedData.tempReviewId = tempReviewId.value;
         }
 
         return  await ReviewsService.saveReview(editedData);
