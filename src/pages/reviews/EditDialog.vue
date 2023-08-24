@@ -9,6 +9,7 @@
             @show="showModal"
             @hide="editedData = {}"
     >
+        {{editedData}}
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
@@ -100,7 +101,6 @@
 
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
     let  editedData = reactive(props.editData);
-    let attachFiles = ref([]);
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
     //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
@@ -116,7 +116,7 @@
 
 
 
-        if(JSON.stringify(editedData) !== JSON.stringify(props.editData) || dataUpdated.value){
+        if(JSON.stringify(editedData) !== JSON.stringify(props.editData)){
             const res = await saveReview(toRaw(editedData));
             if(res.ok ) {
                 if(editedData.id){
@@ -129,14 +129,13 @@
                 }
 
             }
-            dataUpdated.value = false;
         }
-        dismissModal();
+        emit('update:visible', false);
     };
     const updateAttach = async (files) => {
         console.log(files)
-        attachFiles.value = files;
-        dataUpdated.value = true;
+        editedData.content = files;
+        // dataUpdated.value = true;
 
     };
     const removeContent = (index) => {
@@ -156,7 +155,6 @@
             if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
             if(!editedData.reviewable_id) editedData.reviewable_id = 3;
         }
-        editedData.content = toRaw( attachFiles.value );
 
         return  await ReviewsService.saveReview(editedData);
     }
@@ -168,7 +166,7 @@
         }
     }
     const dismissModal = () => {
-        if(dataUpdated.value) {
+        if(JSON.stringify(editedData) !== JSON.stringify(props.editData)) {
             confirm.require({
                 message: 'Закрыть диалог и отменить изменения?',
                 header: 'Отмена',
@@ -179,11 +177,6 @@
                 reject: () => {         }
             });
         }else{ emit('update:visible', false);}
-    };
-
-
-    const confirmDiscardChangeData = () => {
-
     };
 
 
