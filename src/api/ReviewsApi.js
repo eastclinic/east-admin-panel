@@ -44,9 +44,6 @@ export default (() => ({
         }
         try {
             const res = await fetch(url, request);
-            console.log(request)
-            console.log(url)
-            console.log(res)
             //todo handle server error (500, 502 ...)
             if(!res) return {};
             return await res.json()
@@ -80,5 +77,41 @@ export default (() => ({
         const url = new URL(baseURL);
         url.search = searchParams;
         return url.toString();
-    }
+    },
+
+    async fileUpload( fileList, requestData ){
+        if(!fileList || fileList.length === 0) return {}
+        const formData = new FormData();
+
+
+        for (let i = 0; i < fileList.length; i++) {
+            formData.append('files[]', fileList[i]);
+        }
+        if(requestData){
+            Object.keys(requestData).forEach((field)=>{
+                formData.append(field, requestData[field]);
+            });
+        }
+
+
+        try {
+            console.log(baseUrl + '/api/reviews/content')
+            const res = await fetch(baseUrl + '/api/reviews/content', {method:'POST', body:formData});
+            //todo handle server error (500, 502 ...)
+            if(!res) return {};
+            return await res.json()
+        } catch (error) {
+            // code to handle the error
+            console.log("An error occurred:", error.message);
+        }
+        return {};
+
+
+    },
+    contentUrl(){
+            return baseUrl + '/api/reviews/content';
+    },
+
+
+
     }))();

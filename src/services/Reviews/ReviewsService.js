@@ -1,11 +1,13 @@
 
 import reviewsState from '../../state/ReviewsState.js'
 import reviewsApi from '../../api/ReviewsApi'
+import FilesApi from "../../api/FilesApi";
 
 
 export default (() =>({
     state: reviewsState,
     requestData:{},
+
 
     //actions
     //todo set definition requestAdapter type
@@ -43,6 +45,12 @@ export default (() =>({
         if( !condition ) return this.state.getItems();
     },
 
+    //actions
+    async saveContent( files, requestData ){
+        return  await reviewsApi.fileUpload( files, requestData );
+    },
+
     count(){   return this.state.count();  },
+    getApiContentUrl(){   return reviewsApi.contentUrl();  },
 
 }))();

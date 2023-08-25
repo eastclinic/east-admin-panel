@@ -19,6 +19,7 @@ onBeforeMount(onBeforeMountInitFilters());
 </script>
 
 <template>
+
 <EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated:review="refreshReviewRow" @created:review="refreshReviews"></EditDialog>
     <div class="grid">
         <div class="col-12">
