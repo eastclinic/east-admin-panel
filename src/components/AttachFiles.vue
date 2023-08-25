@@ -41,14 +41,20 @@ if(props.files?.length > 0){
     // const files = event.target.files;
 
     const uploadFiles = event.target.files;
+      console.log({...uploadFiles})
 
     for (let i = 0; i < uploadFiles.length; i++) {
       //filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
       //console.log(filesSelected[i])
       const fileId = uploadFiles[i].blobPath;
       // const idTemp = Math.random().toString(36).substring(2,7);
+        let typeFile = ''
+        if(uploadFiles[i].type) typeFile = uploadFiles[i].type;
+        if(typeFile) typeFile = typeFile.split('/');
+        if( typeFile.length > 0 ) typeFile = typeFile[0];
+
       attachFiles.value.push( reactive({
-        type: uploadFiles[i].type,
+        typeFile: typeFile,
         blobPath: URL.createObjectURL(uploadFiles[i]),  //temp path for show image
         loadPersent: 0,
         errors: {},
@@ -113,6 +119,8 @@ if(props.files?.length > 0){
   const fileDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
   }
+  const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
+  const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
   watch(props.files, () => {
     // Обработка изменений в selectedFiles
@@ -143,7 +151,7 @@ if(props.files?.length > 0){
         <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
         <div class="pi pi-ellipsis-h load-button"> </div>
 
-        <img :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
+        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
 <!--        <video height="100" v-if="file.type.startsWith('video')">-->
