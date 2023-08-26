@@ -154,9 +154,9 @@ if(props.files?.length > 0){
         <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
-<!--        <video height="100" v-if="file.type.startsWith('video')">-->
-<!--          <source :src="file.blobPath">-->
-<!--        </video>-->
+        <video v-else-if="isVideo(file)" controls>
+          <source :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url">
+        </video>
 
       </div>
 
