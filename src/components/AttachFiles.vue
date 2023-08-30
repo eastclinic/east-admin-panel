@@ -12,8 +12,21 @@
   let attachFiles = ref([]);
   const uploadProgress = ref(null);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
-  const props = defineProps({
+    const props = defineProps({
     files: Object,
+        possibleTypeFiles:{
+            type: Array,
+            default(rawProps) {
+                return [
+                    'mp4',
+                    'webm',
+                    'mov',
+                    'quicktime',
+                    'jpeg',
+                    'png',
+                ]
+            }
+        },
     server:{
       type: Object,
       required: true,
@@ -24,12 +37,17 @@
         return true;
       },
     },
-  });
-if(props.files?.length > 0){
-    for (let i = 0; i < props.files.length; i++) {
-        attachFiles.value.push(reactive({...props.files[i]}));
+        maxSizeFile:{
+            type:Number,
+            default:2000000000
+        }
+    });
+    if(props.files?.length > 0){
+        for (let i = 0; i < props.files.length; i++) {
+            attachFiles.value.push(reactive({...props.files[i]}));
+        }
     }
-}
+
 
   FilesService.setRequestInfo(props.server);
 
@@ -41,17 +59,32 @@ if(props.files?.length > 0){
     // const files = event.target.files;
 
     const uploadFiles = event.target.files;
-      console.log({...uploadFiles})
-
     for (let i = 0; i < uploadFiles.length; i++) {
       //filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
       //console.log(filesSelected[i])
       const fileId = uploadFiles[i].blobPath;
+      const fileName = uploadFiles[i].name;
       // const idTemp = Math.random().toString(36).substring(2,7);
-        let typeFile = ''
-        if(uploadFiles[i].type) typeFile = uploadFiles[i].type;
-        if(typeFile) typeFile = typeFile.split('/');
-        if( typeFile.length > 0 ) typeFile = typeFile[0];
+        let mimeFile = ''
+        if(uploadFiles[i].type) mimeFile = uploadFiles[i].type;
+        if(mimeFile) mimeFile = mimeFile.split('/');
+        if( mimeFile.length === 0 ) {
+            toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
+            continue;
+        }
+        const fileExtension = mimeFile[1]
+        const typeFile = mimeFile[0]
+//check file extension
+        if(!props.possibleTypeFiles.includes(fileExtension)){
+            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleTypeFiles.join(', ') + ')', )
+            continue;
+        }
+//check file size
+        if(uploadFiles[i].size < 200 || uploadFiles[i].size > props.maxSizeFile){
+            toastService.duration(5000).error('Слишком большой размер файла ' + fileName + '. (' + Math.round(uploadFiles[i].size/1000)  +' kb) Допустимо ' + Math.round(props.maxSizeFile/1000) +'kb', )
+            continue;
+        }
+
 
       attachFiles.value.push( reactive({
         typeFile: typeFile,
@@ -154,9 +187,12 @@ if(props.files?.length > 0){
         <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
-        <video v-else-if="isVideo(file)" controls>
-          <source :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url">
-        </video>
+          <div v-else-if="isVideo(file)">
+              <video  controls  style="height: 100%;width:50%">
+                  <source :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url">
+              </video>
+          </div>
+
 
       </div>
 
