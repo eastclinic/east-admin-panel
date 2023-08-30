@@ -1,5 +1,5 @@
 <script setup>
-  import {defineEmits, defineProps, reactive, ref, toRaw, watch} from 'vue';
+  import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed} from 'vue';
   import ReviewsService from "../services/Reviews/ReviewsService";
   import FilesService from "../services/Files/FilesService";
   import toastService from '../services/Toast'
@@ -9,7 +9,7 @@
 
 
   const uploadInput = ref([]);
-  let attachFiles = ref([]);
+
   const uploadProgress = ref(null);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
     const props = defineProps({
@@ -42,11 +42,9 @@
             default:2000000000
         }
     });
-    if(props.files?.length > 0){
-        for (let i = 0; i < props.files.length; i++) {
-            attachFiles.value.push(reactive({...props.files[i]}));
-        }
-    }
+
+  // const attachFiles = computed(() => {return [...props.files]});
+  const attachFiles = ref([...props.files]);
 
 
   FilesService.setRequestInfo(props.server);
@@ -109,9 +107,6 @@
 
       if(res.data ){
           attachFiles.value[aIndex] = {...res.data}
-          // attachFiles.value[aIndex].data = res.data
-          // attachFiles.value[aIndex].id = res.data.id;
-          // attachFiles.value[aIndex].url = res.data.url;
           toastService.duration(3000).success('Load image', 'Файл загружен')
       }else if(res.errors ){
           for ( const error in res.errors){
@@ -169,7 +164,6 @@
 
 <template>
   <div class="flex">
-
     <div class="attach-files">
 <!--      <div v-for="(file, index) in files2" class="attach-files__item thumb">-->
 <!--        <div @click="removeFile(file)" class="pi pi-times delete-button"></div>-->
@@ -179,11 +173,18 @@
 <!--          <source :src="file.url">-->
 <!--        </video>-->
 <!--      </div>-->
-
       <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb">
-        <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
-        <div class="pi pi-ellipsis-h load-button"> </div>
+          <div>
+              <slot name="controlFilePanel" v-bind="file">
 
+                  <div class="pi pi-ellipsis-h load-button"> </div>
+              </slot>
+              <slot name="controlFileDelete">
+                  <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
+              </slot>
+          </div>
+
+          {{file.loadPersent}}
         <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->

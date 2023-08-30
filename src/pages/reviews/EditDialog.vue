@@ -52,8 +52,12 @@
                            @delete:content="removeContent"
                            @update:attachFiles="updateAttach"
                            :server="attachFilesServerSettings"
-              />
-
+              >
+                  <template #controlFilePanel="file">
+                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
+                  </template>
+              </AttachFiles>
+                {{editedData}}
             </div>
             <div class="col-12">
                 <Textarea v-model="editedData.text" rows="5" autoResize  />
@@ -97,7 +101,9 @@
     const dataUpdated = ref(false);
 
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
-    let  editedData = reactive(props.editData);
+    // let  editedData = reactive(props.editData);
+    const editedData = computed(() => {return {...props.editData}});
+
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
     //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
@@ -110,11 +116,19 @@
         }
     }});
 
+    const contentPublish = (publish, contentInfo)=>{
+            for(const f in editedData.content){
+                if(editedData.content[f].id === contentInfo.id){
+                    editedData.content[f].published = publish;
+                }
+            }
+    }
     const saveReview = async () => {
+        console.log('saveReview')
+        console.log(JSON.stringify(editedData.value))
+        console.log(JSON.stringify(props.editData))
 
-
-
-        if(JSON.stringify(editedData) !== JSON.stringify(props.editData)){
+        if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)){
             const res = await saveReviewToServer(toRaw(editedData));
             if(res.ok ) {
                 if(editedData.id){
@@ -139,10 +153,12 @@
     const removeContent = (index) => {
       editedData.content.splice(index, 1);
     };
-    onBeforeUpdate(()=>{
-        //todo its may be wrong
-        editedData = reactive({...toRaw(props.editData)});
-    });
+
+
+    // onBeforeUpdate(()=>{
+    //     //todo its may be wrong
+    //     editedData = reactive({...toRaw(props.editData)});
+    // });
 
 
 
@@ -158,14 +174,15 @@
         return  await ReviewsService.saveReview(editedData);
     }
     const showModal = async () =>{
-        if(props?.editData?.is_new){
-            editedData.is_new = false;
-            await saveReview(toRaw(editedData));
-            emit('updated:review', props.editData.id);
-        }
+        // if(props?.editData?.is_new){
+        //     editedData.is_new = false;
+        //     await saveReview(toRaw(editedData));
+        //     emit('updated:review', props.editData.id);
+        // }
     }
     const dismissModal = () => {
-        if(JSON.stringify(editedData) !== JSON.stringify(props.editData)) {
+        console.log('dismissModal')
+        if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)) {
             confirm.require({
                 message: 'Закрыть диалог и отменить изменения?',
                 header: 'Отмена',

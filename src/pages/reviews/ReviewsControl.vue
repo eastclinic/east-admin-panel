@@ -19,6 +19,7 @@ onBeforeMount(onBeforeMountInitFilters());
 </script>
 
 <template>
+    {{editData}}
 
 <EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated:review="refreshReviewRow" @created:review="refreshReviews"></EditDialog>
     <div class="grid">
@@ -61,6 +62,7 @@ onBeforeMount(onBeforeMountInitFilters());
                     <template #loading> Loading customers data. Please wait. </template>
 
                     <Column field="author" header="Автор" style="min-width: 12rem">
+
                         <template #body="{ data }" >
                             <Badge v-if="data.is_new"/>
                             {{ data.author }}

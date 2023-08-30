@@ -94,6 +94,7 @@ export const onPage = async (e) =>{
 }
 
 export const onOpenEdit = async (e) =>{
+    console.log('onOpenEdit')
     visibleEditDialog.value = true;
     editData = {...e.data};
 }
