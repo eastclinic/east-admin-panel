@@ -17,7 +17,7 @@ export  const customer1 = ref(null);
 export const filters1 = ref(null);
 export const loading1 = ref(null);
 export const visibleEditDialog = ref(false);
-export let editData = {};
+export const editData = ref({});
 
 
 export const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
@@ -94,9 +94,8 @@ export const onPage = async (e) =>{
 }
 
 export const onOpenEdit = async (e) =>{
-    console.log('onOpenEdit')
     visibleEditDialog.value = true;
-    editData = {...e.data};
+    editData.value = {...e.data};
 }
 
 
@@ -110,7 +109,7 @@ export const refreshReviews = async () =>{
 
 export const createItem =  (e) =>{
     visibleEditDialog.value = true;
-    editData = {};
+    editData.value = {};
 }
 
 export const onSort = async (event) =>{

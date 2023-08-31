@@ -81,7 +81,7 @@
 
 <script setup>
 
-    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate  } from 'vue'
+    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
     import FilesService from "../../services/Files/FilesService";
@@ -99,10 +99,14 @@
         editData:Object
     })
     const dataUpdated = ref(false);
-
+    console.log(props.editData)
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
-    // let  editedData = reactive(props.editData);
-    const editedData = computed(() => {return {...props.editData}});
+    const  editedData = ref({});
+    //const editedData = computed({get: () => {return {...props.editData}}, set: (val) => { editedData.value = val; }});
+
+    watchEffect(() =>
+        editedData.value = {...props.editData}
+    )
 
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
@@ -124,12 +128,8 @@
             }
     }
     const saveReview = async () => {
-        console.log('saveReview')
-        console.log(JSON.stringify(editedData.value))
-        console.log(JSON.stringify(props.editData))
-
         if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)){
-            const res = await saveReviewToServer(toRaw(editedData));
+            const res = await saveReviewToServer({...editedData.value});
             if(res.ok ) {
                 if(editedData.id){
                     toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
@@ -146,7 +146,8 @@
     };
     const updateAttach = async (files) => {
         console.log(files)
-        editedData.content = files;
+        editedData.value.content = files;
+        console.log({...editedData})
         // dataUpdated.value = true;
 
     };
