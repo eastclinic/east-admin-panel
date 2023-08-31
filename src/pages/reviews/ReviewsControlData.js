@@ -4,7 +4,7 @@ import CustomerService from '@/services/CustomerService';
 import ReviewsService from "../../services/Reviews/ReviewsService";
 import dataTableRequestAdapter from "../../api/apiRequestAdapters/DataTableRequestAdapter";
 
-import { ref, reactive } from 'vue';
+import { ref, reactive, toRaw, toRefs } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import reviewsState from "../../state/ReviewsState";
 
@@ -95,7 +95,8 @@ export const onPage = async (e) =>{
 
 export const onOpenEdit = async (e) =>{
     visibleEditDialog.value = true;
-    editData.value = {...e.data};
+    console.log(toRaw(e.data))
+    editData.value = toRaw(e.data);
 }
 
 

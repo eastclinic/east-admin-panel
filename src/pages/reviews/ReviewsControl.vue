@@ -19,12 +19,12 @@ onBeforeMount(onBeforeMountInitFilters());
 </script>
 
 <template>
-    {{editData}}
 
 <EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated:review="refreshReviewRow" @created:review="refreshReviews"></EditDialog>
     <div class="grid">
         <div class="col-12">
             <div class="card">
+                {{editData}}
                 <DataTable
                     :value="reviews"
                     :paginator="true"

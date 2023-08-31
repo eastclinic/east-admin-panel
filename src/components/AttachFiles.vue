@@ -13,7 +13,10 @@
   const uploadProgress = ref(null);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
     const props = defineProps({
-    files: Object,
+    files: {
+        type: Object,
+        required: true,}
+        ,
         possibleTypeFiles:{
             type: Array,
             default(rawProps) {
@@ -44,7 +47,8 @@
     });
 
   // const attachFiles = computed(() => {return [...props.files]});
-  const attachFiles = ref([...props.files]);
+  const attachFiles = reactive(props.files);
+  const uploadFiles =
 
 
   FilesService.setRequestInfo(props.server);
@@ -150,15 +154,14 @@
   const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
   const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
-  watch(props.files, () => {
-    // Обработка изменений в selectedFiles
-    console.log(props.files);
-  });
-  //
-  // const files = computed(() => {
-  //     console.log(attachFiles)
-  //     return attachFiles.reverse()
+  // watch(props.files, () => {
+  //   // Обработка изменений в selectedFiles
+  //   console.log(props.files);
   // });
+  //
+  const files = computed(() => {
+      return attachFiles.reverse()
+  });
 
 </script>
 

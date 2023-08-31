@@ -57,6 +57,7 @@
                     <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
                   </template>
               </AttachFiles>
+
                 {{editedData}}
             </div>
             <div class="col-12">
@@ -99,14 +100,13 @@
         editData:Object
     })
     const dataUpdated = ref(false);
-    console.log(props.editData)
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
-    const  editedData = ref({});
-    //const editedData = computed({get: () => {return {...props.editData}}, set: (val) => { editedData.value = val; }});
+    const  editedData = reactive(props.message);
+    //const  = computed({get: () => {return {...props.editData}}, set: (val) => { editedData.value = val; }});
 
-    watchEffect(() =>
-        editedData.value = {...props.editData}
-    )
+    // watchEffect(() =>    editedData.value = toRaw(props.editData));
+
+
 
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
@@ -121,13 +121,17 @@
     }});
 
     const contentPublish = (publish, contentInfo)=>{
-            for(const f in editedData.content){
-                if(editedData.content[f].id === contentInfo.id){
-                    editedData.content[f].published = publish;
+        console.log({...editedData.value.content})
+            for(const f in editedData.value.content){
+                if(editedData.value.content[f].id === contentInfo.id){
+                    editedData.value.content[f].published = publish;
                 }
             }
     }
     const saveReview = async () => {
+        return ;
+        console.log(JSON.stringify(editedData.value))
+        console.log(JSON.stringify(props.editData))
         if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)){
             const res = await saveReviewToServer({...editedData.value});
             if(res.ok ) {
@@ -147,7 +151,6 @@
     const updateAttach = async (files) => {
         console.log(files)
         editedData.value.content = files;
-        console.log({...editedData})
         // dataUpdated.value = true;
 
     };
