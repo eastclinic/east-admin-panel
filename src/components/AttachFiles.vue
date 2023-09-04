@@ -49,10 +49,12 @@
   // const attachFiles = computed(() => {return [...props.files]});
   const attachedFiles = ref([]);
   const  attachFiles = computed({
-      get: () => {attachedFiles.value = [...toRaw(props.files)]; return attachedFiles.value},
+      get: () => {attachedFiles.value = [...toRaw(props.files)];
+      return attachedFiles.value},
       set: (val) => {
           console.log('attachFiles')
-          attachedFiles.value = val; }
+          // attachedFiles.value = val;
+      }
   });
 
   // const uploadFiles =

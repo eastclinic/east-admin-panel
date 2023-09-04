@@ -95,7 +95,8 @@ export const onPage = async (e) =>{
 
 export const onOpenEdit = async (e) =>{
     visibleEditDialog.value = true;
-    editData.value = e.data;
+    // console.log(toRaw(e.data))
+    editData.value = toRaw(e.data);
 }
 
 
