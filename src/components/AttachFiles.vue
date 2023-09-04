@@ -47,8 +47,15 @@
     });
 
   // const attachFiles = computed(() => {return [...props.files]});
-  const attachFiles = reactive(props.files);
-  const uploadFiles =
+  const attachedFiles = ref([]);
+  const  attachFiles = computed({
+      get: () => {attachedFiles.value = [...toRaw(props.files)]; return attachedFiles.value},
+      set: (val) => {
+          console.log('attachFiles')
+          attachedFiles.value = val; }
+  });
+
+  // const uploadFiles =
 
 
   FilesService.setRequestInfo(props.server);
@@ -60,15 +67,11 @@
   const handleFilesUpload = async (event) => {
     // const files = event.target.files;
 
-    const uploadFiles = event.target.files;
-    for (let i = 0; i < uploadFiles.length; i++) {
-      //filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
-      //console.log(filesSelected[i])
-      const fileId = uploadFiles[i].blobPath;
-      const fileName = uploadFiles[i].name;
-      // const idTemp = Math.random().toString(36).substring(2,7);
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const fileName = files[i].name;
         let mimeFile = ''
-        if(uploadFiles[i].type) mimeFile = uploadFiles[i].type;
+        if(files[i].type) mimeFile = files[i].type;
         if(mimeFile) mimeFile = mimeFile.split('/');
         if( mimeFile.length === 0 ) {
             toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
@@ -82,27 +85,27 @@
             continue;
         }
 //check file size
-        if(uploadFiles[i].size < 200 || uploadFiles[i].size > props.maxSizeFile){
-            toastService.duration(5000).error('Слишком большой размер файла ' + fileName + '. (' + Math.round(uploadFiles[i].size/1000)  +' kb) Допустимо ' + Math.round(props.maxSizeFile/1000) +'kb', )
+        if(files[i].size < 200 || files[i].size > props.maxSizeFile){
+            toastService.duration(5000).error('Слишком большой размер файла ' + fileName + '. (' + Math.round(files[i].size/1000)  +' kb) Допустимо ' + Math.round(props.maxSizeFile/1000) +'kb', )
             continue;
         }
 
 
       attachFiles.value.push( reactive({
         typeFile: typeFile,
-        blobPath: URL.createObjectURL(uploadFiles[i]),  //temp path for show image
+        blobPath: URL.createObjectURL(files[i]),  //temp path for show image
         loadPersent: 0,
         errors: {},
         data:{},
         id:0,   //random temp id
         url:''
       }));
-        uploadFiles[i].attachFileIndex = attachFiles.value.length-1;
+        files[i].attachFileIndex = attachFiles.value.length-1;
     }
-    for ( const i in uploadFiles ) {
-      let aIndex =  uploadFiles[i].attachFileIndex;
+    for ( const i in files ) {
+      let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
-      let res = await FilesService.fileUpload(uploadFiles[i], {
+      let res = await FilesService.fileUpload(files[i], {
         onUploadProgress:  progressEvent => {
             attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
           //todo save all upload progress

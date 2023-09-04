@@ -101,8 +101,19 @@
     })
     const dataUpdated = ref(false);
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
-    const  editedData = reactive(props.message);
-    //const  = computed({get: () => {return {...props.editData}}, set: (val) => { editedData.value = val; }});
+    // const  editedData = reactive(props.message);
+
+    const editData = ref({});
+    const  editedData = computed({
+        get: () => {editedData.value = toRaw(props.editData); return editData.value},
+        set: (val) => {
+            console.log('editData')
+            console.log(val)
+            editData.value = val; }
+    });
+    // const  editedData = computed({get: () => {return toRaw(props.editData)}, set: (val) => {
+    //         console.log('editedData')
+    //     editedData.value = val; }});
 
     // watchEffect(() =>    editedData.value = toRaw(props.editData));
 
@@ -133,7 +144,7 @@
         console.log(JSON.stringify(editedData.value))
         console.log(JSON.stringify(props.editData))
         if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)){
-            const res = await saveReviewToServer({...editedData.value});
+            const res = await saveReviewToServer(toRaw(editedData.value));
             if(res.ok ) {
                 if(editedData.id){
                     toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
