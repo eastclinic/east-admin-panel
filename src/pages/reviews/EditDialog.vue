@@ -7,13 +7,12 @@
             :dismissableMask="true"
             @update:visible="dismissModal"
             @show="showModal"
-            @hide="editedData = {}"
     >
         <div class="grid p-fluid ">
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
                     <div class="flex align-items-center justify-content-center m-2">
-                        <InputSwitch v-model="editedData.published"/>
+                        <InputSwitch v-model="editDataComputed.published"/>
                     </div>
                     <div class="flex align-items-center justify-content-center m-2">
                         <label >Опубликован</label>
@@ -25,11 +24,11 @@
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
-                    <InputText type="text" v-model="editedData.author"/>
+                    <InputText type="text" v-model="editDataComputed.author"/>
                 </span>
             </div>
             <div class="col-12 lg:col-6 ">
-                    <InputNumber v-model="editedData.rating" :min="1" :max="100" />
+                    <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" />
             </div>
 <!--          <div class="col-12 ">-->
 <!--              <div class="flex gallery-item-container" v-for="item in props.editData.content">-->
@@ -48,15 +47,18 @@
 <!--          </div>-->
             <div class="col-12">
               <AttachFiles
-                      :files="editedData.content"
+                      :files="editDataComputed.content"
                            @delete:content="removeContent"
                            @update:attachFiles="updateAttach"
                            :server="attachFilesServerSettings"
-              />
-
+              >
+                  <template #controlFilePanel="file">
+                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
+                  </template>
+              </AttachFiles>
             </div>
             <div class="col-12">
-                <Textarea v-model="editedData.text" rows="5" autoResize  />
+                <Textarea v-model="editDataComputed.text" rows="5" autoResize  />
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Сохранить" text :raised="true" @click="saveReview"/>
@@ -77,7 +79,7 @@
 
 <script setup>
 
-    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate  } from 'vue'
+    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
     import FilesService from "../../services/Files/FilesService";
@@ -95,9 +97,12 @@
         editData:Object
     })
     const dataUpdated = ref(false);
-
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
-    let  editedData = reactive(props.editData);
+    // const  editedData = reactive(props.message);
+
+    const editData = ref({});
+    const  editDataComputed = computed(() => { editData.value = JSON.parse(JSON.stringify(props.editData)); return editData.value});
+
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
     //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
@@ -110,16 +115,22 @@
         }
     }});
 
+    const contentPublish = (publish, contentInfo)=>{
+            for(const f in editData.value.content){
+                if(editData.value.content[f].id === contentInfo.id){
+                    editData.value.content[f].published = publish;
+                }
+            }
+    }
     const saveReview = async () => {
-
-
-
-        if(JSON.stringify(editedData) !== JSON.stringify(props.editData)){
-            const res = await saveReviewToServer(toRaw(editedData));
+        console.log(JSON.stringify(editData.value))
+        console.log(JSON.stringify(props.editData))
+        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
+            const res = await saveReviewToServer(toRaw(editData.value));
             if(res.ok ) {
-                if(editedData.id){
+                if(editData.value.id){
                     toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
-                    emit('updated:review', editedData.id);
+                    emit('updated:review', editData.value.id);
 
                 }else{
                     toastService.duration(3000).success('Отзыв', 'Отзыв создан')
@@ -131,18 +142,21 @@
         emit('update:visible', false);
     };
     const updateAttach = async (files) => {
-        console.log(files)
-        editedData.content = files;
+        console.log('updateAttach')
+        editData.value.content = files;
         // dataUpdated.value = true;
 
     };
     const removeContent = (index) => {
-      editedData.content.splice(index, 1);
+        console.log('removeContent')
+      editData.content.splice(index, 1);
     };
-    onBeforeUpdate(()=>{
-        //todo its may be wrong
-        editedData = reactive({...toRaw(props.editData)});
-    });
+
+
+    // onBeforeUpdate(()=>{
+    //     //todo its may be wrong
+    //     editedData = reactive({...toRaw(props.editData)});
+    // });
 
 
 
@@ -154,23 +168,25 @@
             if(!editedData.reviewable_id) editedData.reviewable_id = 3;
             editedData.tempReviewId = tempReviewId.value;
         }
-
+        console.log('saveReviewToServer')
         return  await ReviewsService.saveReview(editedData);
     }
     const showModal = async () =>{
-        if(props?.editData?.is_new){
-            editedData.is_new = false;
-            await saveReview(toRaw(editedData));
-            emit('updated:review', props.editData.id);
-        }
+        // if(props?.editData?.is_new){
+        //     editedData.is_new = false;
+        //     await saveReview(toRaw(editedData));
+        //     emit('updated:review', props.editData.id);
+        // }
     }
     const dismissModal = () => {
-        if(JSON.stringify(editedData) !== JSON.stringify(props.editData)) {
+        console.log('dismissModal')
+        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {
             confirm.require({
                 message: 'Закрыть диалог и отменить изменения?',
                 header: 'Отмена',
                 icon: 'pi pi-exclamation-triangle',
                 accept: () => {
+                    editData.value = {};
                     emit('update:visible', false);
                 },
                 reject: () => {         }

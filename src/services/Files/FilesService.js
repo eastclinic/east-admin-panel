@@ -6,7 +6,8 @@ export default (() =>({
     requestInfo : {},
 
     //actions
-    async fileUpload( file ){
+    async fileUpload( file, requestInfo ){
+        if(requestInfo)  this.setRequestInfo(requestInfo);
         return  await FilesApi.fileUpload( file, this.requestInfo);
     },
 

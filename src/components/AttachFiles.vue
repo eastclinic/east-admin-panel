@@ -1,5 +1,5 @@
 <script setup>
-  import {defineEmits, defineProps, reactive, ref, toRaw, watch} from 'vue';
+  import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed} from 'vue';
   import ReviewsService from "../services/Reviews/ReviewsService";
   import FilesService from "../services/Files/FilesService";
   import toastService from '../services/Toast'
@@ -9,11 +9,28 @@
 
 
   const uploadInput = ref([]);
-  let attachFiles = ref([]);
+
   const uploadProgress = ref(null);
   const emit = defineEmits(['update:attachFiles', 'delete:content']);
-  const props = defineProps({
-    files: Object,
+    const props = defineProps({
+    files: {
+        type: Array,
+        required: true,
+        default:[]}
+        ,
+        possibleTypeFiles:{
+            type: Array,
+            default(rawProps) {
+                return [
+                    'mp4',
+                    'webm',
+                    'mov',
+                    'quicktime',
+                    'jpeg',
+                    'png',
+                ]
+            }
+        },
     server:{
       type: Object,
       required: true,
@@ -24,12 +41,27 @@
         return true;
       },
     },
+        maxSizeFile:{
+            type:Number,
+            default:2000000000
+        }
+    });
+
+  // const attachFiles = computed(() => {return [...props.files]});
+  const attachedFiles = ref([]);
+  const  attachFiles = computed({
+      get: () => {
+
+          attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
+      return attachedFiles.value},
+      set: (val) => {
+          console.log('attachFiles')
+          // attachedFiles.value = val;
+      }
   });
-if(props.files?.length > 0){
-    for (let i = 0; i < props.files.length; i++) {
-        attachFiles.value.push(reactive({...props.files[i]}));
-    }
-}
+
+  // const uploadFiles =
+
 
   FilesService.setRequestInfo(props.server);
 
@@ -40,28 +72,45 @@ if(props.files?.length > 0){
   const handleFilesUpload = async (event) => {
     // const files = event.target.files;
 
-    const uploadFiles = event.target.files;
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const fileName = files[i].name;
+        let mimeFile = ''
+        if(files[i].type) mimeFile = files[i].type;
+        if(mimeFile) mimeFile = mimeFile.split('/');
+        if( mimeFile.length === 0 ) {
+            toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
+            continue;
+        }
+        const fileExtension = mimeFile[1]
+        const typeFile = mimeFile[0]
+//check file extension
+        if(!props.possibleTypeFiles.includes(fileExtension)){
+            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleTypeFiles.join(', ') + ')', )
+            continue;
+        }
+//check file size
+        if(files[i].size < 200 || files[i].size > props.maxSizeFile){
+            toastService.duration(5000).error('Слишком большой размер файла ' + fileName + '. (' + Math.round(files[i].size/1000)  +' kb) Допустимо ' + Math.round(props.maxSizeFile/1000) +'kb', )
+            continue;
+        }
 
-    for (let i = 0; i < uploadFiles.length; i++) {
-      //filesSelected[i].blobPath = URL.createObjectURL(filesSelected[i]);
-      //console.log(filesSelected[i])
-      const fileId = uploadFiles[i].blobPath;
-      // const idTemp = Math.random().toString(36).substring(2,7);
+
       attachFiles.value.push( reactive({
-        type: uploadFiles[i].type,
-        blobPath: URL.createObjectURL(uploadFiles[i]),  //temp path for show image
+        typeFile: typeFile,
+        blobPath: URL.createObjectURL(files[i]),  //temp path for show image
         loadPersent: 0,
         errors: {},
         data:{},
         id:0,   //random temp id
         url:''
       }));
-        uploadFiles[i].attachFileIndex = attachFiles.value.length-1;
+        files[i].attachFileIndex = attachFiles.value.length-1;
     }
-    for ( const i in uploadFiles ) {
-      let aIndex =  uploadFiles[i].attachFileIndex;
+    for ( const i in files ) {
+      let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
-      let res = await FilesService.fileUpload(uploadFiles[i], {
+      let res = await FilesService.fileUpload(files[i], {
         onUploadProgress:  progressEvent => {
             attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
           //todo save all upload progress
@@ -70,9 +119,6 @@ if(props.files?.length > 0){
 
       if(res.data ){
           attachFiles.value[aIndex] = {...res.data}
-          // attachFiles.value[aIndex].data = res.data
-          // attachFiles.value[aIndex].id = res.data.id;
-          // attachFiles.value[aIndex].url = res.data.url;
           toastService.duration(3000).success('Load image', 'Файл загружен')
       }else if(res.errors ){
           for ( const error in res.errors){
@@ -113,22 +159,22 @@ if(props.files?.length > 0){
   const fileDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
   }
+  const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
+  const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
-  watch(props.files, () => {
-    // Обработка изменений в selectedFiles
-    console.log(props.files);
-  });
-  //
-  // const files = computed(() => {
-  //     console.log(attachFiles)
-  //     return attachFiles.reverse()
+  // watch(props.files, () => {
+  //   // Обработка изменений в selectedFiles
+  //   console.log(props.files);
   // });
+  //
+  const files = computed(() => {
+      return attachFiles.reverse()
+  });
 
 </script>
 
 <template>
   <div class="flex">
-
     <div class="attach-files">
 <!--      <div v-for="(file, index) in files2" class="attach-files__item thumb">-->
 <!--        <div @click="removeFile(file)" class="pi pi-times delete-button"></div>-->
@@ -138,17 +184,27 @@ if(props.files?.length > 0){
 <!--          <source :src="file.url">-->
 <!--        </video>-->
 <!--      </div>-->
-
       <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb">
-        <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
-        <div class="pi pi-ellipsis-h load-button"> </div>
+          <div>
+              <slot name="controlFilePanel" v-bind="file">
 
-        <img :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
+                  <div class="pi pi-ellipsis-h load-button"> </div>
+              </slot>
+              <slot name="controlFileDelete">
+                  <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
+              </slot>
+          </div>
+
+          {{file.loadPersent}}
+        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
-<!--        <video height="100" v-if="file.type.startsWith('video')">-->
-<!--          <source :src="file.blobPath">-->
-<!--        </video>-->
+          <div v-else-if="isVideo(file)">
+              <video  controls  style="height: 100%;width:50%">
+                  <source :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url">
+              </video>
+          </div>
+
 
       </div>
 
