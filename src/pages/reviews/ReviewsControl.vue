@@ -24,7 +24,6 @@ onBeforeMount(onBeforeMountInitFilters());
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                {{editData}}
                 <DataTable
                     :value="reviews"
                     :paginator="true"

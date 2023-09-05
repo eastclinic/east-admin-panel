@@ -143,13 +143,13 @@
     };
     const updateAttach = async (files) => {
         console.log('updateAttach')
-        editedData.value.content = files;
+        editData.value.content = files;
         // dataUpdated.value = true;
 
     };
     const removeContent = (index) => {
         console.log('removeContent')
-      editedData.content.splice(index, 1);
+      editData.content.splice(index, 1);
     };
 
 
