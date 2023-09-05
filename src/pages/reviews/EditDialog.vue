@@ -19,8 +19,12 @@
                     </div>
                 </div>
 
+            </div>
+            <div class="col-12  lg:col-12">
+                <TargetList url="api/doctors"></TargetList>
 
-        </div>
+            </div>
+
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
@@ -30,21 +34,6 @@
             <div class="col-12 lg:col-6 ">
                     <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" />
             </div>
-<!--          <div class="col-12 ">-->
-<!--              <div class="flex gallery-item-container" v-for="item in props.editData.content">-->
-<!--                <div style="position:relative" class="gallery-item">-->
-<!--                  <div class="pi pi-video p-button-icon video-icon"></div>-->
-<!--                  <video height="100">-->
-<!--                    <source :src="item.url" type="video/mp4">-->
-<!--                  </video>-->
-<!--                </div>-->
-<!--                <div style="position:relative" class="gallery-item">-->
-<!--                  <div class="pi pi-close p-button-icon video-icon"></div>-->
-<!--                  <img src="https://eastclinic.ru/assets/resourceimages/9788/_232x269/Gybarev1_2.0_232x269.webp">-->
-<!--                </div>-->
-
-<!--              </div>-->
-<!--          </div>-->
             <div class="col-12">
               <AttachFiles
                       :files="editDataComputed.content"
@@ -85,6 +74,7 @@
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
+    import TargetList from "../../components/TargetList.vue";
     import FilesService from "../../services/Files/FilesService";
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
