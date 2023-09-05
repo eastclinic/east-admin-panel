@@ -40,6 +40,10 @@ export default (() =>({
         return  await reviewsApi.saveReview(data);
     },
 
+    async deleteReview( id ){
+        return  await reviewsApi.deleteReview(id);
+    },
+
     //getters
     reviews(condition){
         if( !condition ) return this.state.getItems();
