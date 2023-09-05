@@ -20,7 +20,7 @@ onBeforeMount(onBeforeMountInitFilters());
 
 <template>
 
-<EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated:review="refreshReviewRow" @created:review="refreshReviews"></EditDialog>
+<EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated:review="refreshReviewRow" @created:review="refreshReviews"  @deleted:review="refreshReviews"></EditDialog>
     <div class="grid">
         <div class="col-12">
             <div class="card">

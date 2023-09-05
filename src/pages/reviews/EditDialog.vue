@@ -60,11 +60,14 @@
             <div class="col-12">
                 <Textarea v-model="editDataComputed.text" rows="5" autoResize  />
             </div>
-            <div class="col-12  lg:col-6 ">
+            <div class="col-12 " :class="{'lg:col-4':(editDataComputed.id), 'lg:col-6':(!editDataComputed.id)}">
                 <Button label="Сохранить" text :raised="true" @click="saveReview"/>
             </div>
-            <div class="col-12  lg:col-6 ">
-                <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
+            <div class="col-12" :class="{'lg:col-4':(editDataComputed.id), 'lg:col-6':(!editDataComputed.id)}">
+                <Button label="Отменить" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
+            </div>
+            <div class="col-12  lg:col-4 " v-if="editDataComputed.id">
+                <Button label="Удалить" class="p-button-outlined p-button-danger" @click="deleteReview"/>
             </div>
 <!--          <div class="col-12  lg:col-6 ">-->
 <!--            <img v-for="item in props.editData.content" :src="item.url">-->
@@ -97,7 +100,7 @@
         editData:Object
     })
     const dataUpdated = ref(false);
-    const emit = defineEmits(['update:visible', 'updated:review', 'created:review'])
+    const emit = defineEmits(['update:visible', 'updated:review', 'created:review', 'deleted:review'])
     // const  editedData = reactive(props.message);
 
     const editData = ref({});
@@ -141,6 +144,25 @@
         }
         emit('update:visible', false);
     };
+
+    const deleteReview = async ()   => {
+
+        confirm.require({
+            message: 'Удалить отзыв?',
+            header: 'Удаление отзыва',
+            icon: 'pi pi-exclamation-triangle',
+            accept: async () => {
+                const res = await ReviewsService.deleteReview(editData.value.id);
+                if(res.ok ) {
+                    toastService.duration(3000).success('Отзыв', 'Отзыв удален')
+                    emit('update:visible', false);
+                    emit('deleted:review', editData.value.id);
+                }
+            },
+            reject: () => {         }
+        });
+    }
+
     const updateAttach = async (files) => {
         console.log('updateAttach')
         editData.value.content = files;
