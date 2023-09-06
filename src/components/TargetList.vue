@@ -25,6 +25,7 @@ const props = defineProps({
     url:String,
     optionLabel:String,
     optionValue:String,
+    service:Object,
 });
 
 // const items = ref(props.options);
