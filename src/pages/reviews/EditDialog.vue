@@ -21,7 +21,7 @@
 
             </div>
             <div class="col-12  lg:col-12">
-                <TargetList url="api/doctors"></TargetList>
+                <TargetList url="api/doctors-list" v-model=""></TargetList>
 
             </div>
 

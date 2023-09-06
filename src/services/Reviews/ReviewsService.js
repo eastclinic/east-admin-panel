@@ -1,7 +1,6 @@
 
 import reviewsState from '../../state/ReviewsState.js'
 import reviewsApi from '../../api/ReviewsApi'
-import FilesApi from "../../api/FilesApi";
 
 
 export default (() =>({
