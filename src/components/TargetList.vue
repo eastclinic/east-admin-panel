@@ -43,6 +43,10 @@ const optionValue = ref(props.optionValue);
     ]);
 
     onMounted(async ()=>{
+        if(props.service){
+            const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
+            console.log(props.service)
+        }
         if(props.url){
             console.log(props.url)
             const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());

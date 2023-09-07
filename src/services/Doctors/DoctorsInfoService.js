@@ -4,7 +4,7 @@ import doctorsApi from '../../api/DoctorsApi'
 
 
 export default {
-    state: doctorsState,
+    // state: doctorsState,
 
     //actions
     //todo set definition requestAdapter type
@@ -23,8 +23,8 @@ export default {
 
 
     //getters
-    doctors(condition){
-        if( !condition ) return this.state.getItems();
+    items(condition){
+        if( !condition ) return doctorsState.getItems();
     },
 
 

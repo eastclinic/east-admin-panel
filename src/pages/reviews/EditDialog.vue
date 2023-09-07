@@ -21,7 +21,7 @@
 
             </div>
             <div class="col-12  lg:col-12">
-                <TargetList url="api/doctors-list" v-model=""></TargetList>
+                <TargetList :service="doctorsListService" ></TargetList>
 
             </div>
 
@@ -79,11 +79,16 @@
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
     import { useToast } from 'primevue/usetoast';
+    // import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
+    // import DoctorsListService from "../../services/Doctors/DoctorsListService";
+
+    import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
+    debugger;
 
     const toast = useToast();
+    const doctorsListService = ref(DoctorsInfoService);
 
-
-
+    // console.log(DoctorsInfoService)
     const confirm = useConfirm();
     const props = defineProps({
         visible: Boolean,
