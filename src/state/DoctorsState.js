@@ -13,6 +13,7 @@ import MultiStateManager from '../services/util/MultiStateManager.class.js'
 const DoctorsState = (() => {
     let instance = null;
     let s = 10;
+    debugger;
     return class DoctorsState extends MultiStateManager{
 
         constructor(...args) {
@@ -44,4 +45,4 @@ const DoctorsState = (() => {
 // })();
 // DoctorsState.state();//
 
-export default DoctorsState;
+export default new DoctorsState();

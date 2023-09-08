@@ -79,11 +79,9 @@
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
     import { useToast } from 'primevue/usetoast';
-    // import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
-    // import DoctorsListService from "../../services/Doctors/DoctorsListService";
-
     import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
-    debugger;
+    import DoctorsListService from "../../services/Doctors/DoctorsListService";
+
 
     const toast = useToast();
     const doctorsListService = ref(DoctorsInfoService);
