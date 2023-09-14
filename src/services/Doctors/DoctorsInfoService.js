@@ -1,6 +1,7 @@
 
-import doctorsState from '../../state/DoctorsState.js'
+// import doctorsState from '../../state/DoctorsState.js'
 import doctorsApi from '../../api/DoctorsApi'
+import MultiStateManager from "../util/MultiStateManager.class";
 /*
 Сервисов может быть множество
 стейтов может быть множество
@@ -18,13 +19,30 @@ DoctorsState должен иметь public методы, для обращен�
 
 Будем считать что вложенные объекты это субстейты
 
-
+для разных сервисов возможно будут нужны разные наборы данных,
+будет так называемый минимальный набор данных, нужный стейту
 
  */
 
-export default {
-    // state: doctorsState,
+const DoctorsState = (() => {
+    let instance = null;
+    let s = 10;
+    debugger;
+    return class DoctorsState extends MultiStateManager{
 
+        constructor(...args) {
+            super (...args);
+            if(instance === null) {
+                instance = this;
+            }
+            debugger;
+            return instance;
+        }
+    }
+})();
+
+export default {
+     state: new DoctorsState,
     //actions
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
