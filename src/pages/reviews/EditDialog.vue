@@ -80,7 +80,6 @@
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
-    import TargetList from "../../components/TargetList.vue";
     import FilesService from "../../services/Files/FilesService";
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
@@ -202,7 +201,6 @@
         // }
     }
     const dismissModal = () => {
-        console.log('dismissModal')
         if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {
             confirm.require({
                 message: 'Закрыть диалог и отменить изменения?',

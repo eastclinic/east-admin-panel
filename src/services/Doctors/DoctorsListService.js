@@ -25,7 +25,7 @@ DoctorsState должен иметь public методы, для обращен�
 
 const DoctorsState = StateManager.setGlobalWithName('DoctorsListState');
 
-export default {
+export default (() => ({
     state: DoctorsState,
     //actions
     //todo set definition requestAdapter type
@@ -51,4 +51,5 @@ export default {
     count(){
         return this.state.count();
     },
-}
+
+}))();
