@@ -1,31 +1,52 @@
 
-import DoctorsInfoService from './DoctorsInfoService'
+import doctorsApi from '../../api/DoctorsApi'
+import StateManager from "../util/StateManager";
+/*
+Сервисов может быть множество
+стейтов может быть множество
+Несколько сервисов могут работать с одним стейтом
+DoctorsListService и DoctorsListService будут работать с одним стейтом DoctorsState
+DoctorsState должен быть синглтоном
+DoctorsState должен иметь public методы, для обращения к данным и приватные методы для внутреннего устройства данных
+сам объект стейт const state = reactive() должен быть встроен в DoctorsState, и всем выдаваться один и тот же объект
 
-// export default {
-//     //extends DoctorsInfoService
-//     ...DoctorsInfoService,
-//
-//     //actions
-//
-//     //getters
-//     items(condition){
-//         if( !condition ) return this.state.getItems();
-//     },
-//
-//
-// }
+сервис обращается к стейту и выдает лишь необходимые поля
+
+для тестирования можно делать глобальный объект стейта, для отслеживания свойств
+
+Оба сервиса работая с одним мульти стейтом, работают с разными вложенными объектами
+
+Будем считать что вложенные объекты это субстейты
+
+для разных сервисов возможно будут нужны разные наборы данных,
+будет так называемый минимальный набор данных, нужный стейту
+
+ */
+
+const DoctorsState = StateManager.setGlobalWithName('DoctorsListState');
+
+export default {
+    state: DoctorsState,
+    //actions
+    //todo set definition requestAdapter type
+    async fetchServerData(requestAdapter){
+        //handle data from request adapters
+        const requestData = ( requestAdapter ) ? requestAdapter.toArray() : null
+        const res = await doctorsApi.getDoctors(requestData);
+        console.log(res)
+        if( res?.items) this.state.setItems(res.items)
+        if( res?.count) this.state.setCount(res.count)
+
+        //todo handle error
+        return this;
+    },
 
 
-export default  (() => {
-
-    let instance = null;
-
-    return class GlobalStore {
-        constructor() {
-            if(instance === null) {
-                instance = this;
-            }
-            return instance;
-        }
-    }
-})();
+    //getters
+    items(condition){
+        if( !condition ) return this.state.getItems();
+    },
+    count(){
+        return this.state.count();
+    },
+}

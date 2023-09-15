@@ -1,7 +1,7 @@
 
 // import doctorsState from '../../state/DoctorsState.js'
 import doctorsApi from '../../api/DoctorsApi'
-import MultiStateManager from "../util/MultiStateManager.class";
+import StateManager from "../util/StateManager";
 /*
 Сервисов может быть множество
 стейтов может быть множество
@@ -24,35 +24,19 @@ DoctorsState должен иметь public методы, для обращен�
 
  */
 
-const DoctorsState = (() => {
-    let instance = null;
-    let s = 10;
-    debugger;
-    return class DoctorsState extends MultiStateManager{
-
-        constructor(...args) {
-            super (...args);
-            if(instance === null) {
-                instance = this;
-            }
-            debugger;
-            return instance;
-        }
-    }
-})();
+const DoctorsState = StateManager.setGlobalWithName('DoctorInfoState');
 
 export default {
-     state: new DoctorsState,
+     state: DoctorsState,
     //actions
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
         if( requestAdapter )    doctorsApi.withRequestData(requestAdapter.toArray());
-        if( doctorsState.requestData() )  doctorsApi.withRequestData(doctorsState.requestData());
 
-        const res = await doctorsApi.getReviews();
+        const res = await doctorsApi.getDoctors();
         if(Object.keys(res).length > 0 && res.items){
-            doctorsState.setItems(res.items);
+            this.state.setItems(res.items);
         }
         //todo handle error
         return this;
@@ -61,7 +45,7 @@ export default {
 
     //getters
     items(condition){
-        if( !condition ) return doctorsState.getItems();
+        if( !condition ) return this.state.getItems();
     },
 
 

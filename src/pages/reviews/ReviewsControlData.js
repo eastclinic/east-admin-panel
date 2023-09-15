@@ -6,7 +6,9 @@ import dataTableRequestAdapter from "../../api/apiRequestAdapters/DataTableReque
 
 import { ref, reactive, toRaw, toRefs } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
-import reviewsState from "../../state/ReviewsState";
+import DoctorsListService from "../../services/Doctors/DoctorsListService";
+import ListRequest from "../../api/apiRequestAdapters/ListRequestAdapter";
+import {all} from "axios";
 
 export const { contextPath } = useLayout();
 
@@ -35,18 +37,19 @@ export const countRows = 10;
 
 export const onBeforeMountHook = () => async () => {
     await reviewsService.fetchServerData();
-    customerService.getCustomersLarge().then((data) => {
-        customer1.value = data;
-        loading1.value = false;
-        customer1.value.forEach((customer) => (customer.date = new Date(customer.date)));
-    });
 
-
-
+    console.log('onBeforeMountHook')
+};
+//init  use services
+export const initUseServices = () => async ()=> {
+    if(DoctorsListService.count() === 0){
+        await DoctorsListService.fetchServerData(ListRequest.all());
+    }
+    console.log(DoctorsListService);
 };
 
-
 export const onBeforeMountInitFilters = () => () => {
+    console.log('onBeforeMountInitFilters')
     initFilters1();
 };
 

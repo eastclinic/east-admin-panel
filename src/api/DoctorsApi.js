@@ -1,23 +1,19 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
-import UseGetParametersBuilder from '@/services/util/UseGetParametersBuilder.js';
+import buildGetURL from '@/services/util/UseGetParametersBuilder.js';
 
 export default (() => ({
         ...UseRequestAdapters,
-        ...UseGetParametersBuilder,
         _requestData : {},
         async getDoctors(requestData){
             let request = {method:'GET'}
             let requestUrl = baseUrl + '/api/doctors';
-            if(requestData.id){
-                requestUrl += '/'+requestData.id;
+
+            if(requestData &&  Object.keys(requestData).length > 0 ){
+                // Create the URL with the parameters
+                requestUrl = buildGetURL(requestUrl, requestData)
             }
-            else {
-                if( Object.keys(requestData).length > 0 ){
-                    // Create the URL with the parameters
-                    requestUrl = this._buildURL(requestUrl, requestData)
-                }
-            }
+
             const res = await fetch(requestUrl, request);
             if(!res) return {};
             const data = await res.json()

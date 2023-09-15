@@ -22,7 +22,6 @@
 const props = defineProps({
     modelValue:Object,
     options:Array,
-    url:String,
     optionLabel:String,
     optionValue:String,
     service:Object,
@@ -41,25 +40,15 @@ const optionValue = ref(props.optionValue);
         { name: 'Istanbul', code: 'IST' },
         { name: 'Paris', code: 'PRS' }
     ]);
-
+const Service = ref(props.service);
     onMounted(async ()=>{
+        console.log(Service.value)
         if(props.service){
-            const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
-            console.log(props.service)
-        }
-        if(props.url){
-            console.log(props.url)
-            const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
 
-            if(res.items){
-                items.value = res.items;
-                if(res.optionLabel) optionLabel.value = res.optionLabel;
-                if(res.optionValue) optionValue.value = res.optionValue;
-
-                console.log(optionValue.value)
-                console.log(optionLabel.value)
-            }
+            //const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
+            //console.log(props.service)
         }
+
     });
 
 

@@ -84,7 +84,7 @@
 
 
     const toast = useToast();
-    const doctorsListService = ref(DoctorsInfoService);
+    const doctorsListService = ref(DoctorsListService);
 
     // console.log(DoctorsInfoService)
     const confirm = useConfirm();

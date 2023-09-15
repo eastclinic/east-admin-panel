@@ -14,6 +14,13 @@ export default (() => ({
         this._requestData = {};
         return this;
     },
+    all(){
+        this._requestData['all'] = true;
+        return this;
+    },
     requestData() {return {...this._requestData}},
+    toArray(){
+        return {...this._requestData}
+    },
     //
 }))();
