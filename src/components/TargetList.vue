@@ -1,10 +1,9 @@
 <template>
 <div>
     <slot v-bind="items">
-        {{items}}
         {{optionValue}}
         <Dropdown v-model="selectedItems"
-                  :options="cities"
+                  :options="items"
                   optionLabel="name"
                   :optionLabel="optionLabel"
                   :optionValue="optionValue"
@@ -28,11 +27,11 @@ const props = defineProps({
 });
 
 // const items = ref(props.options);
-const items = ref([]);
 const selectedItems = ref(props.modelValue);
 const optionLabel = ref(props.optionLabel);
 const optionValue = ref(props.optionValue);
-
+    const Service = ref(props.service);
+    const items = ref(Service.value.items());
     const cities = ref([
         { name: 'New York', code: 'NY' },
         { name: 'Rome', code: 'RM' },
@@ -40,16 +39,17 @@ const optionValue = ref(props.optionValue);
         { name: 'Istanbul', code: 'IST' },
         { name: 'Paris', code: 'PRS' }
     ]);
-const Service = ref(props.service);
-    onMounted(async ()=>{
-        console.log(Service.value)
-        if(props.service){
 
-            //const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
-            //console.log(props.service)
-        }
-
-    });
+    // onMounted(async ()=>{
+    //
+    //     console.log({...props.service.items})
+    //     if(props.service){
+    //
+    //         //const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
+    //         //console.log(props.service)
+    //     }
+    //
+    // });
 
 
 </script>

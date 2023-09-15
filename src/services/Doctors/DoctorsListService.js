@@ -31,9 +31,7 @@ export default {
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
-        const requestData = ( requestAdapter ) ? requestAdapter.toArray() : null
-        const res = await doctorsApi.getDoctors(requestData);
-        console.log(res)
+        const res = await doctorsApi.withUrl('/api/doctors-list').getDoctors(( requestAdapter ) ? requestAdapter.toArray() : null);
         if( res?.items) this.state.setItems(res.items)
         if( res?.count) this.state.setCount(res.count)
 
@@ -44,7 +42,10 @@ export default {
 
     //getters
     items(condition){
-        if( !condition ) return this.state.getItems();
+        const items = this.state.getItems();
+        const preparedItems = [];
+        items.map(item => (preparedItems.push({name:item.fullname, code: item.id})))
+        if( !condition ) return preparedItems;
     },
     count(){
         return this.state.count();

@@ -35,7 +35,14 @@ export default  (() => ({
 
 
         //getters
-        getItems(){        return toRef(this._state, 'items'); },
+        getItems(){
+            const items = [];
+            for(const n in this._state.itemsIds){
+                const id = this._state.itemsIds[n];
+                if(this._state._cash[id]) items.push(this._state._cash[id])
+            }
+            return items;
+        },
 
         count() {
             return this._state.count;
