@@ -184,21 +184,15 @@
 
     const saveReviewToServer = async (editedData) => {
         if(props?.editData?.id) editedData.id = props.editData.id;
-        else {
-
-            if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
-            if(!editedData.reviewable_id) editedData.reviewable_id = 3;
-            editedData.tempReviewId = tempReviewId.value;
-        }
         console.log('saveReviewToServer')
         return  await ReviewsService.saveReview(editedData);
     }
     const showModal = async () =>{
-        // if(props?.editData?.is_new){
-        //     editedData.is_new = false;
-        //     await saveReview(toRaw(editedData));
-        //     emit('updated:review', props.editData.id);
-        // }
+        if(props?.editData?.is_new){
+            editData.is_new = false;
+            await saveReviewToServer(toRaw(editData));
+            emit('updated:review', props.editData.id);
+        }
     }
     const dismissModal = () => {
         if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {

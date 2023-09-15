@@ -13,7 +13,7 @@ const _setItemsIds = (store, items) => {
     return store._state.itemsIds = itemsIds;
 }
 export default  (() => ({
-        _state : reactive({ count : 0, _cash: {}, itemsIds:{} }),
+        _state : reactive({ count : 0, _cash: {}, itemsIds:[] }),
 
         //mutations
         setItems: function(items){

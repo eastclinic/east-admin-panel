@@ -18,7 +18,7 @@ export default (() => {
                 // Create the URL with the parameters
                 requestUrl = buildGetURL(requestUrl, requestData)
             }
-
+//todo move to global fetch
             const res = await fetch(requestUrl, request);
             if(!res) return {};
             const data = await res.json()
@@ -75,6 +75,7 @@ export default (() => {
             }
             return {};
         },
+
         withUrl(url){
             if(url) _url = url;
             return this;
