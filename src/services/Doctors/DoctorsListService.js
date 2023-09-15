@@ -42,6 +42,7 @@ export default {
 
     //getters
     items(condition){
+        return this.state.getItems();
         const items = this.state.getItems();
         const preparedItems = [];
         items.map(item => (preparedItems.push({name:item.fullname, code: item.id})))

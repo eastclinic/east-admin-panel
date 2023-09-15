@@ -21,8 +21,14 @@
 
             </div>
             <div class="col-12  lg:col-12">
-                <TargetList :service="doctorsListService" ></TargetList>
+                <Dropdown v-model="editData.reviewable_id"
+                          :options="doctorsListService.items()"
+                          optionLabel="fullname"
+                          optionValue="id"
+                          placeholder="На кого отзыв" class="w-full md:w-14rem"
+                          filter >
 
+                </Dropdown>
             </div>
 
             <div class="col-12  lg:col-6 ">
@@ -173,6 +179,8 @@
     //     editedData = reactive({...toRaw(props.editData)});
     // });
 
+
+    const targetList = ref(doctorsListService.value.items());
 
 
     const saveReviewToServer = async (editedData) => {

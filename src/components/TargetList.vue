@@ -26,30 +26,12 @@ const props = defineProps({
     service:Object,
 });
 
-// const items = ref(props.options);
-const selectedItems = ref(props.modelValue);
-const optionLabel = ref(props.optionLabel);
-const optionValue = ref(props.optionValue);
+    // const items = ref(props.options);
+    const selectedItems = ref(props.modelValue);
+    const optionLabel = ref(props.optionLabel);
+    const optionValue = ref(props.optionValue);
     const Service = ref(props.service);
     const items = ref(Service.value.items());
-    const cities = ref([
-        { name: 'New York', code: 'NY' },
-        { name: 'Rome', code: 'RM' },
-        { name: 'London', code: 'LDN' },
-        { name: 'Istanbul', code: 'IST' },
-        { name: 'Paris', code: 'PRS' }
-    ]);
-
-    // onMounted(async ()=>{
-    //
-    //     console.log({...props.service.items})
-    //     if(props.service){
-    //
-    //         //const res = await Api.fetchServerData(props.url, ListRequestAdapter.page(1).requestData());
-    //         //console.log(props.service)
-    //     }
-    //
-    // });
 
 
 </script>
