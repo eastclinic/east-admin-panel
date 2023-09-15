@@ -19,8 +19,18 @@
                     </div>
                 </div>
 
+            </div>
+            <div class="col-12  lg:col-12">
+                <Dropdown v-model="editData.reviewable_id"
+                          :options="doctorsListService.items()"
+                          optionLabel="fullname"
+                          optionValue="id"
+                          placeholder="На кого отзыв" class="w-full md:w-14rem"
+                          filter >
 
-        </div>
+                </Dropdown>
+            </div>
+
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
@@ -30,21 +40,6 @@
             <div class="col-12 lg:col-6 ">
                     <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" />
             </div>
-<!--          <div class="col-12 ">-->
-<!--              <div class="flex gallery-item-container" v-for="item in props.editData.content">-->
-<!--                <div style="position:relative" class="gallery-item">-->
-<!--                  <div class="pi pi-video p-button-icon video-icon"></div>-->
-<!--                  <video height="100">-->
-<!--                    <source :src="item.url" type="video/mp4">-->
-<!--                  </video>-->
-<!--                </div>-->
-<!--                <div style="position:relative" class="gallery-item">-->
-<!--                  <div class="pi pi-close p-button-icon video-icon"></div>-->
-<!--                  <img src="https://eastclinic.ru/assets/resourceimages/9788/_232x269/Gybarev1_2.0_232x269.webp">-->
-<!--                </div>-->
-
-<!--              </div>-->
-<!--          </div>-->
             <div class="col-12">
               <AttachFiles
                       :files="editDataComputed.content"
@@ -89,11 +84,14 @@
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
     import { useToast } from 'primevue/usetoast';
+    import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
+    import DoctorsListService from "../../services/Doctors/DoctorsListService";
+
 
     const toast = useToast();
+    const doctorsListService = ref(DoctorsListService);
 
-
-
+    // console.log(DoctorsInfoService)
     const confirm = useConfirm();
     const props = defineProps({
         visible: Boolean,
@@ -181,6 +179,8 @@
     // });
 
 
+    const targetList = ref(doctorsListService.value.items());
+
 
     const saveReviewToServer = async (editedData) => {
         if(props?.editData?.id) editedData.id = props.editData.id;
@@ -201,7 +201,6 @@
         // }
     }
     const dismissModal = () => {
-        console.log('dismissModal')
         if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {
             confirm.require({
                 message: 'Закрыть диалог и отменить изменения?',

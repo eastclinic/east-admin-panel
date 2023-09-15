@@ -1,5 +1,4 @@
 
-// import doctorsState from '../../state/DoctorsState.js'
 import doctorsApi from '../../api/DoctorsApi'
 import StateManager from "../util/StateManager";
 /*
@@ -24,20 +23,18 @@ DoctorsState должен иметь public методы, для обращен�
 
  */
 
-const DoctorsState = StateManager.setGlobalWithName('DoctorInfoState');
+const DoctorsState = StateManager.setGlobalWithName('DoctorsListState');
 
-export default {
-     state: DoctorsState,
+export default (() => ({
+    state: DoctorsState,
     //actions
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
-        if( requestAdapter )    doctorsApi.withRequestData(requestAdapter.toArray());
+        const res = await doctorsApi.withUrl('/api/doctors-list').getDoctors(( requestAdapter ) ? requestAdapter.toArray() : null);
+        if( res?.items) this.state.setItems(res.items)
+        if( res?.count) this.state.setCount(res.count)
 
-        const res = await doctorsApi.getDoctors();
-        if(Object.keys(res).length > 0 && res.items){
-            this.state.setItems(res.items);
-        }
         //todo handle error
         return this;
     },
@@ -45,9 +42,14 @@ export default {
 
     //getters
     items(condition){
-        if( !condition ) return this.state.getItems();
+        return this.state.getItems();
+        const items = this.state.getItems();
+        const preparedItems = [];
+        items.map(item => (preparedItems.push({name:item.fullname, code: item.id})))
+        if( !condition ) return preparedItems;
+    },
+    count(){
+        return this.state.count();
     },
 
-
-
-}
+}))();

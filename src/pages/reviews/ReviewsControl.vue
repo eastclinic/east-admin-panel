@@ -1,6 +1,8 @@
 <script setup>
+
+
 import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
-    customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
+    customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters, initUseServices,
     onPage, count, countRows,filters,
     onOpenEdit, visibleEditDialog, editData, createItem,
     refreshReviewRow, refreshReviews, onSort, rating5,
@@ -11,6 +13,7 @@ import {  onBeforeMount } from 'vue';
 import EditDialog from "./EditDialog.vue";
 
 onBeforeMount(onBeforeMountHook());
+onBeforeMount(initUseServices());
 
 
 onBeforeMount(onBeforeMountInitFilters());
