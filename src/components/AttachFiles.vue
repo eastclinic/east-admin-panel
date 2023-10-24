@@ -219,95 +219,95 @@
 </template>
 
 <style scoped lang="scss">
-  .attach-files {
-    display: flex;
-    overflow-x: scroll;
-    margin-right: 5px;
-    &::-webkit-scrollbar {
-      width: 15px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 10px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: transparent;
-      background-clip: content-box;
-      border: 5px solid transparent;
-      border-radius: 20px;
-    }
-    @media (hover: hover) {
-      &:hover {
-        &::-webkit-scrollbar-thumb {
-          background: rgba(135, 143, 162, 0.45);
-          background-clip: content-box;
-          border: 5px solid transparent;
-          border-radius: 20px;
-        }
-      }
-    }
-    @media (hover: none) {
-      &::-webkit-scrollbar {
-        width: 5px;
-      }
+.attach-files {
+  display: flex;
+  overflow-x: scroll;
+  margin-right: 5px;
+  &::-webkit-scrollbar {
+    width: 15px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    background-clip: content-box;
+    border: 5px solid transparent;
+    border-radius: 20px;
+  }
+  @media (hover: hover) {
+    &:hover {
       &::-webkit-scrollbar-thumb {
-        background: rgba(135, 143, 162, 0.45);;
+        background: rgba(135, 143, 162, 0.45);
         background-clip: content-box;
-        border: 7px solid transparent;
+        border: 5px solid transparent;
         border-radius: 20px;
       }
     }
-    &__item {
-      width: 240px;
-      height: 240px;
+  }
+  @media (hover: none) {
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(135, 143, 162, 0.45);;
+      background-clip: content-box;
+      border: 7px solid transparent;
+      border-radius: 20px;
+    }
+  }
+  &__item {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+
+    &.add {
+      background: #d5d5d5;
+      border-radius: 10px;
       position: relative;
-      display: flex;
-      flex-shrink: 0;
-
-      &.add {
-        background: #d5d5d5;
-        border-radius: 10px;
-        position: relative;
-        cursor: pointer;
-        & .upload-button {
-          position: absolute;
-          top: 42%;
-          right: 44%;
-        }
-
-      }
-      & .delete-button {
+      cursor: pointer;
+      & .upload-button {
         position: absolute;
-        top: 5px;
-        right: 5px;
-        display: none;
-        cursor: pointer;
-      }
-      & .load-button {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-      }
-      &:hover .delete-button {
-        display: block;
-      }
-      &.thumb {
-        background-color: #f1f1f1;
-        border-radius: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        &:not(:last-child) {
-          margin-right: 5px;
-        }
-        & img {
-
-          width: 100%;
-        }
+        top: 42%;
+        right: 44%;
       }
 
     }
+    & .delete-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      display: none;
+      cursor: pointer;
+    }
+    & .load-button {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+    }
+    &:hover .delete-button {
+      display: block;
+    }
+    &.thumb {
+      background-color: #f1f1f1;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      &:not(:last-child) {
+        margin-right: 5px;
+      }
+      & img {
+
+        width: 100%;
+      }
+    }
+
   }
+}
 
 </style>
