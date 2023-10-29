@@ -1,29 +1,20 @@
-class AuthService {
-    login(user) {
-        return axios
-            .post(API_URL + 'signin', {
-                username: user.username,
-                password: user.password
-            })
-            .then(response => {
-                if (response.data.accessToken) {
-                    localStorage.setItem('user', JSON.stringify(response.data));
-                }
+import authApi from '../api/AuthApi'
 
-                return response.data;
-            });
+class AuthService {
+    async login(user) {
+        await authApi.login(user)
     }
 
     logout() {
-        localStorage.removeItem('user');
+        localStorage.removeItem('jwtToken');
     }
 
-    register(user) {
-        return axios.post(API_URL + 'signup', {
-            username: user.username,
-            email: user.email,
-            password: user.password
-        });
+    async register(user) {
+        await authApi.register(user)
+    }
+    isAuth(){
+        return false;
+        return (localStorage.getItem('jwtToken'));
     }
 }
 

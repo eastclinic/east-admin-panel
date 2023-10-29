@@ -1,7 +1,7 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
 import buildGetURL from '@/services/util/UseGetParametersBuilder.js';
-import fetchToServer from '@/services/util/UseFetchToServer.js';
+import fetchToServer from '@/services/util/UseFetchToServer.ts';
 
 
 
@@ -26,9 +26,7 @@ export default (() => {
 
             return  await fetchToServer(baseUrl + '/api/auth/signup', request);
         },
-        logout() {
-            localStorage.removeItem('jwtToken');
-        }
+
 
 
     }

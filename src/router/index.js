@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
+import auth from './middleware/auth'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -9,6 +10,9 @@ const router = createRouter({
         {
             path: '/',
             component: AppLayout,
+            meta: {
+                middleware: [ auth ]
+            },
             children: [
                 {
                     path: '/pages/reviews',
