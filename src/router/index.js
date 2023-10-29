@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
-import auth from './middleware/auth'
+import permissions from '../services/Profile/PermissionsService';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -10,14 +10,12 @@ const router = createRouter({
         {
             path: '/',
             component: AppLayout,
-            meta: {
-                middleware: [ auth ]
-            },
+
             children: [
                 {
                     path: '/pages/reviews',
                     name: 'ReviewsControl',
-                    component: () => import('@/pages/reviews/ReviewsControl.vue')
+                    component: () => import('@/pages/reviews/ReviewsControl.vue'),
                 },
                 {
                     path: '/doctors/info',
@@ -187,5 +185,9 @@ const router = createRouter({
         }
     ]
 });
+
+router.beforeResolve((to, from, next) => {
+    permissions.beforeEach(to, from, next);
+})
 
 export default router;

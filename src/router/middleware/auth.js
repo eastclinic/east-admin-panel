@@ -1,5 +1,5 @@
 // src/middleware/auth.js
-import authService from '../../services/AuthService';
+import authService from '../../services/Profile/AuthService';
 
 
 export default function auth({ next, router }) {

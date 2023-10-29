@@ -1,4 +1,4 @@
-import authApi from '../api/AuthApi'
+import authApi from '../../api/AuthApi'
 
 class AuthService {
     async login(user) {
@@ -13,7 +13,7 @@ class AuthService {
         await authApi.register(user)
     }
     isAuth(){
-        return false;
+        return true;
         return (localStorage.getItem('jwtToken'));
     }
 }
