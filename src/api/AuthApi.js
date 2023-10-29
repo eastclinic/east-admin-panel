@@ -6,25 +6,31 @@ import fetchToServer from '@/services/util/UseFetchToServer.js';
 
 
 export default (() => {
-    let _url = '/api/doctors';
     return {
         ...UseRequestAdapters,
         _requestData : {},
 
         async login(requestData){
-            let request = {method:'GET'}
-            if (_url[0] !== '/') _url = '/'+_url;
-            // Create the URL with the parameters
-            const requestUrl = buildGetURL(baseUrl + _url, requestData)
+            let request = {
+                body: JSON.stringify({...requestData, ...this._requestData}),
+                headers: { 'Content-Type': 'application/json' },
+            };
 
-            const res = await fetchToServer(requestUrl, request);
-            if(!res) return {};
-            const data = await res.json()
-            if(!data || !data.items) return {};
-            return data;
+            return  await fetchToServer(baseUrl + '/api/auth/signin', request);
         },
+        async register(requestData){
+            let request = {
+                body: JSON.stringify({...requestData, ...this._requestData}),
+                headers: { 'Content-Type': 'application/json' },
+            };
 
+            return  await fetchToServer(baseUrl + '/api/auth/signup', request);
+        },
+        logout() {
+            localStorage.removeItem('jwtToken');
+        }
 
 
     }
+
 })();
