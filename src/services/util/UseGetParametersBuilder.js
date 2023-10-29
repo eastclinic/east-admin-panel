@@ -15,7 +15,7 @@ const buildSearchParams = (params, prefix = '') => {
         return (queryString.endsWith('&')) ? queryString.slice(0, -1) : queryString;
 };
  const buildGetURL = (baseURL, params) => {
-                const searchParams = buildSearchParams(params);
+                const searchParams = (params &&  Object.keys(params).length > 0 ) ? buildSearchParams(params) : '';
                 const url = new URL(baseURL);
                 url.search = searchParams;
                 return url.toString();

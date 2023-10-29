@@ -8,6 +8,7 @@
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
     },
     "dependencies": {
+        "@types/es6-promise": "^3.3.0",
         "@vueuse/core": "^9.13.0",
         "axios": "^1.4.0",
         "chart.js": "3.3.2",
