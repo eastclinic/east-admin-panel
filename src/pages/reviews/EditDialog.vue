@@ -182,7 +182,7 @@
                 </span>
             </div>
             <div class="col-12 lg:col-6 ">
-                    <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" />
+                    <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" id="rating" placeholder="Рейтинг 1 до 100"/>
             </div>
             <div class="col-12">
               <AttachFiles

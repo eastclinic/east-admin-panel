@@ -24,6 +24,7 @@
                 return [
                     'mp4',
                     'webm',
+                    'webp',
                     'mov',
                     'quicktime',
                     'jpeg',
