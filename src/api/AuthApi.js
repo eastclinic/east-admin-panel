@@ -11,16 +11,10 @@ export default (() => {
         _requestData : {},
 
         async login(requestData){
-            console.log(requestData)
-            return  await postToServer(baseUrl + '/api/auth/signin', {...requestData, ...this._requestData});
+            return  postToServer(baseUrl + '/api/auth/login', {...requestData, ...this._requestData});
         },
         async register(requestData){
-            let request = {
-                body: JSON.stringify({...requestData, ...this._requestData}),
-                headers: { 'Content-Type': 'application/json' },
-            };
-
-            return  await fetchToServer(baseUrl + '/api/auth/signup', request);
+            return  await postToServer(baseUrl + '/api/auth/register', {...requestData, ...this._requestData});
         },
 
 

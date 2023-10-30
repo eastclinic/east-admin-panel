@@ -2,7 +2,7 @@ import authApi from '../../api/AuthApi'
 
 class AuthService {
     async login(authData) {
-        await authApi.login(authData)
+       return  authApi.login(authData);
     }
 
     logout() {
