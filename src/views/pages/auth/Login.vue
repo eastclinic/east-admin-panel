@@ -6,8 +6,8 @@
     import { useRouter } from 'vue-router'
 
     const { layoutConfig, contextPath } = useLayout();
-    const email = ref('jeromwork@inbox.ru');
-    const password = ref('12qwaszx');
+    const email = ref('');
+    const password = ref('');
     const checked = ref(false);
     const passwordErrorMessage = ref('');
     const emailErrorMessage = ref('');
@@ -42,8 +42,8 @@
 
                     <div>
                         <div class="field p-fluid md:w-30rem mb-3">
-                            <label for="login1" class="block text-900 text-xl font-medium mb-2">Логин</label>
-                            <InputText id="login1" type="text" placeholder="введите логин" class="w-full" style="padding: 1rem" v-model="email"
+                            <label for="login1" class="block text-900 text-xl font-medium mb-2">Email</label>
+                            <InputText id="login1" type="text" placeholder="введите email" class="w-full" style="padding: 1rem" v-model="email"
                                        :class="(emailErrorMessage)?'p-invalid':''"
                             />
                             <small class="p-error" id="login1-error">{{ emailErrorMessage || '&nbsp;' }}</small>
