@@ -15,7 +15,15 @@ function saveJWTToken(data){
     }
 }
 
-async function fetchToServer<T>(url: string, options?: RequestInit) {
+export async function postToServer<T>(url: string, requestData: Object, options?: RequestInit) {
+    if(!options) options = {};
+    options.method = 'POST';
+    options.headers = {   'Content-Type': 'application/json', };
+    options.body = JSON.stringify(requestData)
+    return fetchToServer(url, options);
+}
+
+export async function fetchToServer<T>(url: string, options?: RequestInit) {
     try {
         options = addJwtTokenToRequest(options);
 
@@ -32,4 +40,6 @@ async function fetchToServer<T>(url: string, options?: RequestInit) {
         throw new Error(`Fetch error: ${error.message}`);
     }
 }
-export default fetchToServer;
+
+
+
