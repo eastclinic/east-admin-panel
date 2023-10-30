@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import authService from '../services/Profile/AuthService'
 
 const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 
@@ -21,8 +22,11 @@ const logoUrl = computed(() => {
     return `${contextPath}layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
 
-const onTopBarMenuButton = () => {
+const  onTopBarMenuButton = async() => {
     topbarMenuActive.value = !topbarMenuActive.value;
+    await authService.logout();
+    await router.push({name:'login'});
+
 };
 const onSettingsClick = () => {
     topbarMenuActive.value = false;
