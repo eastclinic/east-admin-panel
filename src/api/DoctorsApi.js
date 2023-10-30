@@ -1,7 +1,7 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
 import buildGetURL from '@/services/util/UseGetParametersBuilder.js';
-
+import {getToServer} from '../services/util/UseFetchToServer';
 
 
 export default (() => {
@@ -11,19 +11,7 @@ export default (() => {
         _requestData : {},
 
         async getDoctors(requestData){
-            let request = {method:'GET'}
-            if (_url[0] !== '/') _url = '/'+_url;
-            let requestUrl = baseUrl + _url ;
-            if(requestData &&  Object.keys(requestData).length > 0 ){
-                // Create the URL with the parameters
-                requestUrl = buildGetURL(requestUrl, requestData)
-            }
-
-            const res = await fetch(requestUrl, request);
-            if(!res) return {};
-            const data = await res.json()
-            if(!data || !data.items) return {};
-            return data;
+            return await getToServer(baseUrl + _url, {...requestData, ...this._requestData});
         },
         async saveDoctor( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}

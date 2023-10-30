@@ -1,3 +1,147 @@
+
+<script setup >
+
+    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
+    import ReviewsService from "../../services/Reviews/ReviewsService";
+    import AttachFiles from "@/components/AttachFiles.vue";
+    import FilesService from "../../services/Files/FilesService";
+    import { useConfirm } from "primevue/useconfirm";
+    import toastService from '@/services/Toast'
+    import { useToast } from 'primevue/usetoast';
+    import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
+    import DoctorsListService from "../../services/Doctors/DoctorsListService";
+
+
+    const toast = useToast();
+    const doctorsListService = ref(DoctorsListService);
+
+    // console.log(DoctorsInfoService)
+    const confirm = useConfirm();
+    const props = defineProps({
+        visible: Boolean,
+        editData:Object
+    })
+    const dataUpdated = ref(false);
+    const emit = defineEmits(['update:visible', 'updated:review', 'created:review', 'deleted:review'])
+    // const  editedData = reactive(props.message);
+
+    const editData = ref({});
+    const  editDataComputed = computed(() => { editData.value = JSON.parse(JSON.stringify(props.editData)); return editData.value});
+
+    const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
+    const reviewsService = ReviewsService;
+    //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
+
+    const tempReviewId = computed(()=> (props.editData?.id) ? props.editData.id : Math.floor(Math.random() + Date.now() / 1000 | 0))
+    const attachFilesServerSettings = computed(() => {return {
+        url:ReviewsService.getApiContentUrl(),
+        requestData:{
+            reviewId : (props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
+        }
+    }});
+
+    const contentPublish = (publish, contentInfo)=>{
+        for(const f in editData.value.content){
+            if(editData.value.content[f].id === contentInfo.id){
+                editData.value.content[f].published = publish;
+            }
+        }
+    }
+    const saveReview = async () => {
+        console.log(JSON.stringify(editData.value))
+        console.log(JSON.stringify(props.editData))
+        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
+            const res = await saveReviewToServer(toRaw(editData.value));
+            if(res.ok ) {
+                if(editData.value.id){
+                    toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
+                    emit('updated:review', editData.value.id);
+
+                }else{
+                    toastService.duration(3000).success('Отзыв', 'Отзыв создан')
+                    emit('created:review');
+                }
+
+            }
+        }
+        emit('update:visible', false);
+    };
+
+    const deleteReview = async ()   => {
+
+        confirm.require({
+            message: 'Удалить отзыв?',
+            header: 'Удаление отзыва',
+            icon: 'pi pi-exclamation-triangle',
+            accept: async () => {
+                const res = await ReviewsService.deleteReview(editData.value.id);
+                if(res.ok ) {
+                    toastService.duration(3000).success('Отзыв', 'Отзыв удален')
+                    emit('update:visible', false);
+                    emit('deleted:review', editData.value.id);
+                }
+            },
+            reject: () => {         }
+        });
+    }
+
+    const updateAttach = async (files) => {
+        console.log('updateAttach')
+        editData.value.content = files;
+        // dataUpdated.value = true;
+
+    };
+    const removeContent = (index) => {
+        console.log('removeContent')
+        editData.content.splice(index, 1);
+    };
+
+
+    // onBeforeUpdate(()=>{
+    //     //todo its may be wrong
+    //     editedData = reactive({...toRaw(props.editData)});
+    // });
+
+
+    const targetList = ref(doctorsListService.value.items());
+
+
+    const saveReviewToServer = async (editedData) => {
+        if(props?.editData?.id) editedData.id = props.editData.id;
+        else {
+
+            if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
+            if(!editedData.reviewable_id) editedData.reviewable_id = 3;
+            editedData.tempReviewId = tempReviewId.value;
+        }
+        console.log('saveReviewToServer')
+        return  await ReviewsService.saveReview(editedData);
+    }
+    const showModal = async () =>{
+        // if(props?.editData?.is_new){
+        //     editedData.is_new = false;
+        //     await saveReview(toRaw(editedData));
+        //     emit('updated:review', props.editData.id);
+        // }
+    }
+    const dismissModal = () => {
+        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {
+            confirm.require({
+                message: 'Закрыть диалог и отменить изменения?',
+                header: 'Отмена',
+                icon: 'pi pi-exclamation-triangle',
+                accept: () => {
+                    editData.value = {};
+                    emit('update:visible', false);
+                },
+                reject: () => {         }
+            });
+        }else{ emit('update:visible', false);}
+    };
+
+
+</script>
+
 <template>
     <ConfirmDialog></ConfirmDialog>
     <Dialog :visible="props.visible" modal
@@ -74,149 +218,6 @@
 
 
 </template>
-
-<script setup>
-
-    import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
-    import ReviewsService from "../../services/Reviews/ReviewsService";
-    import AttachFiles from "@/components/AttachFiles.vue";
-    import FilesService from "../../services/Files/FilesService";
-    import { useConfirm } from "primevue/useconfirm";
-    import toastService from '@/services/Toast'
-    import { useToast } from 'primevue/usetoast';
-    import DoctorsInfoService from "../../services/Doctors/DoctorsInfoService";
-    import DoctorsListService from "../../services/Doctors/DoctorsListService";
-
-
-    const toast = useToast();
-    const doctorsListService = ref(DoctorsListService);
-
-    // console.log(DoctorsInfoService)
-    const confirm = useConfirm();
-    const props = defineProps({
-        visible: Boolean,
-        editData:Object
-    })
-    const dataUpdated = ref(false);
-    const emit = defineEmits(['update:visible', 'updated:review', 'created:review', 'deleted:review'])
-    // const  editedData = reactive(props.message);
-
-    const editData = ref({});
-    const  editDataComputed = computed(() => { editData.value = JSON.parse(JSON.stringify(props.editData)); return editData.value});
-
-    const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
-    const reviewsService = ReviewsService;
-    //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
-
-    const tempReviewId = computed(()=> (props.editData?.id) ? props.editData.id : Math.floor(Math.random() + Date.now() / 1000 | 0))
-    const attachFilesServerSettings = computed(() => {return {
-        url:ReviewsService.getApiContentUrl(),
-            requestData:{
-                reviewId : (props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
-        }
-    }});
-
-    const contentPublish = (publish, contentInfo)=>{
-            for(const f in editData.value.content){
-                if(editData.value.content[f].id === contentInfo.id){
-                    editData.value.content[f].published = publish;
-                }
-            }
-    }
-    const saveReview = async () => {
-        console.log(JSON.stringify(editData.value))
-        console.log(JSON.stringify(props.editData))
-        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
-            const res = await saveReviewToServer(toRaw(editData.value));
-            if(res.ok ) {
-                if(editData.value.id){
-                    toastService.duration(3000).success('Отзыв', 'Отзыв обновлен')
-                    emit('updated:review', editData.value.id);
-
-                }else{
-                    toastService.duration(3000).success('Отзыв', 'Отзыв создан')
-                    emit('created:review');
-                }
-
-            }
-        }
-        emit('update:visible', false);
-    };
-
-    const deleteReview = async ()   => {
-
-        confirm.require({
-            message: 'Удалить отзыв?',
-            header: 'Удаление отзыва',
-            icon: 'pi pi-exclamation-triangle',
-            accept: async () => {
-                const res = await ReviewsService.deleteReview(editData.value.id);
-                if(res.ok ) {
-                    toastService.duration(3000).success('Отзыв', 'Отзыв удален')
-                    emit('update:visible', false);
-                    emit('deleted:review', editData.value.id);
-                }
-            },
-            reject: () => {         }
-        });
-    }
-
-    const updateAttach = async (files) => {
-        console.log('updateAttach')
-        editData.value.content = files;
-        // dataUpdated.value = true;
-
-    };
-    const removeContent = (index) => {
-        console.log('removeContent')
-      editData.content.splice(index, 1);
-    };
-
-
-    // onBeforeUpdate(()=>{
-    //     //todo its may be wrong
-    //     editedData = reactive({...toRaw(props.editData)});
-    // });
-
-
-    const targetList = ref(doctorsListService.value.items());
-
-
-    const saveReviewToServer = async (editedData) => {
-        if(props?.editData?.id) editedData.id = props.editData.id;
-        else {
-
-            if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
-            if(!editedData.reviewable_id) editedData.reviewable_id = 3;
-            editedData.tempReviewId = tempReviewId.value;
-        }
-        console.log('saveReviewToServer')
-        return  await ReviewsService.saveReview(editedData);
-    }
-    const showModal = async () =>{
-        // if(props?.editData?.is_new){
-        //     editedData.is_new = false;
-        //     await saveReview(toRaw(editedData));
-        //     emit('updated:review', props.editData.id);
-        // }
-    }
-    const dismissModal = () => {
-        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {
-            confirm.require({
-                message: 'Закрыть диалог и отменить изменения?',
-                header: 'Отмена',
-                icon: 'pi pi-exclamation-triangle',
-                accept: () => {
-                    editData.value = {};
-                    emit('update:visible', false);
-                },
-                reject: () => {         }
-            });
-        }else{ emit('update:visible', false);}
-    };
-
-
-</script>
 
 <style scoped>
 .video-icon {
