@@ -112,7 +112,7 @@
     const attachFilesServerSettings = computed(() => {return {
             requestData:{
                 reviewId : (props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
-                contentable_type:'Modules\\Reviews\\Entities\\Review',
+                contentable_type:'review',
                 contentable_id:(props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
         }
     }});
