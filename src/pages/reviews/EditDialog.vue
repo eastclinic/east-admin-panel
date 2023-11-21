@@ -110,9 +110,10 @@
 
     const tempReviewId = computed(()=> (props.editData?.id) ? props.editData.id : Math.floor(Math.random() + Date.now() / 1000 | 0))
     const attachFilesServerSettings = computed(() => {return {
-        url:ReviewsService.getApiContentUrl(),
             requestData:{
                 reviewId : (props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
+                contentable_type:'Modules\\Reviews\\Entities\\Review',
+                contentable_id:(props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
         }
     }});
 

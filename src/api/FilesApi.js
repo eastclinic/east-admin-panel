@@ -1,16 +1,17 @@
 import baseUrl from '@/api/config.js';
 import axios from "axios";
+const url = baseUrl+'/api/content'
 
 
 export default (() => ({
 
     async fileUpload( file, requestData ){
-    //if(!fileList || fileList.length === 0) return {}
+        //if(!fileList || fileList.length === 0) return {}
 
 // console.log(fileList[i])
         const formData = new FormData();
         formData.append('files[]', file);
-
+        console.log(requestData)
         if(requestData.requestData){
             Object.keys(requestData.requestData).forEach((field)=>{
                 formData.append(field, requestData.requestData[field]);
@@ -19,9 +20,9 @@ export default (() => ({
 
         let data = {};
         try {
-             await axios.request({
+            await axios.request({
                 method: 'POST',
-                url: requestData.url,
+                url: url,
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
                 onUploadProgress: requestData.onUploadProgress
@@ -35,17 +36,17 @@ export default (() => ({
                     }
                 });
 
-             return data;
+            return data;
 
         } catch (error) {
             // code to handle the error
             console.log("An error occurred:", error.message);
         }
 
-    return {};
+        return {};
 
 
-},
+    },
 
     async fileDelete( file, requestData ){
         if(!file.id) return {};
@@ -55,4 +56,4 @@ export default (() => ({
         if(!res) return {};
         return  await res.json()
     }
-    }))();
+}))();
