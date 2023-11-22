@@ -191,12 +191,9 @@
       const saveData = {
           targetType:props.targetType,
           targetId:props.targetId,
-          content:toRaw(attachedFiles.value)}
-    await FilesService.save(saveData);
-      console.log(toRaw(attachedFiles.value))
+          attachContent:toRaw(attachedFiles.value)};
 
-
-
+    return await FilesService.save(saveData);
   }
 
   defineExpose({clear, save})
