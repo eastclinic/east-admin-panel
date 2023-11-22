@@ -1,5 +1,6 @@
 import baseUrl from '@/api/config.js';
 import axios from "axios";
+const url = baseUrl+'/api/content'
 
 
 export default (() => ({
@@ -10,7 +11,7 @@ export default (() => ({
 // console.log(fileList[i])
         const formData = new FormData();
         formData.append('files[]', file);
-
+        console.log(requestData)
         if(requestData.requestData){
             Object.keys(requestData.requestData).forEach((field)=>{
                 formData.append(field, requestData.requestData[field]);
@@ -21,7 +22,7 @@ export default (() => ({
         try {
              await axios.request({
                 method: 'POST',
-                url: requestData.url,
+                url: url,
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
                 onUploadProgress: requestData.onUploadProgress
