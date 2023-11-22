@@ -25,6 +25,15 @@ export async function postToServer<T>(url: string, requestData: Object, options?
     return fetchToServer(url, options);
 }
 
+export async function putToServer<T>(url: string, requestData: Object, options?: RequestInit) {
+    if(!options) options = {};
+    options.method = 'put';
+    options.headers = {   'Content-Type': 'application/json', };
+    options.body = JSON.stringify(requestData)
+    return fetchToServer(url, options);
+}
+
+
 export async function getToServer<T>(url: string, requestData: Object, options?: RequestInit) {
     if(!options) options = {};
     options.method = 'GET';

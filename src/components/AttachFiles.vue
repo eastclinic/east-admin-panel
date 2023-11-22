@@ -11,14 +11,14 @@
   const uploadInput = ref([]);
 
   const uploadProgress = ref(null);
-  const emit = defineEmits(['update:attachFiles', 'delete:content']);
+  const emit = defineEmits(['update:content', 'delete:content', "delete:content"]);
+
     const props = defineProps({
     files: {
         type: Array,
-        required: true,
         default:[]}
         ,
-        possibleTypeFiles:{
+        possibleExtensions:{
             type: Array,
             default(rawProps) {
                 return [
@@ -32,27 +32,33 @@
                 ]
             }
         },
-    server:{
-      type: Object,
-      required: true,
-        default:{},
-      validator: function (settings) {
-        if(!settings.url)  return false;
+    // server:{
+    //   type: Object,
+    //   required: true,
+    //     default:{},
+    //   validator: function (settings) {
+    //     if(!settings?.requestData?.contentable_type)  return false;
+    //     if(!settings?.requestData?.contentable_id)  return false;
+    //
+    //     return true;
+    //   },
+    // },
 
-        return true;
-      },
-    },
+        targetType:{required: true, type:String,},
+        targetId:{required: true, type:Number,},
         maxSizeFile:{
             type:Number,
             default:2000000000
         }
     });
 
+
+
   // const attachFiles = computed(() => {return [...props.files]});
   const attachedFiles = ref([]);
   const  attachFiles = computed({
       get: () => {
-
+          console.log(props.targetId)
           attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
       return attachedFiles.value},
       set: (val) => {
@@ -135,7 +141,7 @@
     }
 
     console.log('all files upload!')
-    emit('update:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
@@ -143,18 +149,22 @@
       if(i === -1) return false;
       //if file.confirm ===  1 temporally deactivate file only on front
 
-      if(!file.confirm){
-          attachFiles.value.splice(i, 1);
-          const res = await FilesService.fileDelete(file);
-          if(res && res.ok && res.message){
-              toastService.success('Удаление файла', res.message)
-              return true;
-          }
 
-      }else{
-          attachFiles.value[i].isDeleted = true;
-          emit('update:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
-      }
+      attachFiles.value[i].isDeleted = true;
+      emit('remove:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+
+      // if(!file.confirm){
+      //     attachFiles.value.splice(i, 1);
+      //     const res = await FilesService.fileDelete(file);
+      //     if(res && res.ok && res.message){
+      //         toastService.success('Удаление файла', res.message)
+      //         return true;
+      //     }
+      //
+      // }else{
+      //     attachFiles.value[i].isDeleted = true;
+      //     emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+      // }
       // emit('delete:content', file);
   };
   const fileDeleted = (file) =>{
@@ -168,6 +178,31 @@
   //   console.log(props.files);
   // });
   //
+  const clear = async ({ contentable_type, contentable_id }) => {
+      if (contentable_type && contentable_id) {
+          return true
+      } else {
+          console.warn('Invalid removeAll event payload! { contentable_type, contentable_id }')
+          return false
+      }
+  }
+
+  const save = async () => {
+      const saveData = {
+          targetType:props.targetType,
+          targetId:props.targetId,
+          content:toRaw(attachedFiles.value)}
+    await FilesService.save(saveData);
+      console.log(toRaw(attachedFiles.value))
+
+
+
+  }
+
+  defineExpose({clear, save})
+
+
+
   const files = computed(() => {
       return attachFiles.reverse()
   });

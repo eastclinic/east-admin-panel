@@ -1,6 +1,7 @@
 import baseUrl from '@/api/config.js';
 import axios from "axios";
 const url = baseUrl+'/api/content'
+import {putToServer} from '@/services/util/UseFetchToServer';
 
 
 export default (() => ({
@@ -47,6 +48,10 @@ export default (() => ({
 
 
 },
+
+    async save(contentData, requestData ){
+        return await  putToServer(url+'/save', contentData, requestData);
+    },
 
     async fileDelete( file, requestData ){
         if(!file.id) return {};

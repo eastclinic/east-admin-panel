@@ -28,6 +28,8 @@
     const editData = ref({});
     const  editDataComputed = computed(() => { editData.value = JSON.parse(JSON.stringify(props.editData)); return editData.value});
 
+    const getId = computed(() =>  editDataComputed.value.id)
+
     const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
     //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
@@ -49,8 +51,8 @@
         }
     }
     const saveReview = async () => {
-        console.log(JSON.stringify(editData.value))
-        console.log(JSON.stringify(props.editData))
+        // console.log(JSON.stringify(editData.value))
+        // console.log(JSON.stringify(props.editData))
         if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
             const res = await saveReviewToServer(toRaw(editData.value));
             if(res.ok ) {
@@ -92,6 +94,12 @@
         // dataUpdated.value = true;
 
     };
+
+    const content = ref(null);
+
+
+
+
     const removeContent = (index) => {
         console.log('removeContent')
         editData.content.splice(index, 1);
@@ -115,8 +123,11 @@
             if(!editedData.reviewable_id) editedData.reviewable_id = 3;
             editedData.tempReviewId = tempReviewId.value;
         }
+
         console.log('saveReviewToServer')
+        if(editedData.id) content.value.save('review', editedData.id);
         return  await ReviewsService.saveReview(editedData);
+
     }
     const showModal = async () =>{
         // if(props?.editData?.is_new){
@@ -185,12 +196,13 @@
             <div class="col-12 lg:col-6 ">
                     <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" id="rating" placeholder="Рейтинг 1 до 100"/>
             </div>
+            {{editDataComputed.content}}
             <div class="col-12">
               <AttachFiles
-                      :files="editDataComputed.content"
-                           @delete:content="removeContent"
-                           @update:attachFiles="updateAttach"
-                           :server="attachFilesServerSettings"
+                  :files="editDataComputed.content"
+                  ref="content"
+                  targetType="review"
+                  :targetId="getId"
               >
                   <template #controlFilePanel="file">
                     <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
