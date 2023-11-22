@@ -37,6 +37,8 @@
         url:ReviewsService.getApiContentUrl(),
         requestData:{
             reviewId : (props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
+            contentable_id:(props.editData?.id) ? props.editData.id : Date.now() / 1000 | 0,
+            contentable_type:'review'
         }
     }});
 
