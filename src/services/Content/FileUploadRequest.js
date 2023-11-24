@@ -1,18 +1,29 @@
 let onUploadProgressCallback = () =>{};
+let onSuccessCallback = () =>{};
+let onErrorCallback = () =>{};
 let file = null;
 export default (() => ({
     _requestData : {},
 
     //setters
 
-    forFile(fileBinary){
-        this._requestData['files[]'] = fileBinary;
-        file = fileBinary;
+    forFile(filesBinary){
+        this._requestData['files[]'] = filesBinary;
+        file = filesBinary;
         return this;
     },
 
     withUploadProgressCallback(callback){
         onUploadProgressCallback = callback;
+        return this;
+    },
+
+    withSuccessCallback(callback){
+        onSuccessCallback = callback;
+        return this;
+    },
+    withErrorCallback(callback){
+        onErrorCallback = callback;
         return this;
     },
 

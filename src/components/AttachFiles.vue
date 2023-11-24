@@ -78,17 +78,22 @@ const attachFiles = ref([]);
 
 
 
-  // const uploadFiles =
-
-
-  ContentService.setRequestInfo(props.server);
-
   const clickOnUpload = () => {
     uploadInput.value.click();
   }
 
   const handleFilesUpload = async (event) => {
     // const files = event.target.files;
+
+
+      try {
+          await ContentService.filesUpload(event.target.files, toRaw(props));
+      }catch (e){
+          console.log(e)
+          toastService.duration(5000).error(e.message);
+      }
+
+      return;
 
     const files = event.target.files;
     for (let i = 0; i < files.length; i++) {
@@ -137,8 +142,6 @@ const attachFiles = ref([]);
                   attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
                   //todo save all upload progress
               })
-
-
       );
 
       if(res.data ){
