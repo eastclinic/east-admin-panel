@@ -1,9 +1,11 @@
 <script setup>
-  import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed} from 'vue';
+import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMounted} from 'vue';
   import ReviewsService from "../services/Reviews/ReviewsService";
-  import FilesService from "../services/Files/FilesService";
+  import ContentService from "../services/Content/ContentService";
   import toastService from '../services/Toast'
   import { useToast } from 'primevue/usetoast';
+import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
+import fileUploadRequest from "@/services/Content/FileUploadRequest";
 
   const toast = useToast();
 
@@ -51,26 +53,35 @@
             default:2000000000
         }
     });
-
-
+const attachedFiles = ref([]);
+const attachFiles = ref([]);
+  onMounted(async () => {
+      attachFiles.value = [];
+      if(!props.files || props.files.length === 0){
+          await ContentService.fetchServerData(ListRequest.with('targetType', props.targetType).with('targetId', props.targetId).all())
+      }
+      attachFiles.value = ContentService.items();
+  });
 
   // const attachFiles = computed(() => {return [...props.files]});
-  const attachedFiles = ref([]);
-  const  attachFiles = computed({
-      get: () => {
-          console.log(props.targetId)
-          attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
-      return attachedFiles.value},
-      set: (val) => {
-          console.log('attachFiles')
-          // attachedFiles.value = val;
-      }
-  });
+//todo add opportunity set files from parent component
+  // const  attachFiles = computed({
+  //     get: () => {
+  //         console.log(props.targetId)
+  //         attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
+  //     return attachedFiles.value},
+  //     set: (val) => {
+  //         console.log('attachFiles')
+  //         // attachedFiles.value = val;
+  //     }
+  // });
+
+
 
   // const uploadFiles =
 
 
-  FilesService.setRequestInfo(props.server);
+  ContentService.setRequestInfo(props.server);
 
   const clickOnUpload = () => {
     uploadInput.value.click();
@@ -92,8 +103,8 @@
         const fileExtension = mimeFile[1]
         const typeFile = mimeFile[0]
 //check file extension
-        if(!props.possibleTypeFiles.includes(fileExtension)){
-            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleTypeFiles.join(', ') + ')', )
+        if(!props.possibleExtensions.includes(fileExtension)){
+            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleExtensions.join(', ') + ')', )
             continue;
         }
 //check file size
@@ -117,12 +128,18 @@
     for ( const i in files ) {
       let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
-      let res = await FilesService.fileUpload(files[i], {
-        onUploadProgress:  progressEvent => {
-            attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
-          //todo save all upload progress
-        }
-      })
+      let res = await ContentService.fileUpload(
+          fileUploadRequest
+              .forFile(files[i])
+              .with('contentable_id', props.targetId)
+              .with('contentable_type', props.targetType)
+              .withUploadProgressCallback(progressEvent => {
+                  attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+                  //todo save all upload progress
+              })
+
+
+      );
 
       if(res.data ){
           attachFiles.value[aIndex] = {...res.data}
@@ -155,7 +172,7 @@
 
       // if(!file.confirm){
       //     attachFiles.value.splice(i, 1);
-      //     const res = await FilesService.fileDelete(file);
+      //     const res = await ContentService.fileDelete(file);
       //     if(res && res.ok && res.message){
       //         toastService.success('Удаление файла', res.message)
       //         return true;
@@ -193,7 +210,7 @@
           targetId:props.targetId,
           attachContent:toRaw(attachedFiles.value)};
 
-    return await FilesService.save(saveData);
+    return await ContentService.save(saveData);
   }
 
   defineExpose({clear, save})

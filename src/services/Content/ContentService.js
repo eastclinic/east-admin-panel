@@ -1,15 +1,19 @@
 
 import FilesApi from '../../api/FilesApi'
 import toastService from "@/services/Toast";
+import stateManager from "@/services/util/UseStateManager";
+import doctorsApi from "@/api/DoctorsApi";
+import fileUploadRequest from "@/services/Content/FileUploadRequest";
 
 
 export default (() =>({
     requestInfo : {},
-
+    state : stateManager.setGlobalWithName('Content'),
     //actions
-    async fileUpload( file, requestInfo ){
-        if(requestInfo)  this.setRequestInfo(requestInfo);
-        return  await FilesApi.fileUpload( file, this.requestInfo);
+    async fileUpload( fileUploadRequest ){
+        if(!fileUploadRequest.getFile()) throw new Error('Not set file')
+        if(!fileUploadRequest.getRequestData()) throw new Error('Not fill request data')
+        return  await FilesApi.fileUpload( fileUploadRequest );
     },
 
 
@@ -38,6 +42,24 @@ export default (() =>({
     setRequestInfo(requestInfo){
         this.requestInfo = {...this.requestInfo, ...requestInfo};
         return this;
+    },
+
+
+    async fetchServerData(requestAdapter){
+        //handle data from request adapters
+        const response = await FilesApi.getContent(( requestAdapter ) ? requestAdapter.toArray() : null);
+        this.state.setFromResponse(response);
+        //todo handle error
+        return this;
+    },
+
+
+    //getters
+    items(condition){
+        return this.state.getItems();
+    },
+    count(){
+        return this.state.count();
     },
 
 }))();

@@ -4,7 +4,7 @@
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
     import AttachFiles from "@/components/AttachFiles.vue";
-    import FilesService from "../../services/Files/FilesService";
+    import FilesService from "../../services/Content/ContentService";
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
     import { useToast } from 'primevue/usetoast';
@@ -199,7 +199,7 @@
             {{editDataComputed.content}}
             <div class="col-12">
               <AttachFiles
-                  :files="editDataComputed.content"
+
                   ref="content"
                   targetType="review"
                   :targetId="getId"
