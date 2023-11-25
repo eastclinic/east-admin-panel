@@ -50,7 +50,7 @@ export default (() => ({
 
     async fileDelete( file, requestData ){
         if(!file.id) return {};
-        const res =  await fetch(requestData.url+'/'+file.id, {
+        const res =  await fetch(url+'/'+file.id, {
             method:'DELETE'
         });
         if(!res) return {};

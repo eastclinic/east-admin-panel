@@ -11,9 +11,10 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
 
 
   const uploadInput = ref([]);
+  let initData = '';
 
   const uploadProgress = ref(null);
-  const emit = defineEmits(['update:content', 'delete:content', "delete:content"]);
+  const emit = defineEmits(['update:content', 'delete:content', "delete:content", 'saved:content', 'updated:content', 'updating:content']);
 
     const props = defineProps({
     files: {
@@ -34,17 +35,6 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
                 ]
             }
         },
-    // server:{
-    //   type: Object,
-    //   required: true,
-    //     default:{},
-    //   validator: function (settings) {
-    //     if(!settings?.requestData?.contentable_type)  return false;
-    //     if(!settings?.requestData?.contentable_id)  return false;
-    //
-    //     return true;
-    //   },
-    // },
 
         targetType:{required: true, type:String,},
         targetId:{required: true, type:Number,},
@@ -60,7 +50,9 @@ const attachFiles = ref([]);
       if(!props.files || props.files.length === 0){
           await ContentService.fetchServerData(ListRequest.with('targetType', props.targetType).with('targetId', props.targetId).all())
       }
-      attachFiles.value = ContentService.items();
+      const items = ContentService.items();
+      initData = JSON.stringify(items)
+      attachFiles.value = items;
   });
 
   // const attachFiles = computed(() => {return [...props.files]});
@@ -83,17 +75,18 @@ const attachFiles = ref([]);
   }
 
   const handleFilesUpload = async (event) => {
+      emit('updating:content');
     // const files = event.target.files;
 
 
-      try {
-          await ContentService.filesUpload(event.target.files, toRaw(props));
-      }catch (e){
-          console.log(e)
-          toastService.duration(5000).error(e.message);
-      }
+      // try {
+      //     await ContentService.filesUpload(event.target.files, toRaw(props));
+      // }catch (e){
+      //     console.log(e)
+      //     toastService.duration(5000).error(e.message);
+      // }
 
-      return;
+      // return;
 
     const files = event.target.files;
     for (let i = 0; i < files.length; i++) {
@@ -162,6 +155,7 @@ const attachFiles = ref([]);
 
     console.log('all files upload!')
     emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    emit('updated:content' );
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
@@ -171,21 +165,21 @@ const attachFiles = ref([]);
 
 
       attachFiles.value[i].isDeleted = true;
-      emit('remove:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+      if(!file.confirm){
+          attachFiles.value.splice(i, 1);
+          const res = await ContentService.fileDelete(file);
+          if(res && res.ok && res.message){
+              toastService.success('Удаление файла', res.message)
+              return true;
+          }
 
-      // if(!file.confirm){
-      //     attachFiles.value.splice(i, 1);
-      //     const res = await ContentService.fileDelete(file);
-      //     if(res && res.ok && res.message){
-      //         toastService.success('Удаление файла', res.message)
-      //         return true;
-      //     }
-      //
-      // }else{
-      //     attachFiles.value[i].isDeleted = true;
-      //     emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
-      // }
-      // emit('delete:content', file);
+      }else{
+          attachFiles.value[i].isDeleted = true;
+          if(initData !== JSON.stringify(attachFiles.value)){
+
+          }
+          emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+      }
   };
   const fileDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
@@ -212,17 +206,13 @@ const attachFiles = ref([]);
           targetType:props.targetType,
           targetId:props.targetId,
           attachContent:toRaw(attachedFiles.value)};
-
+        emit('saved:content', toRaw(attachFiles.value) );
     return await ContentService.save(saveData);
   }
 
   defineExpose({clear, save})
 
 
-
-  const files = computed(() => {
-      return attachFiles.reverse()
-  });
 
 </script>
 

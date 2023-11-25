@@ -22,6 +22,13 @@ export default (() =>({
 
 
 
+    async fileUpload( fileUploadRequest ){
+        if(!fileUploadRequest.getFile()) throw new Error('Not set file')
+        if(!fileUploadRequest.getRequestData()) throw new Error('Not fill request data')
+        return  await FilesApi.fileUpload( fileUploadRequest );
+    },
+
+
     async fileDelete( file ){
         return  await FilesApi.fileDelete( file, this.requestInfo);
     },
@@ -62,7 +69,6 @@ export default (() =>({
 
     //getters
     items(condition){
-        console.log(this.state.getItems())
         return this.state.getItems();
     },
     count(){
