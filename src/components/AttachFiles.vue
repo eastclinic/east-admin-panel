@@ -155,7 +155,7 @@ const attachedFiles = ref([]);
 
     console.log('all files upload!')
     emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
-    emit('updated:content' );
+    // emit('updated:content' );
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
@@ -175,10 +175,7 @@ const attachedFiles = ref([]);
 
       }else{
           attachFiles.value[i].isDeleted = true;
-          if(initData !== JSON.stringify(attachFiles.value)){
-
-          }
-          emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+          emit('update:content', toRaw(attachFiles.value) );
       }
   };
   const fileDeleted = (file) =>{
