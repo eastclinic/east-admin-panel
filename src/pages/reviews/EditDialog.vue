@@ -42,7 +42,7 @@
         }
     }
     const saveReview = async () => {
-        if(editData?.value?.id) content.value.save('review', editData.value.id);
+        // if(editData?.value?.id) content.value.save('review', editData.value.id);
         if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
             const res = await saveReviewToServer(toRaw(editData.value));
             if(res.ok ) {
@@ -62,6 +62,12 @@
         emit('update:visible', false);
     };
 
+    const updateAttach = async (files) => {
+        console.log('updateAttach')
+        editData.value.content = files;
+        // dataUpdated.value = true;
+
+    };
     const deleteReview = async ()   => {
 
         confirm.require({
@@ -80,22 +86,7 @@
         });
     }
 
-    const updateAttach = async (files) => {
-        console.log('updateAttach')
-        editData.value.content = files;
-        // dataUpdated.value = true;
-
-    };
-
     const content = ref(null);
-
-
-
-
-    const removeContent = (index) => {
-        console.log('removeContent')
-        editData.content.splice(index, 1);
-    };
 
 
     // onBeforeUpdate(()=>{
@@ -114,8 +105,6 @@
             if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
             if(!editedData.reviewable_id) editedData.reviewable_id = 3;
         }
-
-
         return  await ReviewsService.saveReview(editedData);
 
     }
@@ -187,14 +176,16 @@
                     <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" id="rating" placeholder="Рейтинг 1 до 100"/>
             </div>
             <div class="col-12" v-if="editDataComputed.id">
+                {{editDataComputed.content}}
               <AttachFiles
+                  :files="editDataComputed.content"
                   ref="content"
                   targetType="review"
                   :targetId="editDataComputed.id"
-
+                  @update:content="updateAttach"
               >
                   <template #controlFilePanel="file">
-                    <InputSwitch :modelValue="file.published" @update:modelValue="removeFile($event, file)"/>
+                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
                   </template>
               </AttachFiles>
             </div>

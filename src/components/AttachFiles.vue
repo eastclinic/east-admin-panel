@@ -44,29 +44,29 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
         }
     });
 const attachedFiles = ref([]);
-const attachFiles = ref([]);
+// const attachFiles = ref([]);
   onMounted(async () => {
-      attachFiles.value = [];
-      if(!props.files || props.files.length === 0){
-          await ContentService.fetchServerData(ListRequest.with('targetType', props.targetType).with('targetId', props.targetId).all())
-      }
-      const items = ContentService.items();
-      initData = JSON.stringify(items)
-      attachFiles.value = items;
+      // attachFiles.value = [];
+      // if(!props.files || props.files.length === 0){
+      //     await ContentService.fetchServerData(ListRequest.with('targetType', props.targetType).with('targetId', props.targetId).all())
+      // }
+      // const items = ContentService.items();
+      // initData = JSON.stringify(items)
+      // attachFiles.value = items;
   });
 
   // const attachFiles = computed(() => {return [...props.files]});
 //todo add opportunity set files from parent component
-  // const  attachFiles = computed({
-  //     get: () => {
-  //         console.log(props.targetId)
-  //         attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
-  //     return attachedFiles.value},
-  //     set: (val) => {
-  //         console.log('attachFiles')
-  //         // attachedFiles.value = val;
-  //     }
-  // });
+  const  attachFiles = computed({
+      get: () => {
+          console.log(props.targetId)
+          attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
+      return attachedFiles.value},
+      set: (val) => {
+          console.log('attachFiles')
+          // attachedFiles.value = val;
+      }
+  });
 
 
 
@@ -205,8 +205,8 @@ const attachFiles = ref([]);
       const saveData = {
           targetType:props.targetType,
           targetId:props.targetId,
-          attachContent:toRaw(attachedFiles.value)};
-        emit('saved:content', toRaw(attachFiles.value) );
+          attachContent:toRaw(attachFiles.value)};
+        emit('saved:content', attachFiles.value );
     return await ContentService.save(saveData);
   }
 
