@@ -14,6 +14,7 @@
 
     const toast = useToast();
     const doctorsListService = ref(DoctorsListService);
+    let uploadContent = ref(false);
 
     // console.log(DoctorsInfoService)
     const confirm = useConfirm();
@@ -64,6 +65,7 @@
 
     const updateAttach = async (files) => {
         console.log('updateAttach')
+        uploadContent.value=false;
         editData.value.content = files;
         // dataUpdated.value = true;
 
@@ -183,6 +185,7 @@
                   targetType="review"
                   :targetId="editDataComputed.id"
                   @update:content="updateAttach"
+                  @updating:content="uploadContent=true"
               >
                   <template #controlFilePanel="file">
                     <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
@@ -193,7 +196,7 @@
                 <Textarea v-model="editDataComputed.text" rows="5" autoResize  />
             </div>
             <div class="col-12 " :class="{'lg:col-4':(editDataComputed.id), 'lg:col-6':(!editDataComputed.id)}">
-                <Button label="Сохранить" text :raised="true" @click="saveReview"/>
+                <Button label="Сохранить" text :raised="true" @click="saveReview" :disabled="uploadContent"/>
             </div>
             <div class="col-12" :class="{'lg:col-4':(editDataComputed.id), 'lg:col-6':(!editDataComputed.id)}">
                 <Button label="Отменить" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>

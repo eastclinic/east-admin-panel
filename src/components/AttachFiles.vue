@@ -189,25 +189,25 @@ const attachedFiles = ref([]);
   //   console.log(props.files);
   // });
   //
-  const clear = async ({ contentable_type, contentable_id }) => {
-      if (contentable_type && contentable_id) {
-          return true
-      } else {
-          console.warn('Invalid removeAll event payload! { contentable_type, contentable_id }')
-          return false
-      }
-  }
-
-  const save = async () => {
-      const saveData = {
-          targetType:props.targetType,
-          targetId:props.targetId,
-          attachContent:toRaw(attachFiles.value)};
-        emit('saved:content', attachFiles.value );
-    return await ContentService.save(saveData);
-  }
-
-  defineExpose({clear, save})
+  // const clear = async ({ contentable_type, contentable_id }) => {
+  //     if (contentable_type && contentable_id) {
+  //         return true
+  //     } else {
+  //         console.warn('Invalid removeAll event payload! { contentable_type, contentable_id }')
+  //         return false
+  //     }
+  // }
+  //
+  // const save = async () => {
+  //     const saveData = {
+  //         targetType:props.targetType,
+  //         targetId:props.targetId,
+  //         attachContent:toRaw(attachFiles.value)};
+  //       emit('saved:content', attachFiles.value );
+  //   return await ContentService.save(saveData);
+  // }
+  //
+  // defineExpose({clear, save})
 
 
 
