@@ -1,30 +1,27 @@
 import baseUrl from '@/api/config.js';
 import axios from "axios";
+const url = baseUrl+'/api/content'
+import {getToServer, putToServer} from '@/services/util/UseFetchToServer';
 
 
 export default (() => ({
 
-    async fileUpload( file, requestData ){
-    //if(!fileList || fileList.length === 0) return {}
+    async fileUpload( fileUploadRequest ){
 
-// console.log(fileList[i])
         const formData = new FormData();
-        formData.append('files[]', file);
-
-        if(requestData.requestData){
-            Object.keys(requestData.requestData).forEach((field)=>{
-                formData.append(field, requestData.requestData[field]);
-            });
-        }
+        const requestData = fileUploadRequest.getRequestData();
+        Object.keys(requestData).forEach((field)=>{
+            formData.append(field, requestData[field]);
+        });
 
         let data = {};
         try {
              await axios.request({
                 method: 'POST',
-                url: requestData.url,
+                url: url,
                 data: formData,
                 headers: { "Content-Type": "multipart/form-data" },
-                onUploadProgress: requestData.onUploadProgress
+                onUploadProgress: fileUploadRequest.getUploadProgressCallback()
             }).then(response => {
                 if(response?.data?.data?.[0]) data.data = response.data.data[0];
                 //return response.data;
@@ -47,12 +44,22 @@ export default (() => ({
 
 },
 
+    async save(contentData, requestData ){
+        return await  putToServer(url+'/save', contentData, requestData);
+    },
+
     async fileDelete( file, requestData ){
         if(!file.id) return {};
-        const res =  await fetch(requestData.url+'/'+file.id, {
+        const res =  await fetch(url+'/'+file.id, {
             method:'DELETE'
         });
         if(!res) return {};
         return  await res.json()
-    }
+    },
+
+    async getContent(requestData){
+        return await getToServer(url, {...requestData, ...this._requestData});
+    },
+
+
     }))();

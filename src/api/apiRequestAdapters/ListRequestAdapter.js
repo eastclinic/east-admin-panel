@@ -1,3 +1,4 @@
+
 export default (() => ({
     _requestData : {},
     page(page){
@@ -21,6 +22,11 @@ export default (() => ({
     requestData() {return {...this._requestData}},
     toArray(){
         return {...this._requestData}
+    },
+    with(field, value){
+        if( !field ) return this;
+        this._requestData[field] = value;
+        return this;
     },
     //
 }))();
