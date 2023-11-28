@@ -44,7 +44,6 @@ export const initUseServices = () => async ()=> {
     if(DoctorsListService.count() === 0){
         await DoctorsListService.fetchServerData(ListRequest.all());
     }
-    console.log({...DoctorsListService3})
 };
 
 export const onBeforeMountInitFilters = () => () => {

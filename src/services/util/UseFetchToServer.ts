@@ -1,4 +1,6 @@
 
+import buildGetURL from './UseGetParametersBuilder';
+
 function addJwtTokenToRequest(options?: RequestInit){
     if(localStorage.getItem('jwtToken')){
         const headers = options?.headers ? new Headers(options.headers) : new Headers();
@@ -22,6 +24,26 @@ export async function postToServer<T>(url: string, requestData: Object, options?
     options.body = JSON.stringify(requestData)
     return fetchToServer(url, options);
 }
+
+export async function putToServer<T>(url: string, requestData: Object, options?: RequestInit) {
+    if(!options) options = {};
+    options.method = 'put';
+    options.headers = {   'Content-Type': 'application/json', };
+    options.body = JSON.stringify(requestData)
+    return fetchToServer(url, options);
+}
+
+
+export async function getToServer<T>(url: string, requestData: Object, options?: RequestInit) {
+    if(!options) options = {};
+    options.method = 'GET';
+    if(requestData &&  Object.keys(requestData).length > 0 ){
+        // Create the URL with the parameters
+        url = buildGetURL(url, requestData)
+    }
+    return fetchToServer(url, options);
+}
+
 
 export async function fetchToServer<T>(url: string, options?: RequestInit) {
     try {

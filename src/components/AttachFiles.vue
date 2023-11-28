@@ -1,29 +1,33 @@
 <script setup>
-  import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed} from 'vue';
+import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMounted} from 'vue';
   import ReviewsService from "../services/Reviews/ReviewsService";
-  import FilesService from "../services/Files/FilesService";
+  import ContentService from "../services/Content/ContentService";
   import toastService from '../services/Toast'
   import { useToast } from 'primevue/usetoast';
+import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
+import fileUploadRequest from "@/services/Content/FileUploadRequest";
 
   const toast = useToast();
 
 
   const uploadInput = ref([]);
+  let initData = '';
 
   const uploadProgress = ref(null);
-  const emit = defineEmits(['update:attachFiles', 'delete:content']);
+  const emit = defineEmits(['update:content', 'delete:content', "delete:content", 'saved:content', 'updated:content', 'updating:content']);
+
     const props = defineProps({
     files: {
         type: Array,
-        required: true,
         default:[]}
         ,
-        possibleTypeFiles:{
+        possibleExtensions:{
             type: Array,
             default(rawProps) {
                 return [
                     'mp4',
                     'webm',
+                    'webp',
                     'mov',
                     'quicktime',
                     'jpeg',
@@ -31,27 +35,31 @@
                 ]
             }
         },
-    server:{
-      type: Object,
-      required: true,
-        default:{},
-      validator: function (settings) {
-        if(!settings.url)  return false;
 
-        return true;
-      },
-    },
+        targetType:{required: true, type:String,},
+        targetId:{required: true, type:Number,},
         maxSizeFile:{
             type:Number,
             default:2000000000
         }
     });
+const attachedFiles = ref([]);
+// const attachFiles = ref([]);
+  onMounted(async () => {
+      // attachFiles.value = [];
+      // if(!props.files || props.files.length === 0){
+      //     await ContentService.fetchServerData(ListRequest.with('targetType', props.targetType).with('targetId', props.targetId).all())
+      // }
+      // const items = ContentService.items();
+      // initData = JSON.stringify(items)
+      // attachFiles.value = items;
+  });
 
   // const attachFiles = computed(() => {return [...props.files]});
-  const attachedFiles = ref([]);
+//todo add opportunity set files from parent component
   const  attachFiles = computed({
       get: () => {
-
+          console.log(props.targetId)
           attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
       return attachedFiles.value},
       set: (val) => {
@@ -60,17 +68,25 @@
       }
   });
 
-  // const uploadFiles =
 
-
-  FilesService.setRequestInfo(props.server);
 
   const clickOnUpload = () => {
     uploadInput.value.click();
   }
 
   const handleFilesUpload = async (event) => {
+      emit('updating:content');
     // const files = event.target.files;
+
+
+      // try {
+      //     await ContentService.filesUpload(event.target.files, toRaw(props));
+      // }catch (e){
+      //     console.log(e)
+      //     toastService.duration(5000).error(e.message);
+      // }
+
+      // return;
 
     const files = event.target.files;
     for (let i = 0; i < files.length; i++) {
@@ -85,8 +101,8 @@
         const fileExtension = mimeFile[1]
         const typeFile = mimeFile[0]
 //check file extension
-        if(!props.possibleTypeFiles.includes(fileExtension)){
-            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleTypeFiles.join(', ') + ')', )
+        if(!props.possibleExtensions.includes(fileExtension)){
+            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleExtensions.join(', ') + ')', )
             continue;
         }
 //check file size
@@ -110,12 +126,16 @@
     for ( const i in files ) {
       let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
-      let res = await FilesService.fileUpload(files[i], {
-        onUploadProgress:  progressEvent => {
-            attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
-          //todo save all upload progress
-        }
-      })
+      let res = await ContentService.fileUpload(
+          fileUploadRequest
+              .forFile(files[i])
+              .with('contentable_id', props.targetId)
+              .with('contentable_type', props.targetType)
+              .withUploadProgressCallback(progressEvent => {
+                  attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+                  //todo save all upload progress
+              })
+      );
 
       if(res.data ){
           attachFiles.value[aIndex] = {...res.data}
@@ -134,7 +154,8 @@
     }
 
     console.log('all files upload!')
-    emit('update:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    // emit('updated:content' );
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;
@@ -142,9 +163,11 @@
       if(i === -1) return false;
       //if file.confirm ===  1 temporally deactivate file only on front
 
+
+      attachFiles.value[i].isDeleted = true;
       if(!file.confirm){
           attachFiles.value.splice(i, 1);
-          const res = await FilesService.fileDelete(file);
+          const res = await ContentService.fileDelete(file);
           if(res && res.ok && res.message){
               toastService.success('Удаление файла', res.message)
               return true;
@@ -152,9 +175,8 @@
 
       }else{
           attachFiles.value[i].isDeleted = true;
-          emit('update:attachFiles', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+          emit('update:content', toRaw(attachFiles.value) );
       }
-      // emit('delete:content', file);
   };
   const fileDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
@@ -167,9 +189,27 @@
   //   console.log(props.files);
   // });
   //
-  const files = computed(() => {
-      return attachFiles.reverse()
-  });
+  // const clear = async ({ contentable_type, contentable_id }) => {
+  //     if (contentable_type && contentable_id) {
+  //         return true
+  //     } else {
+  //         console.warn('Invalid removeAll event payload! { contentable_type, contentable_id }')
+  //         return false
+  //     }
+  // }
+  //
+  // const save = async () => {
+  //     const saveData = {
+  //         targetType:props.targetType,
+  //         targetId:props.targetId,
+  //         attachContent:toRaw(attachFiles.value)};
+  //       emit('saved:content', attachFiles.value );
+  //   return await ContentService.save(saveData);
+  // }
+  //
+  // defineExpose({clear, save})
+
+
 
 </script>
 
