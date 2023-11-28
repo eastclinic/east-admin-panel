@@ -20,7 +20,7 @@ const router = createRouter({
                 {
                     path: '/doctors/info',
                     name: 'DoctorsInfoControl',
-                    component: () => import('@/pages/doctors/info/Control.vue')
+                    component: () => import('@/pages/doctors/info/DoctorsTableControl.vue')
                 },
                 {
                     path: '/',

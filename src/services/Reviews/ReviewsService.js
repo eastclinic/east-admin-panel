@@ -54,6 +54,5 @@ export default (() =>({
     },
 
     count(){   return this.state.count();  },
-    getApiContentUrl(){   return reviewsApi.contentUrl();  },
 
 }))();

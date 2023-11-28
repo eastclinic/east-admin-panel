@@ -10,7 +10,7 @@ export default (() => {
         ...UseRequestAdapters,
         _requestData : {},
 
-        async getDoctors(requestData){
+        async get(requestData){
             return await getToServer(baseUrl + _url, {...requestData, ...this._requestData});
         },
         async saveDoctor( saveData ){

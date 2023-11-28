@@ -1,29 +1,70 @@
 <script setup>
-import {contextPath, reviews, customer1, filters1, loading1, statuses, representatives,
-    customerService, initFilters1, clearFilter1, formatDate, onBeforeMountHook, onBeforeMountInitFilters,
-    onPage, count, countRows,
-    onOpenEdit, visibleEditDialog, editData,
-    updateReview
-} from './ControlData'
 
-import {  onBeforeMount } from 'vue';
 import EditDialog from "./EditDialog.vue";
 
-onBeforeMount(onBeforeMountHook());
+import { FilterMatchMode, FilterOperator } from 'primevue/api';
+import doctorsService from "@/services/Doctors/DoctorsInfoService";
+import dataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
+
+import { ref, reactive, onBeforeMount, computed } from 'vue';
+const filters1 = ref(null);
+const visibleEditDialog = ref(false);
+const editData = ref({});
+
+const doctors = computed(() => doctorsService.items());
+// // const count = doctorsService.count();
+// const countRows = computed(() => doctorsService.count());
+
+const count = computed(() => doctorsService.count());
+const countRows = 10;
 
 
-onBeforeMount(onBeforeMountInitFilters());
+onBeforeMount(async () => {
+    initFilters1();
+    await doctorsService.fetchServerData();
+});
+
+
+
+
+
+const initFilters1 = () => {
+    filters1.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        representative: { value: null, matchMode: FilterMatchMode.IN },
+    };
+};
+
+const clearFilter1 = () => {
+    initFilters1();
+};
+
+const onPage = async (e) =>{
+    await doctorsService.fetchServerData(dataTableRequestAdapter.page(e.page+1));
+}
+
+const onOpenEdit = async (e) =>{
+    visibleEditDialog.value = true;
+    editData.value = e.data;
+}
+
+
+const refreshItem = async (id) =>{
+    await doctorsService.refreshItem( id );
+}
 
 
 </script>
 
 <template>
-<EditDialog v-model:visible="visibleEditDialog" :editData="editData" @update:review="updateReview"></EditDialog>
+<EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated="refreshItem"></EditDialog>
     <div class="grid">
         <div class="col-12">
             <div class="card">
                 <DataTable
-                    :value="reviews"
+                    :value="doctors"
                     :paginator="true"
                     class="p-datatable-gridlines"
                     :rows="countRows"
@@ -51,21 +92,14 @@ onBeforeMount(onBeforeMountInitFilters());
 
                     <Column field="author" header="Автор" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.author }}
+                            {{ data.fullname
+                            }}
                         </template>
                         <template #filter="{ filterModel }">
                             <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />
                         </template>
                     </Column>
-                    <Column field="author" header="Рейтинг" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            <Rating v-model="data.rating" readonly :cancel="false" />
-                        </template>
-                        <template #filter="{ filterModel }">
-                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by rating" />
 
-                        </template>
-                    </Column>
                     <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
                 </DataTable>
             </div>

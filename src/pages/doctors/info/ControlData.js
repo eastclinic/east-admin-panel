@@ -1,7 +1,7 @@
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/services/CustomerService';
-import ReviewsService from "@/services/Reviews/ReviewsService";
+import doctorsService from "@/services/Doctors/DoctorsInfoService";
 import dataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
 
 import { ref, reactive } from 'vue';
@@ -24,22 +24,15 @@ export const representatives = ref([]);
 
 export const customerService = new CustomerService();
 
-const reviewsService = ReviewsService;
-export const reviews = reviewsService.reviews();
-export const count = reviewsService.count();
+export const doctors = doctorsService.items();
+export const count = doctorsService.count();
 export const countRows = 10;
 
 
 
 
 export const onBeforeMountHook = () => async () => {
-    await reviewsService.fetchServerData();
-    customerService.getCustomersLarge().then((data) => {
-        customer1.value = data;
-        loading1.value = false;
-        customer1.value.forEach((customer) => (customer.date = new Date(customer.date)));
-    });
-
+    await doctorsService.fetchServerData();
 
 
 };
@@ -79,7 +72,7 @@ export const formatDate = (value) => {
 };
 export const onPage = async (e) =>{
 
-    await reviewsService.fetchServerData(dataTableRequestAdapter.page(e.page+1).requestData());
+    await doctorsService.fetchServerData(dataTableRequestAdapter.page(e.page+1).requestData());
 }
 
 export const onOpenEdit = async (e) =>{
@@ -88,6 +81,6 @@ export const onOpenEdit = async (e) =>{
 }
 
 
-export const updateReview = async (id) =>{
-    await reviewsService.fetchServerData({ id:id });
+export const updateDoctor = async (id) =>{
+    await doctorsService.fetchServerData({ id:id });
 }
