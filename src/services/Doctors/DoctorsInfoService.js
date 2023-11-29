@@ -2,7 +2,6 @@
 // import doctorsState from '../../state/DoctorsState.js'
 import doctorsApi from '../../api/DoctorsApi'
 import StateManager from "../util/StateManager";
-import reviewsState from "@/state/ReviewsState";
 /*
 Сервисов может быть множество
 стейтов может быть множество
@@ -65,5 +64,14 @@ export default {
     },
 
     count(){   return this.state.count();  },
+
+    async save( data ){
+        return  await doctorsApi.saveItem(data);
+    },
+
+    async delete( id ){
+        return  await doctorsApi.deleteDoctor(id);
+    },
+
 
 }

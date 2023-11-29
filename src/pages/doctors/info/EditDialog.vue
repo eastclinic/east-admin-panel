@@ -1,6 +1,6 @@
 <script setup>
-import { defineProps, reactive, ref, toRef, defineEmits, computed } from 'vue'
-import DoctorsInfoService from "@/services/Doctors/DoctorsInfoService";
+import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
+import doctorsInfoService from "@/services/Doctors/DoctorsInfoService";
 import AttachFiles from "@/components/AttachFiles.vue";
 const props = defineProps({
     visible: Boolean,
@@ -13,21 +13,21 @@ const emit = defineEmits(['update:visible', 'update', 'updated'])
 const editedData = computed(() => props.editData);
 
 const header = computed(() => (Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
-const doctorsInfoService = DoctorsInfoService;
+
 
 const dismissModal = () => emit('update:visible', false)
-const saveReview = async () => {
+const saveItemData = async () => {
     if(props?.editData?.id) editedData.id = props.editData.id;
-    const res = await doctorsInfoService.saveReview(editedData);
+    const res = await doctorsInfoService.save(toRaw(editedData.value));
     if(res.ok ) dismissModal();
     //todo refresh row from server
-    emit('update:review', props.editData.id);
+    emit('updated', props.editData.id);
 }
 
 const updateAttach = async (files) => {
     console.log('updateAttach')
     uploadContent.value=false;
-    editData.value.content = files;
+    editedData.value.content = files;
     // dataUpdated.value = true;
 
 };
@@ -70,7 +70,7 @@ const updateAttach = async (files) => {
                 <Editor v-model="props.editData.text"  @update:modelValue="editedData.text =$event" editorStyle="min-height: 240px" />
             </div>
             <div class="col-12  lg:col-6 ">
-                <Button label="Сохранить" text :raised="true" @click="saveReview"/>
+                <Button label="Сохранить" text :raised="true" @click="saveItemData"/>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>

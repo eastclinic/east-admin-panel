@@ -52,6 +52,7 @@ const onOpenEdit = async (e) =>{
 
 
 const refreshItem = async (id) =>{
+
     await doctorsService.refreshItem( id );
 }
 
