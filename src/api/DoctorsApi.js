@@ -10,10 +10,10 @@ export default (() => {
         ...UseRequestAdapters,
         _requestData : {},
 
-        async getDoctors(requestData){
+        async get(requestData){
             return await getToServer(baseUrl + _url, {...requestData, ...this._requestData});
         },
-        async saveDoctor( saveData ){
+        async saveItem( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}
 
             let request = {

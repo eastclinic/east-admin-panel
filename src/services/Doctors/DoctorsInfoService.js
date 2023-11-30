@@ -28,16 +28,31 @@ const DoctorsState = StateManager.setGlobalWithName('DoctorInfoState');
 
 export default {
      state: DoctorsState,
+
+    async refreshItem(id){
+        const res = await doctorsApi.get({id});
+        if(Object.keys(res).length > 0 && res.items){
+            reviewsState.refreshItems(res.items);
+        }
+    },
+
     //actions
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
         if( requestAdapter )    doctorsApi.withRequestData(requestAdapter.toArray());
 
-        const res = await doctorsApi.getDoctors();
+        const res = await doctorsApi.get();
         if(Object.keys(res).length > 0 && res.items){
             this.state.setItems(res.items);
+            this.state.setCount(res.count);
         }
+        // if(requestData?.id || requestData?.ids){
+        //     reviewsState.refreshItems(res.items);
+        // }else{
+        //     reviewsState.setItems(res.items);
+        //     reviewsState.setCount(res.count);
+        // }
         //todo handle error
         return this;
     },
@@ -48,6 +63,15 @@ export default {
         if( !condition ) return this.state.getItems();
     },
 
+    count(){   return this.state.count();  },
+
+    async save( data ){
+        return  await doctorsApi.saveItem(data);
+    },
+
+    async delete( id ){
+        return  await doctorsApi.deleteDoctor(id);
+    },
 
 
 }

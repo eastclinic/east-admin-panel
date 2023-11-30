@@ -41,6 +41,7 @@ export default (() => ({
         return this;
     },
     data(){ return {...this._requestData} },
+    toArray(){ return {...this._requestData} },
     clear(){
         this._requestData = {};
         return this;
