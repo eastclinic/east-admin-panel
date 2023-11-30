@@ -89,16 +89,17 @@ const refreshItem = async (id) =>{
                         </div>
                     </template>
                     <template #empty> No customers found. </template>
-                    <template #loading> Loading customers data. Please wait. </template>
+                    <template #loading> Загрузка докторов. Пожалуйста подождите. </template>
 
-                    <Column field="author" header="Автор" style="min-width: 12rem">
+                    <Column field="id" header="id"/>
+
+                    <Column field="fullname" header="Доктор" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.fullname
-                            }}
+                            {{data.fullname}}
                         </template>
-                        <template #filter="{ filterModel }">
-                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />
-                        </template>
+<!--                        <template #filter="{ filterModel }">-->
+<!--                            <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by name" />-->
+<!--                        </template>-->
                     </Column>
 
                     <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
