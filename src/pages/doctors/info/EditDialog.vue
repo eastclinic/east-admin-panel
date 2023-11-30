@@ -49,19 +49,39 @@ const updateAttach = async (files) => {
                 <InputText id="middlename" type="text" v-model:modelValue="editedData.middlename" placeholder="Отчество"/>
             </div>
             <div class="col-12">
-            <AttachFiles
-                :files="editedData.content"
-                targetType="doctor"
-                :targetId="editedData.id"
-                @update:content="updateAttach"
-                @updating:content="uploadContent=true"
-            >
-<!--                <template #controlFilePanel="file">-->
-<!--                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>-->
-<!--                </template>-->
-            </AttachFiles>
-            </div>
 
+            </div>
+            <div class="col-12  lg:col-12 ">
+            <Panel header="Контент" toggleable collapsed
+                   :pt="{
+                      header: { class: 'bg-primary' },
+                      title: { class: 'text-white' },
+                      icons: { class: 'a33333' }
+                  }"
+            >
+                <template #header>
+                    <div class="flex align-items-center gap-2">
+
+                        <span class="font-bold">Контент</span>
+                    </div>
+                </template>
+                <template #icons v-if="editedData.content && editedData.content.length > 0">
+                    <Badge :value="editedData.content.length"  class="ml-auto" />
+                </template>
+                <AttachFiles
+                        :files="editedData.content"
+                        targetType="doctor"
+                        :targetId="editedData.id"
+                        @update:content="updateAttach"
+                        @updating:content="uploadContent=true"
+                >
+                    <!--                <template #controlFilePanel="file">-->
+                    <!--                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>-->
+                    <!--                </template>-->
+                </AttachFiles>
+
+            </Panel>
+            </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Сохранить" text :raised="true" @click="saveItemData"/>
             </div>

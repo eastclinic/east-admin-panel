@@ -7,7 +7,9 @@ import doctorsService from "@/services/Doctors/DoctorsInfoService";
 import dataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
 
 import { ref, reactive, onBeforeMount, computed } from 'vue';
-const filters1 = ref(null);
+const filters1 = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
 const visibleEditDialog = ref(false);
 const editData = ref({});
 
@@ -20,23 +22,40 @@ const countRows = 10;
 
 
 onBeforeMount(async () => {
-    initFilters1();
-    await doctorsService.fetchServerData();
+    await loadDoctors();
 });
 
-
+const loadDoctors = async (dataTableRequestAdapter) => {
+    return await doctorsService.fetchServerData(dataTableRequestAdapter);
+}
 
 
 
 const initFilters1 = () => {
     filters1.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        representative: { value: null, matchMode: FilterMatchMode.IN },
     };
 };
 
+const onFilter = async (event) => {
+    debugger
+    // lazyParams.value.filters = filters.value ;
+    // loadLazyData(event);
+    return await doctorsService.fetchServerData(dataTableRequestAdapter.dtEvent(event));
+};
+
+const loadLazyData = (event) => {
+    loading.value = true;
+    lazyParams.value = { ...lazyParams.value, first: event?.first || first.value };
+
+    setTimeout(() => {
+        CustomerService.getCustomers({ lazyEvent: JSON.stringify(lazyParams.value) }).then((data) => {
+            customers.value = data.customers;
+            totalRecords.value = data.totalRecords;
+            loading.value = false;
+        });
+    }, Math.random() * 1000 + 250);
+};
 const clearFilter1 = () => {
     initFilters1();
 };
@@ -72,12 +91,13 @@ const refreshItem = async (id) =>{
                     :lazy="true"
                     dataKey="id"
                     :rowHover="true"
-                    filterDisplay="menu"
                     responsiveLayout="scroll"
                     @page="onPage"
                     :totalRecords="count"
                     editMode="row"
                     @row-edit-init="onOpenEdit"
+                    @filter="onFilter($event)"
+                    filterDisplay="row"
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
