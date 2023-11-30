@@ -4,10 +4,10 @@ import EditDialog from "./EditDialog.vue";
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import doctorsService from "@/services/Doctors/DoctorsInfoService";
-import dataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
+import DataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
 
-import { ref, reactive, onBeforeMount, computed } from 'vue';
-const filters1 = ref({
+import { ref, reactive, onBeforeMount, computed, watch } from 'vue';
+const filters = reactive({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const visibleEditDialog = ref(false);
@@ -20,48 +20,42 @@ const doctors = computed(() => doctorsService.items());
 const count = computed(() => doctorsService.count());
 const countRows = 10;
 
+let requestAdapter = new DataTableRequestAdapter();
 
 onBeforeMount(async () => {
     await loadDoctors();
 });
 
-const loadDoctors = async (dataTableRequestAdapter) => {
-    return await doctorsService.fetchServerData(dataTableRequestAdapter);
+const loadDoctors = async (requestAdapter) => {
+    return await doctorsService.fetchServerData(requestAdapter);
 }
 
 
 
-const initFilters1 = () => {
-    filters1.value = {
+const initFilters = () => {
+    filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     };
 };
 
 const onFilter = async (event) => {
-    debugger
     // lazyParams.value.filters = filters.value ;
     // loadLazyData(event);
-    return await doctorsService.fetchServerData(dataTableRequestAdapter.dtEvent(event));
+    return await loadDoctors(requestAdapter.dtEvent(event));
 };
 
-const loadLazyData = (event) => {
-    loading.value = true;
-    lazyParams.value = { ...lazyParams.value, first: event?.first || first.value };
 
-    setTimeout(() => {
-        CustomerService.getCustomers({ lazyEvent: JSON.stringify(lazyParams.value) }).then((data) => {
-            customers.value = data.customers;
-            totalRecords.value = data.totalRecords;
-            loading.value = false;
-        });
-    }, Math.random() * 1000 + 250);
-};
+watch(filters, async (newQuestion, oldQuestion) => {
+    await loadDoctors(requestAdapter.withFiltration(filters));
+
+})
+
 const clearFilter1 = () => {
-    initFilters1();
+    initFilters();
 };
 
 const onPage = async (e) =>{
-    await doctorsService.fetchServerData(dataTableRequestAdapter.page(e.page+1));
+    await doctorsService.fetchServerData(requestAdapter.page(e.page+1));
 }
 
 const onOpenEdit = async (e) =>{
@@ -96,7 +90,7 @@ const refreshItem = async (id) =>{
                     :totalRecords="count"
                     editMode="row"
                     @row-edit-init="onOpenEdit"
-                    @filter="onFilter($event)"
+                    @update:filters="onFilter($event)"
                     filterDisplay="row"
                 >
                     <template #header>
@@ -104,7 +98,7 @@ const refreshItem = async (id) =>{
                             <Button type="button" icon="pi pi-filter-slash" label="Clear" class="p-button-outlined mb-2" @click="clearFilter1()" />
                             <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters1['global'].value" placeholder="Keyword Search" style="width: 100%" />
+                                <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="width: 100%" />
                             </span>
                         </div>
                     </template>
