@@ -12,6 +12,20 @@ const _setItemsIds = (store, items) => {
     for (const item of items) itemsIds.push(item.id);
     return store._state.itemsIds = itemsIds;
 }
+const _refreshItems = (store,items) => {
+    if(!items || items.length === 0) return ;
+    let itemsNew = {};
+    let existItems = [];
+    for (const item of items) itemsNew[item.id] = item;
+    if(store._state.items.length === 0 ){
+        store._state.items = Object.values(itemsNew);
+    }else{
+        for (const item of store._state.items) {
+            existItems.push((itemsNew[item.id]) ? itemsNew[item.id] : item);
+        }
+        store._state.items = existItems;
+    }
+}
 export default  (() => ({
         _state : reactive({ count : 0, _cash: {}, itemsIds:{} }),
 
@@ -30,6 +44,12 @@ export default  (() => ({
 
         setGlobalWithName(name){
             if(name) window[name] = this._state;
+            return this;
+        },
+        refreshItems(items){
+            if(!items)   return this;
+            _setCashItems(this, items)
+            _refreshItems(items);
             return this;
         },
 

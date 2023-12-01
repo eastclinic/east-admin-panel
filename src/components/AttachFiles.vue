@@ -14,7 +14,7 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
   let initData = '';
 
   const uploadProgress = ref(null);
-  const emit = defineEmits(['update:content', 'delete:content', "delete:content", 'saved:content', 'updated:content', 'updating:content']);
+  const emit = defineEmits(['update:content', 'delete:content', "delete:content", 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
 
     const props = defineProps({
     files: {
@@ -41,7 +41,8 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
         maxSizeFile:{
             type:Number,
             default:2000000000
-        }
+        },
+        upload:{type:Boolean}
     });
 const attachedFiles = ref([]);
 // const attachFiles = ref([]);
@@ -75,7 +76,8 @@ const attachedFiles = ref([]);
   }
 
   const handleFilesUpload = async (event) => {
-      emit('updating:content');
+
+
     // const files = event.target.files;
 
 
@@ -153,9 +155,8 @@ const attachedFiles = ref([]);
       }
     }
 
-    console.log('all files upload!')
-    emit('update:content', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
-    // emit('updated:content' );
+    emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    emit('update:upload', false);
   }
   const  removeFile = async(file) => {
       if(!file.id)  return false;

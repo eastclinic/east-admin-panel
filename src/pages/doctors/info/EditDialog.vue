@@ -24,14 +24,6 @@ const saveItemData = async () => {
     emit('updated', props.editData.id);
 }
 
-const updateAttach = async (files) => {
-    console.log('updateAttach')
-    uploadContent.value=false;
-    editedData.value.content = files;
-    // dataUpdated.value = true;
-
-};
-
 
 
 </script>
@@ -52,13 +44,7 @@ const updateAttach = async (files) => {
 
             </div>
             <div class="col-12  lg:col-12 ">
-            <Panel header="Контент" toggleable collapsed
-                   :pt="{
-                      header: { class: 'bg-primary' },
-                      title: { class: 'text-white' },
-                      icons: { class: 'a33333' }
-                  }"
-            >
+            <Panel header="Контент" toggleable collapsed   >
                 <template #header>
                     <div class="flex align-items-center gap-2">
 
@@ -69,11 +55,10 @@ const updateAttach = async (files) => {
                     <Badge :value="editedData.content.length"  class="ml-auto" />
                 </template>
                 <AttachFiles
-                        :files="editedData.content"
+                        v-model:files="editedData.content"
+                        v-model:upload="uploadContent"
                         targetType="doctor"
                         :targetId="editedData.id"
-                        @update:content="updateAttach"
-                        @updating:content="uploadContent=true"
                 >
                     <!--                <template #controlFilePanel="file">-->
                     <!--                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>-->
@@ -83,7 +68,7 @@ const updateAttach = async (files) => {
             </Panel>
             </div>
             <div class="col-12  lg:col-6 ">
-                <Button label="Сохранить" text :raised="true" @click="saveItemData"/>
+                <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
