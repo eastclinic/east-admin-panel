@@ -4,10 +4,12 @@ import EditDialog from "./EditDialog.vue";
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import doctorsService from "@/services/Doctors/DoctorsInfoService";
-import dataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
+import DataTableRequestAdapter from "@/api/apiRequestAdapters/DataTableRequestAdapter";
 
-import { ref, reactive, onBeforeMount, computed } from 'vue';
-const filters1 = ref(null);
+import { ref, reactive, onBeforeMount, computed, watch } from 'vue';
+const filters = reactive({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
 const visibleEditDialog = ref(false);
 const editData = ref({});
 
@@ -18,31 +20,42 @@ const doctors = computed(() => doctorsService.items());
 const count = computed(() => doctorsService.count());
 const countRows = 10;
 
+let requestAdapter = new DataTableRequestAdapter();
 
 onBeforeMount(async () => {
-    initFilters1();
-    await doctorsService.fetchServerData();
+    await loadDoctors();
 });
 
+const loadDoctors = async (requestAdapter) => {
+    return await doctorsService.fetchServerData(requestAdapter);
+}
 
 
 
-
-const initFilters1 = () => {
-    filters1.value = {
+const initFilters = () => {
+    filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        representative: { value: null, matchMode: FilterMatchMode.IN },
     };
 };
 
+const onFilter = async (event) => {
+    // lazyParams.value.filters = filters.value ;
+    // loadLazyData(event);
+    return await loadDoctors(requestAdapter.dtEvent(event));
+};
+
+
+watch(filters, async (newQuestion, oldQuestion) => {
+    await loadDoctors(requestAdapter.withFiltration(filters));
+
+})
+
 const clearFilter1 = () => {
-    initFilters1();
+    initFilters();
 };
 
 const onPage = async (e) =>{
-    await doctorsService.fetchServerData(dataTableRequestAdapter.page(e.page+1));
+    await doctorsService.fetchServerData(requestAdapter.page(e.page+1));
 }
 
 const onOpenEdit = async (e) =>{
@@ -72,19 +85,20 @@ const refreshItem = async (id) =>{
                     :lazy="true"
                     dataKey="id"
                     :rowHover="true"
-                    filterDisplay="menu"
                     responsiveLayout="scroll"
                     @page="onPage"
                     :totalRecords="count"
                     editMode="row"
                     @row-edit-init="onOpenEdit"
+                    @update:filters="onFilter($event)"
+                    filterDisplay="row"
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
                             <Button type="button" icon="pi pi-filter-slash" label="Clear" class="p-button-outlined mb-2" @click="clearFilter1()" />
                             <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters1['global'].value" placeholder="Keyword Search" style="width: 100%" />
+                                <InputText v-model="filters['global'].value" placeholder="Keyword Search" style="width: 100%" />
                             </span>
                         </div>
                     </template>

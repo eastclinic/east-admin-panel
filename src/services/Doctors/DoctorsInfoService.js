@@ -32,7 +32,7 @@ export default {
     async refreshItem(id){
         const res = await doctorsApi.get({id});
         if(Object.keys(res).length > 0 && res.items){
-            reviewsState.refreshItems(res.items);
+            this.state.refreshItems(res.items);
         }
     },
 
