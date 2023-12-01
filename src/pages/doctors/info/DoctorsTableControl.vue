@@ -1,6 +1,6 @@
 <script setup>
 
-import EditDialog from "./EditDialog.vue";
+import EditDialog from "./EditDialog/EditDialog.vue";
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import doctorsService from "@/services/Doctors/DoctorsInfoService";
@@ -95,6 +95,7 @@ const refreshItem = async (id) =>{
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
+
                             <Button type="button" icon="pi pi-filter-slash" label="Clear" class="p-button-outlined mb-2" @click="clearFilter1()" />
                             <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />
@@ -104,7 +105,7 @@ const refreshItem = async (id) =>{
                     </template>
                     <template #empty> No customers found. </template>
                     <template #loading> Загрузка докторов. Пожалуйста подождите. </template>
-
+                    <Column expander style="width: 5rem" />
                     <Column field="id" header="id"/>
 
                     <Column field="fullname" header="Доктор" style="min-width: 12rem">

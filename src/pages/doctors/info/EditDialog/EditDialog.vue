@@ -2,6 +2,7 @@
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
 import doctorsInfoService from "@/services/Doctors/DoctorsInfoService";
 import AttachFiles from "@/components/AttachFiles.vue";
+import Diploms from "@/pages/doctors/info/EditDialog/Diploms.vue";
 const props = defineProps({
     visible: Boolean,
     editData:Object
@@ -66,28 +67,7 @@ const saveItemData = async () => {
                 </AttachFiles>
 
             </Panel>
-            <Panel header="Дипломы" toggleable collapsed   >
-                <template #header>
-                    <div class="flex align-items-center gap-2">
-
-                        <span class="font-bold">Дипломы</span>
-                    </div>
-                </template>
-                <template #icons v-if="editedData.content && editedData.content.length > 0">
-                    <Badge :value="editedData.content.length"  class="ml-auto" />
-                </template>
-                <AttachFiles
-                        v-model:files="editedData.content"
-                        v-model:upload="uploadContent"
-                        targetType="doctor"
-                        :targetId="editedData.id"
-                >
-                    <!--                <template #controlFilePanel="file">-->
-                    <!--                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>-->
-                    <!--                </template>-->
-                </AttachFiles>
-
-            </Panel>
+                <Diploms :v-model="editedData.diploms"></Diploms>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>
