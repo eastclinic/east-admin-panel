@@ -1,7 +1,7 @@
 import baseUrl from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
 import buildGetURL from '@/services/util/UseGetParametersBuilder.js';
-import {getToServer} from '../services/util/UseFetchToServer';
+import {getToServer} from '@/services/util/UseFetchToServer';
 
 
 export default (() => {

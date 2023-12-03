@@ -1,7 +1,7 @@
 
 // import doctorsState from '../../state/DoctorsState.js'
-import doctorsApi from '../../api/DoctorsApi'
-import StateManager from "../util/StateManager";
+import doctorsApi from '@/api/Doctors/DoctorsApi'
+import StateManager from "@/services/util/StateManager";
 /*
 Сервисов может быть множество
 стейтов может быть множество

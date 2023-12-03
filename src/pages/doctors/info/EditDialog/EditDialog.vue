@@ -1,8 +1,11 @@
 <script setup>
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
-import doctorsInfoService from "@/services/Doctors/DoctorsInfoService";
+
+import doctorsInfoService from "@/services/Doctors/DoctorsDiplomsService";
 import AttachFiles from "@/components/AttachFiles.vue";
-import Diploms from "@/pages/doctors/info/EditDialog/Diploms.vue";
+import Diploms from "@/pages/doctors/info/EditDialog/Diploms/Diploms.vue";
+
+
 const props = defineProps({
     visible: Boolean,
     editData:Object
@@ -10,10 +13,9 @@ const props = defineProps({
 
 let uploadContent = ref(false);
 const emit = defineEmits(['update:visible', 'update', 'updated'])
-// const editedData = ref(props.editData);
 const editedData = computed(() => props.editData);
 
-const header = computed(() => (Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
+const header = computed(() => (props.editData && Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
 
 
 const dismissModal = () => emit('update:visible', false)
@@ -25,6 +27,7 @@ const saveItemData = async () => {
     emit('updated', props.editData.id);
 }
 
+const visibleDiplomsDialog = ref(false);
 
 
 </script>
@@ -32,6 +35,7 @@ const saveItemData = async () => {
 <template>
     <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
+            {{editedData}}
             <div class="col-12  lg:col-4 ">
                 <InputText type="text" v-model:modelValue="editedData.surname" placeholder="Фамилия"/>
             </div>
@@ -56,6 +60,7 @@ const saveItemData = async () => {
                     <Badge :value="editedData.content.length"  class="ml-auto" />
                 </template>
                 <AttachFiles
+                        v-if="editedData.id"
                         v-model:files="editedData.content"
                         v-model:upload="uploadContent"
                         targetType="doctor"

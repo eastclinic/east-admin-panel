@@ -105,7 +105,7 @@ const refreshItem = async (id) =>{
                     </template>
                     <template #empty> No customers found. </template>
                     <template #loading> Загрузка докторов. Пожалуйста подождите. </template>
-                    <Column expander style="width: 5rem" />
+
                     <Column field="id" header="id"/>
 
                     <Column field="fullname" header="Доктор" style="min-width: 12rem">

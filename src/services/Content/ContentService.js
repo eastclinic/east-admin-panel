@@ -2,7 +2,6 @@
 import FilesApi from '../../api/FilesApi'
 import toastService from "@/services/Toast";
 import stateManager from "@/state/ContentState";
-import doctorsApi from "@/api/DoctorsApi";
 
 import {reactive, toRaw, ref, toRefs, computed} from "vue";
 import fileUploadRequest from "@/services/Content/FileUploadRequest";
