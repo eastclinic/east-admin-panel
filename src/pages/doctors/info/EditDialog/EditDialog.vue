@@ -72,7 +72,7 @@ const visibleDiplomsDialog = ref(false);
                 </AttachFiles>
 
             </Panel>
-                <Diploms :v-model="editedData.diploms"></Diploms>
+                <Diploms :v-model="editedData.diploms" :doctor_id="editedData.id"></Diploms>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>

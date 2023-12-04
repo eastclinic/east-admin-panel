@@ -7,7 +7,8 @@ import EditDialog from "@/pages/doctors/info/EditDialog/Diploms/EditDialog.vue";
 import doctorsDiplomsService from "@/services/Doctors/DoctorsDiplomsService";
 const props = defineProps({
     visible: Boolean,
-    modelValue:{default:[]}
+    modelValue:{default:[]},
+    doctor_id:{        required:true, type:Number   }
 })
 
 const visibleEditDialog = ref(false);
@@ -48,7 +49,7 @@ const loadDiploms = async (requestAdapter) => {
 
 
 
-        <EditDialog v-model:visible="visibleEditDialog" v-model="editData" />
+        <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" />
         <DataTable
                 :value="props.modelValue"
                 class="p-datatable-gridlines"

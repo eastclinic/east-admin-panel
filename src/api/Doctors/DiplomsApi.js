@@ -5,7 +5,7 @@ import {getToServer} from '@/services/util/UseFetchToServer';
 
 
 export default (() => {
-    let _url = '/api/doctors';
+    let _url = '/api/doctor-diploms';
     return {
         ...UseRequestAdapters,
         _requestData : {},
@@ -15,14 +15,13 @@ export default (() => {
         },
         async saveItem( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}
-
             let request = {
                 body: JSON.stringify(saveData),
                 headers: {
                     'Content-Type': 'application/json'
                 },
             };
-            let url = baseUrl + '/api/doctors';
+            let url = baseUrl + _url;
             if(saveData.id ) {
                 request['method'] = 'PUT';
                 url += '/' + saveData.id;
