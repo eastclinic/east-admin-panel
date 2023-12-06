@@ -214,12 +214,12 @@ const attachedFiles = ref([]);
           </div>
 
           {{file.loadPersent}}
-        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
+        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
           <div v-else-if="isVideo(file)">
               <video  controls  style="height: 100%;width:50%">
-                  <source :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url">
+                  <source :src="(file.blobPath) ? file.blobPath :file.url">
               </video>
           </div>
 

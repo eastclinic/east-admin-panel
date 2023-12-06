@@ -64,6 +64,10 @@ export default  (() => ({
             return items;
         },
 
+        item(id){
+            return this._state._cash[id];
+        },
+
         count() {
             return this._state.count;
         }

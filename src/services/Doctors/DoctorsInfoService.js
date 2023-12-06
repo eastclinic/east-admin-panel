@@ -63,6 +63,10 @@ export default {
         if( !condition ) return this.state.getItems();
     },
 
+    item(id){
+        return this.state.item(id);
+    },
+
     count(){   return this.state.count();  },
 
     async save( data ){

@@ -65,14 +65,17 @@ const onOpenEdit = async (e) =>{
 
 
 const refreshItem = async (id) =>{
-
     await doctorsService.refreshItem( id );
+    if(editData.value.id  &&  editData.value.id === id){
+        editData.value = doctorsService.item(id);
+    }
 }
 
 
 </script>
 
 <template>
+
 <EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated="refreshItem"></EditDialog>
     <div class="grid">
         <div class="col-12">

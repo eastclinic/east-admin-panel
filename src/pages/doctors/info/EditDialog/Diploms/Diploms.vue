@@ -11,7 +11,7 @@ const props = defineProps({
     doctor_id:{        required:true, type:Number   }
 })
 
-const emit = defineEmits(['update:visible', 'update:modelValue'])
+const emit = defineEmits(['update:visible', 'updated', 'update:modelValue'])
 
 const visibleEditDialog = ref(false);
 const editData = ref({});
@@ -20,9 +20,20 @@ const diploms = computed({
         return props.modelValue
     },
     set(value) {
+        console.log(value)
         emit('update:modelValue', value)
     }
 });
+
+// const  diploms = computed({
+//     get: () => {
+//         attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
+//         return attachedFiles.value},
+//     set: (val) => {
+//         console.log('attachFiles')
+//         // attachedFiles.value = val;
+//     }
+// });
 
 
 const createItem =  (e) =>{
@@ -30,7 +41,8 @@ const createItem =  (e) =>{
     editData.value = {};
 }
 
-const onOpenEdit = async (e) =>{
+const onOpenEdit = (e) =>{
+    console.log(e)
     visibleEditDialog.value = true;
     editData.value = e.data;
 }
@@ -53,9 +65,8 @@ const onOpenEdit = async (e) =>{
             <Badge :value="diploms.length"  class="ml-auto" />
         </template>
 
-
-{{diploms}}
-        <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" />
+{{editData}}
+        <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" @updated="emit('updated', $event)" />
         <DataTable
                 :value="diploms"
                 class="p-datatable-gridlines"
@@ -67,14 +78,25 @@ const onOpenEdit = async (e) =>{
         >
             <template #header>
                 <div class="flex justify-content-between flex-column sm:flex-row">
-                    <Button type="button" icon="pi pi-plus" label="New" class="p-button-outlined mb-2" @click="createItem" />
+                    <Button type="button" icon="pi pi-plus" label="Добавить диплом" class="p-button-outlined mb-2" @click="createItem" />
                 </div>
             </template>
-            <template #empty> No customers found. </template>
-            <template #loading> Загрузка докторов. Пожалуйста подождите. </template>
-            <Column field="title" header="Title" style="min-width: 12rem"/>
+            <template #empty> No diploms found. </template>
+            <Column field="id" header="id"/>
+            <Column field="title" header="Title" style="min-width: 12rem">
+                <template #body="{ data }">
+                    <div class="flex justify-content-between flex-wrap">
+                        <div class="flex align-items-center justify-content-center">{{data.title}}</div>
+                        <AvatarGroup v-if="data.content">
 
-            <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+                            <Avatar v-for="content in data.content" :image="content.url" size="large" shape="circle" />
+
+                        </AvatarGroup>
+                    </div>
+                </template>
+            </Column>
+
+            <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center"></Column>
         </DataTable>
 
     </Panel>
