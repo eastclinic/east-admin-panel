@@ -11,9 +11,18 @@ const props = defineProps({
     doctor_id:{        required:true, type:Number   }
 })
 
+const emit = defineEmits(['update:visible', 'update:modelValue'])
+
 const visibleEditDialog = ref(false);
 const editData = ref({});
-const editDiplomsData = computed(() => props.modelValue);
+const diploms = computed({
+    get() {
+        return props.modelValue
+    },
+    set(value) {
+        emit('update:modelValue', value)
+    }
+});
 
 
 const createItem =  (e) =>{
@@ -26,9 +35,6 @@ const onOpenEdit = async (e) =>{
     editData.value = e.data;
 }
 
-const loadDiploms = async (requestAdapter) => {
-    return await doctorsDiplomsService.diplomsFromServer(requestAdapter);
-}
 
 
 
@@ -43,15 +49,15 @@ const loadDiploms = async (requestAdapter) => {
                 <span class="font-bold">Дипломы</span>
             </div>
         </template>
-        <template #icons v-if="editDiplomsData && editDiplomsData.length > 0">
-            <Badge :value="editDiplomsData.length"  class="ml-auto" />
+        <template #icons v-if="diploms && diploms.length > 0">
+            <Badge :value="diploms.length"  class="ml-auto" />
         </template>
 
 
-
+{{diploms}}
         <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" />
         <DataTable
-                :value="props.modelValue"
+                :value="diploms"
                 class="p-datatable-gridlines"
                 :rows="3"
                 dataKey="id"
