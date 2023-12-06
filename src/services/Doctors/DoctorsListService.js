@@ -1,5 +1,5 @@
 
-import doctorsApi from '../../api/DoctorsApi'
+import doctorsApi from '../../api/Doctors/DoctorsApi'
 import StateManager from "../util/StateManager";
 /*
 Сервисов может быть множество

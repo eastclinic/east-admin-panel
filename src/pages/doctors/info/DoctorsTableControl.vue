@@ -1,6 +1,6 @@
 <script setup>
 
-import EditDialog from "./EditDialog.vue";
+import EditDialog from "./EditDialog/EditDialog.vue";
 
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import doctorsService from "@/services/Doctors/DoctorsInfoService";
@@ -65,14 +65,17 @@ const onOpenEdit = async (e) =>{
 
 
 const refreshItem = async (id) =>{
-
     await doctorsService.refreshItem( id );
+    if(editData.value.id  &&  editData.value.id === id){
+        editData.value = doctorsService.item(id);
+    }
 }
 
 
 </script>
 
 <template>
+
 <EditDialog v-model:visible="visibleEditDialog" :editData="editData" @updated="refreshItem"></EditDialog>
     <div class="grid">
         <div class="col-12">
@@ -95,6 +98,7 @@ const refreshItem = async (id) =>{
                 >
                     <template #header>
                         <div class="flex justify-content-between flex-column sm:flex-row">
+
                             <Button type="button" icon="pi pi-filter-slash" label="Clear" class="p-button-outlined mb-2" @click="clearFilter1()" />
                             <span class="p-input-icon-left mb-2">
                                 <i class="pi pi-search" />

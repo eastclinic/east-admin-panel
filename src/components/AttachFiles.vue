@@ -1,7 +1,6 @@
 <script setup>
 import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMounted} from 'vue';
-  import ReviewsService from "../services/Reviews/ReviewsService";
-  import ContentService from "../services/Content/ContentService";
+  import ContentService from "@/services/Content/ContentService";
   import toastService from '../services/Toast'
   import { useToast } from 'primevue/usetoast';
 import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
@@ -15,7 +14,7 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
 
   const uploadProgress = ref(null);
   const emit = defineEmits(['update:content', 'delete:content', "delete:content", 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
-
+//
     const props = defineProps({
     files: {
         type: Array,
@@ -44,6 +43,8 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
         },
         upload:{type:Boolean}
     });
+
+
 const attachedFiles = ref([]);
 // const attachFiles = ref([]);
   onMounted(async () => {
@@ -185,30 +186,6 @@ const attachedFiles = ref([]);
   const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
   const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
-  // watch(props.files, () => {
-  //   // Обработка изменений в selectedFiles
-  //   console.log(props.files);
-  // });
-  //
-  // const clear = async ({ contentable_type, contentable_id }) => {
-  //     if (contentable_type && contentable_id) {
-  //         return true
-  //     } else {
-  //         console.warn('Invalid removeAll event payload! { contentable_type, contentable_id }')
-  //         return false
-  //     }
-  // }
-  //
-  // const save = async () => {
-  //     const saveData = {
-  //         targetType:props.targetType,
-  //         targetId:props.targetId,
-  //         attachContent:toRaw(attachFiles.value)};
-  //       emit('saved:content', attachFiles.value );
-  //   return await ContentService.save(saveData);
-  // }
-  //
-  // defineExpose({clear, save})
 
 
 
@@ -237,12 +214,12 @@ const attachedFiles = ref([]);
           </div>
 
           {{file.loadPersent}}
-        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url"  :key="index" :style="fileDeleted(file)">
+        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :file.url"  :key="index" :style="fileDeleted(file)">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
           <div v-else-if="isVideo(file)">
               <video  controls  style="height: 100%;width:50%">
-                  <source :src="(file.blobPath) ? file.blobPath :'http://127.0.0.1:8000'+file.url">
+                  <source :src="(file.blobPath) ? file.blobPath :file.url">
               </video>
           </div>
 

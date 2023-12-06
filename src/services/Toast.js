@@ -1,5 +1,5 @@
 import {ToastSeverity} from 'primevue/api';
-import {app} from '../main';
+import {app} from '@/main';
 
 const lifeTime = 3000;
 
@@ -9,6 +9,7 @@ export default {
         app.config.globalProperties.$toast.add({severity: ToastSeverity.INFO, summary: title, detail: body, life: this.lifeTime});
     },
     error(title, body){
+        if(this.lifeTime === 3000) this.lifeTime = 10000;
         app.config.globalProperties.$toast.add({severity: ToastSeverity.ERROR, summary: title, detail: body, life: this.lifeTime});
     },
     warning(title, body) {

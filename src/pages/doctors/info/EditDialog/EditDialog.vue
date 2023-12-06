@@ -1,7 +1,11 @@
 <script setup>
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
+
 import doctorsInfoService from "@/services/Doctors/DoctorsInfoService";
 import AttachFiles from "@/components/AttachFiles.vue";
+import Diploms from "@/pages/doctors/info/EditDialog/Diploms/Diploms.vue";
+
+
 const props = defineProps({
     visible: Boolean,
     editData:Object
@@ -9,10 +13,9 @@ const props = defineProps({
 
 let uploadContent = ref(false);
 const emit = defineEmits(['update:visible', 'update', 'updated'])
-// const editedData = ref(props.editData);
 const editedData = computed(() => props.editData);
 
-const header = computed(() => (Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
+const header = computed(() => (props.editData && Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
 
 
 const dismissModal = () => emit('update:visible', false)
@@ -24,11 +27,13 @@ const saveItemData = async () => {
     emit('updated', props.editData.id);
 }
 
+const visibleDiplomsDialog = ref(false);
 
 
 </script>
 
 <template>
+    {{editedData.diploms}}
     <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
             <div class="col-12  lg:col-4 ">
@@ -55,6 +60,7 @@ const saveItemData = async () => {
                     <Badge :value="editedData.content.length"  class="ml-auto" />
                 </template>
                 <AttachFiles
+                        v-if="editedData.id"
                         v-model:files="editedData.content"
                         v-model:upload="uploadContent"
                         targetType="doctor"
@@ -66,6 +72,7 @@ const saveItemData = async () => {
                 </AttachFiles>
 
             </Panel>
+                <Diploms v-model="editedData.diploms" :doctor_id="editedData.id" @updated="emit('updated', $event)"></Diploms>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>

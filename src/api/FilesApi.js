@@ -23,7 +23,7 @@ export default (() => ({
                 headers: { "Content-Type": "multipart/form-data" },
                 onUploadProgress: fileUploadRequest.getUploadProgressCallback()
             }).then(response => {
-                if(response?.data?.data?.[0]) data.data = response.data.data[0];
+                if(response?.data?.items?.[0]) data.data = response.data.items[0];
                 //return response.data;
             })
                 .catch(error => {
