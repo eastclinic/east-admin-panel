@@ -118,10 +118,9 @@ const checkUploadFileParameters = (file) => {
           for (const fileIndex in attachedFiles.value) {
               if(attachedFiles.value[fileIndex].id === uploadVideoPreview.value.videoId){
                   attachedFiles.value[fileIndex].preview = res.data;
+                  attachedFiles.value[fileIndex].preview_id = res.data.id;
               }
           }
-            let fwsdf = attachedFiles.value
-          debugger;
           toastService.duration(3000).success('Load image', 'Файл загружен')
       }else if(res.errors ) {
           for (const error in res.errors) {
