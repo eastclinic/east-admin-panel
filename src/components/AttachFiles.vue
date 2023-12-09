@@ -118,7 +118,7 @@ const checkUploadFileParameters = (file) => {
           for (const fileIndex in attachedFiles.value) {
               if(attachedFiles.value[fileIndex].id === uploadVideoPreview.value.videoId){
                   attachedFiles.value[fileIndex].preview = res.data;
-                  attachedFiles.value[fileIndex].preview_id = res.data.id;
+                  // attachedFiles.value[fileIndex].preview_id = res.data.id;
               }
           }
           toastService.duration(3000).success('Load image', 'Файл загружен')
@@ -174,7 +174,6 @@ const uploadFiles = async (event) =>{
         files[i].attachFileIndex = attachFiles.value.length-1;
     }
 
-    debugger;
     for ( const i in files ) {
       let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
