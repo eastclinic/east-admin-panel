@@ -112,6 +112,7 @@ const checkUploadFileParameters = (file) => {
               .forFile(file)
               .with('contentable_id', props.targetId)
               .with('contentable_type', props.targetType)
+              .with('is_preview_for', uploadVideoPreview.value.videoId)
       );
 
       if(res?.data?.id ){
