@@ -19,11 +19,11 @@ const model = ref([
                 icon: 'pi pi-fw pi-sign-in',
                 to: '/doctors/info'
             },
-            {
-                label: 'Научные данные',
-                icon: 'pi pi-fw pi-times-circle',
-                to: '/doctor/science'
-            },
+            // {
+            //     label: 'Научные данные',
+            //     icon: 'pi pi-fw pi-times-circle',
+            //     to: '/doctor/science'
+            // },
 
         ]
     },

@@ -23,12 +23,19 @@
         modelValue:Object
     })
     const dataUpdated = ref(false);
-    const emit = defineEmits(['update:visible', 'updated:review', 'created:review', 'deleted:review'])
-    // const  editedData = reactive(props.message);
+    const emit = defineEmits(['update:visible', 'updated:review', 'created:review', 'deleted:review', 'update:modelValue'])
+    const  editedData = ref({});
 
     // const editData = ref({});
-    const  editData = computed(() => {        return JSON.parse(JSON.stringify(props.modelValue)); });
+    const  editData = computed(() => {
+        if(props.modelValue?.id !== editedData.value?.id)   {
+            editedData.value = JSON.parse(JSON.stringify(props.modelValue));
+        }
+        return editedData.value
+    });
+
     // const  editData = computed(() => props.modelValue);
+
 
 
     const header = computed(() => (editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
@@ -126,6 +133,7 @@
 </script>
 
 <template>
+
     <ConfirmDialog></ConfirmDialog>
     <Dialog :visible="props.visible" modal
             :header="header"
@@ -168,7 +176,6 @@
                     <InputNumber v-model="editData.rating" :min="1" :max="100" id="rating" placeholder="Рейтинг 1 до 100"/>
             </div>
             <div class="col-12" v-if="editData.id">
-                {{editData}}
               <AttachFiles
                   v-model:files="editData.content"
                   v-model:upload="uploadContent"
