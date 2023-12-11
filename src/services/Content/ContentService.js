@@ -74,6 +74,20 @@ export default (() =>({
         return this.state.count();
     },
 
+    getFileType(file){
+        if(file.typeFile) return file.typeFile;
+        if(!file.type) return null;
+        let mimeFile = file.type;
+        mimeFile = mimeFile.split('/');
+        return mimeFile[0];
+    },
+
+    getFileExtension(file){
+        if(!file.type) return null;
+        let mimeFile = file.type;
+        mimeFile = mimeFile.split('/');
+        return mimeFile[1];
+    },
 
 
     async filesUpload  (newFiles, props){

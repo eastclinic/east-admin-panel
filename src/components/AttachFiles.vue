@@ -9,11 +9,12 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
   const toast = useToast();
 
 
-  const uploadInput = ref([]);
-  let initData = '';
 
-  const uploadProgress = ref(null);
-  const emit = defineEmits(['update:content', 'delete:content', "delete:content", 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
+    const uploadInput = ref([]);
+    const uploadVideoPreview = ref([]);
+
+    const uploadProgress = ref(null);
+    const emit = defineEmits(['update:content', 'delete:content', 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
 //
     const props = defineProps({
     files: {
@@ -46,15 +47,8 @@ import fileUploadRequest from "@/services/Content/FileUploadRequest";
 
 
 const attachedFiles = ref([]);
-// const attachFiles = ref([]);
   onMounted(async () => {
-      // attachFiles.value = [];
-      // if(!props.files || props.files.length === 0){
-      //     await ContentService.fetchServerData(ListRequest.with('targetType', props.targetType).with('targetId', props.targetId).all())
-      // }
-      // const items = ContentService.items();
-      // initData = JSON.stringify(items)
-      // attachFiles.value = items;
+
   });
 
   // const attachFiles = computed(() => {return [...props.files]});
@@ -72,18 +66,93 @@ const attachedFiles = ref([]);
 
 
 
-  const clickOnUpload = () => {
+  const OnUpload = () => {
     uploadInput.value.click();
   }
 
-  const handleFilesUpload = async (event) => {
+const OnUploadPreviewForVideoId = (videoId) => {
+    uploadVideoPreview.value.videoId = videoId;
+    uploadVideoPreview.value.click();
+}
+
+const checkUploadFileParameters = (file) => {
+    const fileName = file.name;
+    let mimeFile = ''
+    if(file.type) mimeFile = file.type;
+    if(mimeFile) mimeFile = mimeFile.split('/');
+    if( mimeFile.length === 0 ) {
+        toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
+        return ;
+    }
+    const fileExtension = ContentService.getFileExtension(file);
+
+//check file extension
+    if(!props.possibleExtensions.includes(fileExtension)){
+        toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleExtensions.join(', ') + ')', )
+        return;
+    }
+//check file size
+    if(file.size < 200 || file.size > props.maxSizeFile){
+        toastService.duration(5000).error('Слишком большой размер файла ' + fileName + '. (' + Math.round(file.size/1000)  +' kb) Допустимо ' + Math.round(props.maxSizeFile/1000) +'kb', )
+        return;
+    }
+    return true;
+}
+
+  const uploadVideoPreviewFiles = async (event) =>{
+      if(!uploadVideoPreview.value.videoId) return ;
+      const files = event.target.files;
+      if(!files || files.length === 0) return ;
+      const file = files[0];
+      if (!checkUploadFileParameters(file)) return ;
+
+
+      let res = await ContentService.fileUpload(
+          fileUploadRequest
+              .forFile(file)
+              .with('contentable_id', props.targetId)
+              .with('contentable_type', props.targetType)
+              .with('is_preview_for', uploadVideoPreview.value.videoId)
+      );
+
+      if(res?.data?.id ){
+          for (const fileIndex in attachedFiles.value) {
+              if(attachedFiles.value[fileIndex].id === uploadVideoPreview.value.videoId){
+                  attachedFiles.value[fileIndex].preview = res.data;
+                  // attachedFiles.value[fileIndex].preview_id = res.data.id;
+              }
+          }
+          toastService.duration(3000).success('Load image', 'Файл загружен')
+      }else if(res.errors ) {
+          for (const error in res.errors) {
+              if (Array.isArray(res.errors[error])) {
+                  for (const key in res.errors[error]) {
+                      toastService.duration(5000).error('Load image', res.errors[error][key])
+                  }
+
+              }
+          }
+
+
+      }
+  }
+
+
+
+
+const uploadFiles = async (event) =>{
+    await handleFilesUpload(event.target.files)
+}
+
+
+  const handleFilesUpload = async (files, options) => {
 
 
     // const files = event.target.files;
 
 
       // try {
-      //     await ContentService.filesUpload(event.target.files, toRaw(props));
+      //     await ContentService.filesUpload(files, toRaw(props));
       // }catch (e){
       //     console.log(e)
       //     toastService.duration(5000).error(e.message);
@@ -91,30 +160,9 @@ const attachedFiles = ref([]);
 
       // return;
 
-    const files = event.target.files;
     for (let i = 0; i < files.length; i++) {
-      const fileName = files[i].name;
-        let mimeFile = ''
-        if(files[i].type) mimeFile = files[i].type;
-        if(mimeFile) mimeFile = mimeFile.split('/');
-        if( mimeFile.length === 0 ) {
-            toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
-            continue;
-        }
-        const fileExtension = mimeFile[1]
-        const typeFile = mimeFile[0]
-//check file extension
-        if(!props.possibleExtensions.includes(fileExtension)){
-            toastService.duration(5000).error('Неверный тип файла ' + fileName + '. Допустимо до (' + props.possibleExtensions.join(', ') + ')', )
-            continue;
-        }
-//check file size
-        if(files[i].size < 200 || files[i].size > props.maxSizeFile){
-            toastService.duration(5000).error('Слишком большой размер файла ' + fileName + '. (' + Math.round(files[i].size/1000)  +' kb) Допустимо ' + Math.round(props.maxSizeFile/1000) +'kb', )
-            continue;
-        }
-
-
+        if (!checkUploadFileParameters(files[i])) continue ;
+        const typeFile = ContentService.getFileType(files[i])
       attachFiles.value.push( reactive({
         typeFile: typeFile,
         blobPath: URL.createObjectURL(files[i]),  //temp path for show image
@@ -126,6 +174,7 @@ const attachedFiles = ref([]);
       }));
         files[i].attachFileIndex = attachFiles.value.length-1;
     }
+
     for ( const i in files ) {
       let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
@@ -159,6 +208,9 @@ const attachedFiles = ref([]);
     emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
     emit('update:upload', false);
   }
+
+
+
   const  removeFile = async(file) => {
       if(!file.id)  return false;
       const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
@@ -218,18 +270,22 @@ const attachedFiles = ref([]);
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
           <div v-else-if="isVideo(file)">
+              <Button v-if="file.url" icon="pi pi-clone" aria-label="Submit" @click="OnUploadPreviewForVideoId(file.id)" />
               <video  controls  style="height: 100%;width:50%">
                   <source :src="(file.blobPath) ? file.blobPath :file.url">
               </video>
+              <img v-if="file.preview" :src="file.preview.url">
+
           </div>
 
 
       </div>
 
+        <input style="display: none" ref="uploadVideoPreview" @change="uploadVideoPreviewFiles" type="file" accept="image/*" />
+      <input style="display: none" ref="uploadInput" @change="uploadFiles" type="file" accept="video/*, image/*" multiple />
 
-      <input style="display: none" ref="uploadInput" @change="handleFilesUpload" type="file" accept="video/*, image/*" multiple />
     </div>
-    <div @click="clickOnUpload" class="attach-files__item add">
+    <div @click="OnUpload" class="attach-files__item add">
       <div  class="pi pi-upload upload-button"></div>
     </div>
   </div>
