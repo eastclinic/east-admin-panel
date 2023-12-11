@@ -1,6 +1,6 @@
 
 // import doctorsState from '../../state/DoctorsState.js'
-import doctorsApi from '@/api/Doctors/DoctorsApi'
+import DoctorsApi from '@/api/Doctors/DoctorsApi'
 import StateManager from "@/services/util/StateManager";
 /*
 Сервисов может быть множество
@@ -30,7 +30,7 @@ export default {
      state: DoctorsState,
 
     async refreshItem(id){
-        const res = await doctorsApi.get({id});
+        const res = await (new DoctorsApi).get({id});
         if(Object.keys(res).length > 0 && res.items){
             this.state.refreshItems(res.items);
         }
@@ -40,9 +40,9 @@ export default {
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
-        if( requestAdapter )    doctorsApi.withRequestData(requestAdapter.toArray());
+        if( requestAdapter )    (new DoctorsApi).withRequestData(requestAdapter.toArray());
 
-        const res = await doctorsApi.get();
+        const res = await (new DoctorsApi).get();
         if(Object.keys(res).length > 0 && res.items){
             this.state.setItems(res.items);
             this.state.setCount(res.count);
@@ -70,11 +70,11 @@ export default {
     count(){   return this.state.count();  },
 
     async save( data ){
-        return  await doctorsApi.saveItem(data);
+        return  await (new DoctorsApi).saveItem(data);
     },
 
     async delete( id ){
-        return  await doctorsApi.deleteDoctor(id);
+        return  await (new DoctorsApi).deleteDoctor(id);
     },
 
 

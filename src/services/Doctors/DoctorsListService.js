@@ -1,5 +1,5 @@
 
-import doctorsApi from '../../api/Doctors/DoctorsApi'
+import DoctorsApi from '../../api/Doctors/DoctorsApi'
 import StateManager from "../util/StateManager";
 /*
 Сервисов может быть множество
@@ -31,7 +31,7 @@ export default (() => ({
     //todo set definition requestAdapter type
     async fetchServerData(requestAdapter){
         //handle data from request adapters
-        const res = await doctorsApi.withUrl('/api/doctors-list').get(( requestAdapter ) ? requestAdapter.toArray() : null);
+        const res = await (new DoctorsApi()).withUrl('/api/doctors-list').get(( requestAdapter ) ? requestAdapter.toArray() : null);
         if( res?.items) this.state.setItems(res.items)
         if( res?.count) this.state.setCount(res.count)
 

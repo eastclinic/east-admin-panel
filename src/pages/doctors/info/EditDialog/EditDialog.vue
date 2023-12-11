@@ -33,7 +33,7 @@ const visibleDiplomsDialog = ref(false);
 </script>
 
 <template>
-    {{editedData.diploms}}
+
     <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
             <div class="col-12  lg:col-4 ">
