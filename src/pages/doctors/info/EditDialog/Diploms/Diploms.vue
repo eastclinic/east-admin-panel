@@ -65,7 +65,6 @@ const onOpenEdit = (e) =>{
             <Badge :value="diploms.length"  class="ml-auto" />
         </template>
 
-{{editData}}
         <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" @updated="emit('updated', $event)" />
         <DataTable
                 :value="diploms"

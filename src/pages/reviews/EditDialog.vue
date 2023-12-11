@@ -20,19 +20,19 @@
     const confirm = useConfirm();
     const props = defineProps({
         visible: Boolean,
-        editData:Object
+        modelValue:Object
     })
     const dataUpdated = ref(false);
     const emit = defineEmits(['update:visible', 'updated:review', 'created:review', 'deleted:review'])
     // const  editedData = reactive(props.message);
 
-    const editData = ref({});
-    const  editDataComputed = computed(() => { editData.value = JSON.parse(JSON.stringify(props.editData)); return editData.value});
+    // const editData = ref({});
+    const  editData = computed(() => {        return JSON.parse(JSON.stringify(props.modelValue)); });
+    // const  editData = computed(() => props.modelValue);
 
 
-    const header = computed(() => (props.editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
+    const header = computed(() => (editData?.id) ? 'Редактирование отзыва' : 'Создание нового отзыва');
     const reviewsService = ReviewsService;
-    //const currentId = (props.editData?.id) ? props.editData.id : Math.floor(Math.random() * (4100000000 - 4000000000 + 1)) + 4000000000;
 
 
     const contentPublish = (publish, contentInfo)=>{
@@ -44,7 +44,8 @@
     }
     const saveReview = async () => {
         // if(editData?.value?.id) content.value.save('review', editData.value.id);
-        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
+
+        if(JSON.stringify(editData.value) !== JSON.stringify(props.modelValue)){
             const res = await saveReviewToServer(toRaw(editData.value));
             if(res.ok ) {
                 if(editData.value.id){
@@ -63,13 +64,6 @@
         emit('update:visible', false);
     };
 
-    const updateAttach = async (files) => {
-        console.log('updateAttach')
-        uploadContent.value=false;
-        editData.value.content = files;
-        // dataUpdated.value = true;
-
-    };
     const deleteReview = async ()   => {
 
         confirm.require({
@@ -91,17 +85,13 @@
     const content = ref(null);
 
 
-    // onBeforeUpdate(()=>{
-    //     //todo its may be wrong
-    //     editedData = reactive({...toRaw(props.editData)});
-    // });
 
 
     const targetList = ref(doctorsListService.value.items());
 
 
     const saveReviewToServer = async (editedData) => {
-        if(props?.editData?.id) editedData.id = props.editData.id;
+        if(props?.editData?.id) editedData.id = props.modelValue.id;
         else {
 
             if(!editedData.reviewable_type) editedData.reviewable_type = 'doctor';
@@ -114,11 +104,11 @@
         // if(props?.editData?.is_new){
         //     editedData.is_new = false;
         //     await saveReview(toRaw(editedData));
-        //     emit('updated:review', props.editData.id);
+        //     emit('updated:review', props.showModal.id);
         // }
     }
     const dismissModal = () => {
-        if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)) {
+        if(JSON.stringify(editData.value) !== JSON.stringify(props.modelValue)) {
             confirm.require({
                 message: 'Закрыть диалог и отменить изменения?',
                 header: 'Отмена',
@@ -149,7 +139,7 @@
             <div class="col-12  lg:col-12">
                 <div class="flex flex-wrap">
                     <div class="flex align-items-center justify-content-center m-2">
-                        <InputSwitch v-model="editDataComputed.published"/>
+                        <InputSwitch v-model="editData.published"/>
                     </div>
                     <div class="flex align-items-center justify-content-center m-2">
                         <label >Опубликован</label>
@@ -171,21 +161,19 @@
             <div class="col-12  lg:col-6 ">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user" />
-                    <InputText type="text" v-model="editDataComputed.author"/>
+                    <InputText type="text" v-model="editData.author"/>
                 </span>
             </div>
             <div class="col-12 lg:col-6 ">
-                    <InputNumber v-model="editDataComputed.rating" :min="1" :max="100" id="rating" placeholder="Рейтинг 1 до 100"/>
+                    <InputNumber v-model="editData.rating" :min="1" :max="100" id="rating" placeholder="Рейтинг 1 до 100"/>
             </div>
-            <div class="col-12" v-if="editDataComputed.id">
-                {{editDataComputed.content}}
+            <div class="col-12" v-if="editData.id">
+                {{editData}}
               <AttachFiles
-                  :files="editDataComputed.content"
-                  ref="content"
+                  v-model:files="editData.content"
+                  v-model:upload="uploadContent"
                   targetType="review"
-                  :targetId="editDataComputed.id"
-                  @update:content="updateAttach"
-                  @updating:content="uploadContent=true"
+                  :targetId="editData.id"
               >
                   <template #controlFilePanel="file">
                     <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
@@ -193,20 +181,17 @@
               </AttachFiles>
             </div>
             <div class="col-12">
-                <Textarea v-model="editDataComputed.text" rows="5" autoResize  />
+                <Textarea v-model="editData.text" rows="5" autoResize  />
             </div>
-            <div class="col-12 " :class="{'lg:col-4':(editDataComputed.id), 'lg:col-6':(!editDataComputed.id)}">
+            <div class="col-12 " :class="{'lg:col-4':(editData.id), 'lg:col-6':(!editData.id)}">
                 <Button label="Сохранить" text :raised="true" @click="saveReview" :disabled="uploadContent"/>
             </div>
-            <div class="col-12" :class="{'lg:col-4':(editDataComputed.id), 'lg:col-6':(!editDataComputed.id)}">
+            <div class="col-12" :class="{'lg:col-4':(editData.id), 'lg:col-6':(!editData.id)}">
                 <Button label="Отменить" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
             </div>
-            <div class="col-12  lg:col-4 " v-if="editDataComputed.id">
+            <div class="col-12  lg:col-4 " v-if="editData.id">
                 <Button label="Удалить" class="p-button-outlined p-button-danger" @click="deleteReview"/>
             </div>
-<!--          <div class="col-12  lg:col-6 ">-->
-<!--            <img v-for="item in props.editData.content" :src="item.url">-->
-<!--          </div>-->
 
         </div>
     </Dialog>
