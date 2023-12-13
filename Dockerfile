@@ -19,7 +19,8 @@ RUN apk update && \
     cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
     echo "Europe/Moscow" > /etc/timezone
 
-RUN ln -s /var/www/docker/app/src /var/www/docker/app/nimda-panel
+RUN mkdir /var/www/docker/app/nimda-panel
+RUN ln -s /var/www/docker/app/src /var/www/docker/app/nimda-panel/src
 
 ENV TZ=Europe/Moscow
 
