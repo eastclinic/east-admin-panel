@@ -20,7 +20,7 @@ RUN apk update && \
     echo "Europe/Moscow" > /etc/timezone
 
 ENV TZ=Europe/Moscow
-RUN apk add curl
+
 EXPOSE 3080
 
 CMD [ "sh", "-c", "cd /var/www/docker/app && npm run serve" ]
