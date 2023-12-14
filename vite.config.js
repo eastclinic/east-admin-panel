@@ -7,7 +7,7 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig(({ command }) => {
     return {
         plugins: [vue()],
-        base: command === 'serve' ? '' : '/nimda-panel/',
+        base: command === 'serve' ? '/nimda-panel/' : '/diqi/',
         resolve: {
             alias: {
                 '@': fileURLToPath(new URL('./src', import.meta.url))
