@@ -43,8 +43,8 @@ export default (() => {
 
         },
 
-        async deleteDoctor(id){
-            let url = baseUrl + '/api/doctors/'+id;
+        async deleteDiplom(id){
+            let url = baseUrl + _url+ '/' +id;
             const request = {
                 headers: {
                     'Content-Type': 'application/json'

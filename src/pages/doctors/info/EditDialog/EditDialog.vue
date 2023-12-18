@@ -27,6 +27,11 @@ const saveItemData = async () => {
     emit('updated', props.editData.id);
 }
 
+const updated = () => {
+    console.log('updated')
+    emit('updated', props.editData.id);
+}
+
 const visibleDiplomsDialog = ref(false);
 
 
@@ -72,7 +77,7 @@ const visibleDiplomsDialog = ref(false);
                 </AttachFiles>
 
             </Panel>
-                <Diploms v-model="editedData.diploms" :doctor_id="editedData.id" @updated="emit('updated', $event)"></Diploms>
+                <Diploms v-model="editedData.diploms" :doctor_id="editedData.id" @updated="updated"></Diploms>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>

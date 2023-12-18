@@ -187,6 +187,7 @@
                   @update:content="updateAttach"
                   @updating:content="uploadContent=true"
               >
+
                   <template #controlFilePanel="file">
                     <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>
                   </template>

@@ -23,7 +23,7 @@ const DoctorsState = StateManager.setGlobalWithName('DoctorInfoState');
     },
 
     async delete( id ){
-        return  await diplomsApi.deleteDoctor(id);
+        return  await diplomsApi.deleteDiplom(id);
     },
 
 
