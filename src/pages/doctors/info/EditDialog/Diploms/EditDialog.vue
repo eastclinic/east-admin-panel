@@ -3,7 +3,8 @@ import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 
 import AttachFiles from "@/components/AttachFiles.vue";
 import doctorDiplomsService from "@/services/Doctors/DoctorsDiplomsService";
 import toastService from '@/services/Toast'
-
+import ReviewsService from "@/services/Reviews/ReviewsService";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     visible: Boolean,
@@ -22,13 +23,9 @@ const saveItemData = async () => {
     const saveData = JSON.parse(JSON.stringify(editedData.value));
     saveData.doctor_id = props.doctor_id;
     const res = await doctorDiplomsService.save( saveData );
-
-    if(res.data ) {
-
+    if( res.data && res.data.id) {
         dismissModal();
-        if(editedData.value.id){
-            emit('updated', editedData.value.id);
-        }
+        emit('updated', editedData.value.id);
 
         toastService.success('Диплом', 'Диплом сохранен')
     } else {
@@ -37,12 +34,31 @@ const saveItemData = async () => {
 
 
 }
+const confirm = useConfirm();
+const deleteDiplom = async ()   => {
+    confirm.require({
+        message: 'Удалить диплом?',
+        header: 'Удаление диплома',
+        icon: 'pi pi-exclamation-triangle',
+        accept: async () => {
+            console.log('accept')
+            const res = await doctorDiplomsService.delete(editedData.value.id);
+            if(res.ok ) {
+                toastService.duration(3000).success('Диплом', 'Диплом удален')
+                dismissModal();
+                emit('updated', editedData.value.id);
+            }
+        },
+        reject: () => {         }
+    });
+}
 
 
 
 </script>
 
 <template>
+    <ConfirmDialog></ConfirmDialog>
     <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
             <div class="col-12  lg:col-12 ">
@@ -65,11 +81,14 @@ const saveItemData = async () => {
                     <!--                </template>-->
                 </AttachFiles>
             </div>
-            <div class="col-12  lg:col-6 ">
+            <div class="col-12  lg:col-4 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>
             </div>
-            <div class="col-12  lg:col-6 ">
+            <div class="col-12  lg:col-4 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
+            </div>
+            <div class="col-12  lg:col-4 " v-if="editedData.id">
+                <Button label="Удалить" class="p-button-outlined p-button-danger" @click="deleteDiplom"/>
             </div>
         </div>
     </Dialog>
