@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, getCurrentInstance } from 'vue';
 import App from './App.vue';
 import router from './router';
 
@@ -107,12 +107,20 @@ import BlockViewer from '@/components/BlockViewer.vue';
 import '@/assets/styles.scss';
 
 export const app = createApp(App);
+let containerSelector = "#app";
+
+// check if app has been mounted already
+const existingApp = document.querySelector(containerSelector);
+if (existingApp && existingApp.__vue_app__) {
+    existingApp.__vue_app__.unmount(); // Unmount the existing app
+}
 
 app.use(router);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);
+
 
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);
@@ -212,5 +220,9 @@ app.component('TreeSelect', TreeSelect);
 app.component('TreeTable', TreeTable);
 app.component('TriStateCheckbox', TriStateCheckbox);
 app.component('VirtualScroller', VirtualScroller);
+console.log('create')
 
-app.mount('#app');
+
+
+// Mount 'app' (App.vue) as root component.
+app.mount(containerSelector);

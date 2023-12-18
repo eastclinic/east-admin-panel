@@ -55,16 +55,12 @@ const attachedFiles = ref([]);
 //todo add opportunity set files from parent component
   const  attachFiles = computed({
       get: () => {
-          console.log(props.targetId)
           attachedFiles.value = (Array.isArray(props.files)) ? [...toRaw(props.files)] : [];
       return attachedFiles.value},
       set: (val) => {
-          console.log('attachFiles')
           // attachedFiles.value = val;
       }
   });
-
-
 
   const OnUpload = () => {
     uploadInput.value.click();
