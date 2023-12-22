@@ -4,7 +4,7 @@ import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMount
   import toastService from '../services/Toast'
   import { useToast } from 'primevue/usetoast';
 import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
-import fileUploadRequest from "@/services/Content/FileUploadRequest";
+import FileUploadRequest from "@/services/Content/FileUploadRequest";
 
   const toast = useToast();
 
@@ -104,7 +104,7 @@ const checkUploadFileParameters = (file) => {
 
 
       let res = await ContentService.fileUpload(
-          fileUploadRequest
+          (new FileUploadRequest)
               .forFile(file)
               .with('contentable_id', props.targetId)
               .with('contentable_type', props.targetType)
@@ -175,7 +175,7 @@ const uploadFiles = async (event) =>{
       let aIndex =  files[i].attachFileIndex;
       if(!attachFiles.value[aIndex]) continue;
       let res = await ContentService.fileUpload(
-          fileUploadRequest
+          (new FileUploadRequest)
               .forFile(files[i])
               .with('contentable_id', props.targetId)
               .with('contentable_type', props.targetType)
