@@ -1,17 +1,17 @@
-import baseUrl from '@/api/config.js';
+import {BASE_URL, API_URL} from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
 import buildGetURL from '@/services/util/UseGetParametersBuilder.js';
 import {getToServer} from '@/services/util/UseFetchToServer';
 
 
 export default (() => {
-    let _url = '/api/doctor-diploms';
+    let _url = '/doctor-diploms';
     return {
         ...UseRequestAdapters,
         _requestData : {},
 
         async get(requestData){
-            return await getToServer(baseUrl + _url, {...requestData, ...this._requestData});
+            return await getToServer(BASE_URL + API_URL + _url, {...requestData, ...this._requestData});
         },
         async saveItem( saveData ){
             if(!saveData || Object.keys(saveData).length === 0) return {}
@@ -21,7 +21,7 @@ export default (() => {
                     'Content-Type': 'application/json'
                 },
             };
-            let url = baseUrl + _url;
+            let url = BASE_URL + API_URL + _url;
             if(saveData.id ) {
                 request['method'] = 'PUT';
                 url += '/' + saveData.id;
@@ -44,7 +44,7 @@ export default (() => {
         },
 
         async deleteDiplom(id){
-            let url = baseUrl + _url+ '/' +id;
+            let url = BASE_URL + API_URL + _url+ '/' +id;
             const request = {
                 headers: {
                     'Content-Type': 'application/json'

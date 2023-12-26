@@ -1,4 +1,4 @@
-import baseUrl from '@/api/config.js';
+import {BASE_URL, API_URL} from '@/api/config.js';
 import UseRequestAdapters from '@/services/util/UseRequestAdapters.js';
 
 export default (() => ({
@@ -6,7 +6,7 @@ export default (() => ({
         _requestData : {},
         async getReviews(requestData){
             let request = {method:'GET'}
-            let requestUrl = baseUrl + '/api/reviews';
+            let requestUrl = BASE_URL + API_URL + '/reviews';
             if(requestData.id){
                 requestUrl += '/'+requestData.id;
             }
@@ -34,7 +34,7 @@ export default (() => ({
                 'Content-Type': 'application/json'
             },
         };
-        let url = baseUrl + '/api/reviews';
+        let url = BASE_URL + API_URL + '/reviews';
         if(saveData.id ) {
             request['method'] = 'PUT';
             url += '/' + saveData.id;
@@ -57,7 +57,7 @@ export default (() => ({
     },
 
     async deleteReview(id){
-        let url = baseUrl + '/api/reviews/'+id;
+        let url = BASE_URL + API_URL + '/reviews/'+id;
         const request = {
             headers: {
                 'Content-Type': 'application/json'
@@ -101,7 +101,7 @@ export default (() => ({
     },
 
     contentUrl(){
-            return baseUrl + '/api/reviews/content';
+            return BASE_URL + API_URL +  '/reviews/content';
     },
 
 

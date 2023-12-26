@@ -1,6 +1,6 @@
-import baseUrl from '@/api/config.js';
+import {BASE_URL, API_URL} from '@/api/config.js';
 import axios from "axios";
-const url = baseUrl+'/api/content'
+const url = BASE_URL + API_URL + '/content'
 import {getToServer, putToServer} from '@/services/util/UseFetchToServer';
 
 
