@@ -225,7 +225,7 @@ const uploadFiles = async (event) =>{
 
       }else{
           attachFiles.value[i].isDeleted = true;
-          emit('update:content', toRaw(attachFiles.value) );
+          emit('update:files', toRaw(attachFiles.value) );
       }
   };
   const fileDeleted = (file) =>{
@@ -250,7 +250,7 @@ const uploadFiles = async (event) =>{
 <!--          <source :src="file.url">-->
 <!--        </video>-->
 <!--      </div>-->
-      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb">
+      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb" :style="fileDeleted(file)">
           <div>
               <slot name="controlFilePanel" v-bind="file">
 
@@ -260,9 +260,7 @@ const uploadFiles = async (event) =>{
                   <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
               </slot>
           </div>
-
-          {{file.loadPersent}}
-        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :file.url"  :key="index" :style="fileDeleted(file)">
+        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :file.url"  :key="index">
 
 <!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
           <div v-else-if="isVideo(file)">
