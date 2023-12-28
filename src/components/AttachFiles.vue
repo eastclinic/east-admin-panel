@@ -350,6 +350,7 @@ const uploadFiles = async (event) =>{
       right: 5px;
       display: none;
       cursor: pointer;
+      z-index: 1000;
     }
     & .load-button {
       position: absolute;
