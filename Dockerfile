@@ -9,6 +9,7 @@ RUN npx browserslist@latest --update-db
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
 RUN npm install
+RUN echo NODE_ENV=production > /var/www/docker/app/.env
 
 COPY . .
 RUN ls -al -R
