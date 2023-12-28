@@ -23,6 +23,7 @@ RUN mkdir /var/www/docker/app/nimda-panel
 RUN ln -s /var/www/docker/app/src /var/www/docker/app/nimda-panel/src
 
 ENV TZ=Europe/Moscow
+ENV NODE_ENV=production
 
 EXPOSE 3080
 
