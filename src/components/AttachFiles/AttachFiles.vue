@@ -1,18 +1,19 @@
 <script setup>
 import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMounted} from 'vue';
   import ContentService from "@/services/Content/ContentService";
-  import toastService from '../services/Toast'
+  import toastService from '../../services/Toast'
   import { useToast } from 'primevue/usetoast';
 import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
 import FileUploadRequest from "@/services/Content/FileUploadRequest";
+import EditDialog from "@/pages/doctors/info/EditDialog/Diploms/EditDialog.vue";
 
   const toast = useToast();
 
-
+const visibleEditDialog = ref(false);
 
     const uploadInput = ref([]);
     const uploadVideoPreview = ref([]);
-
+const editData = ref({});
     const uploadProgress = ref(null);
     const emit = defineEmits(['update:content', 'delete:content', 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
 //
@@ -35,6 +36,7 @@ import FileUploadRequest from "@/services/Content/FileUploadRequest";
                 ]
             }
         },
+
 
         targetType:{required: true, type:String,},
         targetId:{required: true, type:Number,},
@@ -234,46 +236,106 @@ const uploadFiles = async (event) =>{
   const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
   const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
+const createItem =  (e) =>{
+    visibleEditDialog.value = true;
+    editData.value = {};
+}
 
+const onOpenEdit = (e) =>{
+    console.log(e)
+    visibleEditDialog.value = true;
+    editData.value = e.data;
+}
 
 
 </script>
 
 <template>
+    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" @updated="emit('updated', $event)" />
   <div class="flex">
+      <DataTable
+              :value="attachFiles"
+              class="p-datatable-gridlines"
+              :rows="3"
+              dataKey="id"
+              :totalRecords="attachFiles.length"
+              editMode="row"
+              @row-edit-init="onOpenEdit"
+      >
+          <template #header>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+
+                  <Button type="button" icon="pi pi-plus" label="Выбрать файлы" class="p-button-outlined mb-2" @click="createItem" />
+              </div>
+          </template>
+          <template #empty> No content found. </template>
+          <Column field="id" header="id">
+              <template #body="{ data }">
+                  <div class="flex justify-content-between flex-wrap">
+                      <div class="flex align-items-center justify-content-center">{{data.title}}</div>
+
+                  </div>
+              </template>
+          </Column>
+          <Column field="contentOriginal" header="Title" style="min-width: 12rem">
+              <template #body="{ data }">
+                  <div class="flex justify-content-between flex-wrap">
+                      <div>
+                          <div>
+                          <slot name="controlFilePanel" v-bind="data">
+
+                              <div class="pi pi-ellipsis-h load-button"> </div>
+                          </slot>
+                          <slot name="controlFileDelete">
+                              <div @click="removeFile(data)" class="pi pi-times delete-button" v-if="(data?.id)"></div>
+                          </slot>
+                      </div>
+                      <img v-if="isImage(data)" :src="(data.blobPath) ? data.blobPath :data.url" class="attach-files__item thumb">
+
+                      <div v-else-if="isVideo(data)">
+                          <Button v-if="data.url" icon="pi pi-clone" aria-label="Submit" @click="OnUploadPreviewForVideoId(data.id)" />
+                          <video>
+                              <source :src="(data.blobPath) ? data.blobPath :data.url">
+                          </video>
+                          <img v-if="data.preview" :src="data.preview.url">
+
+                      </div>
+                    </div>
+                  </div>
+
+              </template>
+          </Column>
+
+          <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center"></Column>
+      </DataTable>
+
     <div class="attach-files">
-<!--      <div v-for="(file, index) in files2" class="attach-files__item thumb">-->
-<!--        <div @click="removeFile(file)" class="pi pi-times delete-button"></div>-->
 
-<!--        <img v-if="/(jpg|png|jpeg|webp)$/.test(file.url)" :src="'http://127.0.0.1:8000'+file.url"  :key="index">-->
-<!--        <video height="100" v-if="/(mp4)$/.test(file.url)">-->
-<!--          <source :src="file.url">-->
-<!--        </video>-->
+
+<!--      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb" :style="fileDeleted(file)">-->
+<!--          <div>-->
+<!--              <slot name="controlFilePanel" v-bind="file">-->
+
+<!--                  <div class="pi pi-ellipsis-h load-button"> </div>-->
+<!--              </slot>-->
+<!--              <slot name="controlFileDelete">-->
+<!--                  <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>-->
+<!--              </slot>-->
+<!--          </div>-->
+<!--        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :file.url"  :key="index">-->
+
+<!--&lt;!&ndash;        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">&ndash;&gt;-->
+<!--          <div v-else-if="isVideo(file)">-->
+<!--              <Button v-if="file.url" icon="pi pi-clone" aria-label="Submit" @click="OnUploadPreviewForVideoId(file.id)" />-->
+<!--              <video>-->
+<!--                  <source :src="(file.blobPath) ? file.blobPath :file.url">-->
+<!--              </video>-->
+<!--              <img v-if="file.preview" :src="file.preview.url">-->
+
+<!--          </div>-->
+
+
 <!--      </div>-->
-      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb" :style="fileDeleted(file)">
-          <div>
-              <slot name="controlFilePanel" v-bind="file">
-
-                  <div class="pi pi-ellipsis-h load-button"> </div>
-              </slot>
-              <slot name="controlFileDelete">
-                  <div @click="removeFile(file)" class="pi pi-times delete-button" v-if="(file?.id)"></div>
-              </slot>
-          </div>
-        <img v-if="isImage(file)" :src="(file.blobPath) ? file.blobPath :file.url"  :key="index">
-
-<!--        <img v-if="file.type.startsWith('image')" :src="file.blobPath"  :key="index">-->
-          <div v-else-if="isVideo(file)">
-              <Button v-if="file.url" icon="pi pi-clone" aria-label="Submit" @click="OnUploadPreviewForVideoId(file.id)" />
-              <video  controls  style="height: 100%;width:50%">
-                  <source :src="(file.blobPath) ? file.blobPath :file.url">
-              </video>
-              <img v-if="file.preview" :src="file.preview.url">
-
-          </div>
-
-
-      </div>
 
         <input style="display: none" ref="uploadVideoPreview" @change="uploadVideoPreviewFiles" type="file" accept="image/*" />
       <input style="display: none" ref="uploadInput" @change="uploadFiles" type="file" accept="video/*, image/*" multiple />
@@ -326,8 +388,7 @@ const uploadFiles = async (event) =>{
     }
   }
   &__item {
-    width: 100px;
-    height: 100px;
+    max-height: 150px;
     position: relative;
     display: flex;
     flex-shrink: 0;

@@ -2,7 +2,7 @@
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
 
 import doctorsInfoService from "@/services/Doctors/DoctorsInfoService";
-import AttachFiles from "@/components/AttachFiles.vue";
+import AttachFiles from "@/components/AttachFiles/AttachFiles.vue";
 import Diploms from "@/pages/doctors/info/EditDialog/Diploms/Diploms.vue";
 
 

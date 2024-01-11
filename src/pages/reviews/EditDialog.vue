@@ -3,7 +3,7 @@
 
     import { defineProps, reactive, ref, toRefs, defineEmits, computed, toRaw, onBeforeUpdate, watchEffect  } from 'vue'
     import ReviewsService from "../../services/Reviews/ReviewsService";
-    import AttachFiles from "@/components/AttachFiles.vue";
+    import AttachFiles from "@/components/AttachFiles/AttachFiles.vue";
     import FilesService from "../../services/Content/ContentService";
     import { useConfirm } from "primevue/useconfirm";
     import toastService from '@/services/Toast'
