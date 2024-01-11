@@ -71,7 +71,7 @@ const deleteDiplom = async ()   => {
             <div class="col-12  lg:col-12 ">
                 <AttachFiles
                         v-if="editedData.id"
-                        v-model:files="editedData.content"
+                        v-model:files="editedData.contentOriginal"
                         v-model:upload="uploadContent"
                         targetType="doctorDiplom"
                         :targetId="editedData.id"

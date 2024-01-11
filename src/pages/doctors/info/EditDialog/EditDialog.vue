@@ -61,12 +61,12 @@ const visibleDiplomsDialog = ref(false);
                         <span class="font-bold">Контент</span>
                     </div>
                 </template>
-                <template #icons v-if="editedData.content && editedData.content.length > 0">
-                    <Badge :value="editedData.content.length"  class="ml-auto" />
+                <template #icons v-if="editedData.contentOriginal && editedData.contentOriginal.length > 0">
+                    <Badge :value="editedData.contentOriginal.length"  class="ml-auto" />
                 </template>
                 <AttachFiles
                         v-if="editedData.id"
-                        v-model:files="editedData.content"
+                        v-model:files="editedData.contentOriginal"
                         v-model:upload="uploadContent"
                         targetType="doctor"
                         :targetId="editedData.id"
@@ -77,7 +77,7 @@ const visibleDiplomsDialog = ref(false);
                 </AttachFiles>
 
             </Panel>
-                <Diploms v-model="editedData.diploms" :doctor_id="editedData.id" @updated="updated"></Diploms>
+                <Diploms v-model="editedData.diplomsOriginal" :doctor_id="editedData.id" @updated="updated"></Diploms>
             </div>
             <div class="col-12  lg:col-6 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>
