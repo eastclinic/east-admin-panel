@@ -86,9 +86,9 @@ const onOpenEdit = (e) =>{
                 <template #body="{ data }">
                     <div class="flex justify-content-between flex-wrap">
                         <div class="flex align-items-center justify-content-center">{{data.title}}</div>
-                        <AvatarGroup v-if="data.content">
+                        <AvatarGroup v-if="data.contentOriginal">
 
-                            <Avatar v-for="content in data.content" :image="content.url" size="large" shape="circle" />
+                            <Avatar v-for="content in data.contentOriginal" :image="content.url" size="large" shape="circle" />
 
                         </AvatarGroup>
                     </div>
