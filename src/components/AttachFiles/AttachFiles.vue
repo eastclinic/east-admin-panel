@@ -1,10 +1,8 @@
 <script setup>
+
 import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMounted} from 'vue';
-  import ContentService from "@/services/Content/ContentService";
-// import StateManager from "@/services/util/StateManager.class"; //probably use one state manage for many services - its global state
-  import toastService from '../../services/Toast'
-import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
-import FileUploadRequest from "@/services/Content/FileUploadRequest";
+import ContentService from "@/services/Content/ContentService";
+import toastService from '../../services/Toast'
 import EditDialog from "@/components/AttachFiles/EditDialog.vue";
 
     const props = defineProps({
@@ -35,7 +33,6 @@ import EditDialog from "@/components/AttachFiles/EditDialog.vue";
     upload:{type:Boolean}
 });
 
-
     const contentService = (new ContentService()).withProps(props);
 
     const visibleEditDialog = ref(false);
@@ -45,98 +42,57 @@ import EditDialog from "@/components/AttachFiles/EditDialog.vue";
     const editData = ref({});
     const uploadProgress = ref(null);
     const emit = defineEmits(['update:content', 'delete:content', 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
-//
 
+    //todo add opportunity set files from parent component
+    const  attachFiles = contentService.attachFiles;
 
+    const OnUploadPreviewForVideoId = (videoId) => {
+        uploadVideoPreview.value.videoId = videoId;
+        uploadVideoPreview.value.click();
 
-const attachedFiles = ref([]);
-  onMounted(async () => {
+    }
 
-  });
-
-  // const attachFiles = computed(() => {return [...props.files]});
-//todo add opportunity set files from parent component
-  const  attachFiles = contentService.attachFiles;
-
-const OnUploadPreviewForVideoId = (videoId) => {
-    uploadVideoPreview.value.videoId = videoId;
-    uploadVideoPreview.value.click();
-}
-
-
-
-  const uploadVideoPreviewFiles = async (event) =>{
-      if(!uploadVideoPreview.value.videoId) return ;
+    const uploadVideoPreviewFiles = async (event) =>{
       const files = event.target.files;
       if(!files || files.length === 0) return ;
       const file = files[0];
-      if (!checkUploadFileParameters(file)) return ;
+      await contentService.uploadVideoPreviewFile(file, uploadVideoPreview.value.videoId);
+      emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    }
 
 
-      let res = await contentService.fileUpload(
-          (new FileUploadRequest)
-              .forFile(file)
-              .with('contentable_id', props.targetId)
-              .with('contentable_type', props.targetType)
-              .with('is_preview_for', uploadVideoPreview.value.videoId)
-      );
-
-      if(res?.data?.id ){
-          for (const fileIndex in attachedFiles.value) {
-              if(attachedFiles.value[fileIndex].id === uploadVideoPreview.value.videoId){
-                  attachedFiles.value[fileIndex].preview = res.data;
-                  // attachedFiles.value[fileIndex].preview_id = res.data.id;
-              }
-          }
-          toastService.duration(3000).success('Load image', 'Файл загружен')
-      }else if(res.errors ) {
-          for (const error in res.errors) {
-              if (Array.isArray(res.errors[error])) {
-                  for (const key in res.errors[error]) {
-                      toastService.duration(5000).error('Load image', res.errors[error][key])
-                  }
-
-              }
-          }
-
-
-      }
-  }
-
-
-  const filesUpload = async (files) => {
-      try {
-          await contentService.filesUpload(files);
-      }catch (e){
+    const filesUpload = async (event) => {
+        try {
+          await contentService.filesUpload(event.target.files);
+        }catch (e){
           console.log(e)
           toastService.duration(5000).error(e.message);
-      }
-      emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
-      emit('update:upload', false);
+        }
+        emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+        emit('update:upload', false);
+    }
+    const removeFile = async (file) => {
+        await contentService.removeFile(file);
+        emit('update:files', toRaw(attachFiles.value) );
+    }
 
-  }
-const removeFile = async (file) => {
-    await contentService.removeFile(file);
-    emit('update:files', toRaw(attachFiles.value) );
-}
 
-
-  const fileDeleted = (file) =>{
+    const fileIsDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
-  }
-  const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
-  const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
+    }
+    const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
+    const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
-const createItem =  (e) =>{
-    visibleEditDialog.value = true;
-    editData.value = {};
-}
+    const createItem =  (e) =>{
+        visibleEditDialog.value = true;
+        editData.value = {};
+    }
 
-const onOpenEdit = (e) =>{
-    console.log(e)
-    visibleEditDialog.value = true;
-    editData.value = e.data;
-}
+    const onOpenEdit = (e) =>{
+        console.log(e)
+        visibleEditDialog.value = true;
+        editData.value = e.data;
+    }
 
 </script>
 
@@ -202,7 +158,7 @@ const onOpenEdit = (e) =>{
 <!--    <div class="attach-files" >-->
 
 
-<!--      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb" :style="fileDeleted(file)">-->
+<!--      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb" :style="fileIsDeleted(file)">-->
 <!--          <div>-->
 <!--              <slot name="controlFilePanel" v-bind="file">-->
 

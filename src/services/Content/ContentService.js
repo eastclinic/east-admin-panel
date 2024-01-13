@@ -1,9 +1,8 @@
 import FilesApi from '../../api/FilesApi';
 import toastService from "@/services/Toast";
-import StateManager from "@/services/util/StateManager.class";
+import StateManager from "@/services/util/StateManager.class";//probably to use one state manage for many services - its global stat
 import {computed, reactive, ref, toRaw} from "vue";
 import FileUploadRequest from "@/services/Content/FileUploadRequest";
-
 
 
 class ContentService {
@@ -95,6 +94,7 @@ class ContentService {
     }
 
     async filesUpload( files ) {
+        if(!this.props)  throw new Error('not set props');
         for (let i = 0; i < files.length; i++) {
             if (!this.checkUploadFileParameters(files[i])) continue ;
             const typeFile = this.getFileType(files[i])
@@ -116,8 +116,8 @@ class ContentService {
             let res = await this.fileUpload(
                 (new FileUploadRequest)
                     .forFile(files[i])
-                    .with('contentable_id', props.targetId)
-                    .with('contentable_type', props.targetType)
+                    .with('contentable_id', this.props.targetId)
+                    .with('contentable_type', this.props.targetType)
                     .withUploadProgressCallback(progressEvent => {
                         this.attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
                         //todo save all upload progress
@@ -192,7 +192,39 @@ class ContentService {
             this.attachFiles.value[i].isDeleted = true;
 
         }
-    };
+    }
+    async uploadVideoPreviewFile(file, videoId){
+        if(!videoId) return ;
+        if (!this.checkUploadFileParameters(file)) return ;
+        let res = await this.fileUpload(
+            (new FileUploadRequest)
+                .forFile(file)
+                .with('contentable_id', this.props.targetId)
+                .with('contentable_type', this.props.targetType)
+                .with('is_preview_for', this.uploadVideoPreview.value.videoId)
+        );
+
+        if(res?.data?.id ){
+            for (const fileIndex in this.attachedFiles.value) {
+                if(this.attachedFiles.value[fileIndex].id === this.uploadVideoPreview.value.videoId){
+                    this.attachedFiles.value[fileIndex].preview = res.data;
+                    // this.attachedFiles.value[fileIndex].preview_id = res.data.id;
+                }
+            }
+            toastService.duration(3000).success('Load image', 'Файл загружен')
+        }else if(res.errors ) {
+            for (const error in res.errors) {
+                if (Array.isArray(res.errors[error])) {
+                    for (const key in res.errors[error]) {
+                        toastService.duration(5000).error('Load image', res.errors[error][key])
+                    }
+
+                }
+            }
+
+
+        }
+    }
 
 }
 
