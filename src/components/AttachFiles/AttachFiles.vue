@@ -5,7 +5,7 @@ import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMount
   import { useToast } from 'primevue/usetoast';
 import ListRequest from "@/api/apiRequestAdapters/ListRequestAdapter";
 import FileUploadRequest from "@/services/Content/FileUploadRequest";
-import EditDialog from "@/pages/doctors/info/EditDialog/Diploms/EditDialog.vue";
+import EditDialog from "@/components/AttachFiles/EditDialog.vue";
 
   const toast = useToast();
 
@@ -36,8 +36,6 @@ const editData = ref({});
                 ]
             }
         },
-
-
         targetType:{required: true, type:String,},
         targetId:{required: true, type:Number,},
         maxSizeFile:{
@@ -144,19 +142,14 @@ const uploadFiles = async (event) =>{
 
 
   const handleFilesUpload = async (files, options) => {
+      try {
+          await ContentService.filesUpload(files, toRaw(props));
+      }catch (e){
+          console.log(e)
+          toastService.duration(5000).error(e.message);
+      }
 
-
-    // const files = event.target.files;
-
-
-      // try {
-      //     await ContentService.filesUpload(files, toRaw(props));
-      // }catch (e){
-      //     console.log(e)
-      //     toastService.duration(5000).error(e.message);
-      // }
-
-      // return;
+      return;
 
     for (let i = 0; i < files.length; i++) {
         if (!checkUploadFileParameters(files[i])) continue ;
@@ -247,12 +240,11 @@ const onOpenEdit = (e) =>{
     editData.value = e.data;
 }
 
-
 </script>
 
 <template>
-    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" :doctor_id="props.doctor_id" @updated="emit('updated', $event)" />
-  <div class="flex">
+    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="emit('updated', $event)" />
+  <div >
       <DataTable
               :value="attachFiles"
               class="p-datatable-gridlines"
@@ -264,8 +256,7 @@ const onOpenEdit = (e) =>{
       >
           <template #header>
               <div class="flex justify-content-between flex-column sm:flex-row">
-
-                  <Button type="button" icon="pi pi-plus" label="Выбрать файлы" class="p-button-outlined mb-2" @click="createItem" />
+                  <Button type="button" icon="pi pi-plus" label="Выбрать файлы" class="p-button-outlined mb-2" @click="uploadInput.click()" />
               </div>
           </template>
           <template #empty> No content found. </template>
@@ -277,7 +268,7 @@ const onOpenEdit = (e) =>{
                   </div>
               </template>
           </Column>
-          <Column field="contentOriginal" header="Title" style="min-width: 12rem">
+          <Column field="contentOriginal" header="File" style="min-width: 12rem">
               <template #body="{ data }">
                   <div class="flex justify-content-between flex-wrap">
                       <div>
@@ -309,7 +300,7 @@ const onOpenEdit = (e) =>{
           <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center"></Column>
       </DataTable>
 
-    <div class="attach-files">
+<!--    <div class="attach-files" >-->
 
 
 <!--      <div v-if="attachFiles.length > 0" v-for="(file, index) in attachFiles" class="attach-files__item thumb" :style="fileDeleted(file)">-->
@@ -337,13 +328,11 @@ const onOpenEdit = (e) =>{
 
 <!--      </div>-->
 
-        <input style="display: none" ref="uploadVideoPreview" @change="uploadVideoPreviewFiles" type="file" accept="image/*" />
-      <input style="display: none" ref="uploadInput" @change="uploadFiles" type="file" accept="video/*, image/*" multiple />
+<!--        <input style="display: none" ref="uploadVideoPreview" @change="uploadVideoPreviewFiles" type="file" accept="image/*" />-->
+<!--      <input style="display: none" ref="uploadInput" @change="uploadFiles" type="file" accept="video/*, image/*" multiple />-->
 
-    </div>
-    <div @click="OnUpload" class="attach-files__item add">
-      <div  class="pi pi-upload upload-button"></div>
-    </div>
+<!--    </div>-->
+      <input style="display: none" ref="uploadInput" @change="uploadFiles" type="file" accept="video/*, image/*" multiple />
   </div>
 
 </template>
