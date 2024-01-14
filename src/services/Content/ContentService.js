@@ -7,23 +7,24 @@ import FileUploadRequest from "@/services/Content/FileUploadRequest";
 
 class ContentService {
     props = null;
-    state = null;
+    state = new StateManager();
     attachedFiles = ref([]);
     constructor(state = null) {
         this.requestInfo = {};
         if(state) this.state = state;
-        else this.state = new StateManager();
     }
 
-    attachFiles = computed({
-        get: () => {
-            if(!this.props)  throw new Error('not set props');
-            this.attachedFiles.value = (Array.isArray(this.props.files)) ? [...JSON.parse(JSON.stringify(this.props.files))] : [];
-            return this.attachedFiles.value},
-        set: (val) => {
-            this.attachedFiles.value = [...val];
-        }
-    });
+    // attachFiles(){
+    //     return this.state.computed( 'attachFiles', this.props.files );
+    // }
+
+    init(){
+        if(!this.props) throw new Error('Not set props');
+        this.attachFiles= this.state.computed( 'attachFiles', this.props.files );
+        return this;
+    }
+
+
 
     async fileUploadToServer(fileUploadRequest) {
         if (!fileUploadRequest.getFile()) throw new Error('Not set file');
@@ -146,6 +147,7 @@ class ContentService {
 
     withProps(props){
         this.props = props;
+        this.init();
         return this;
     }
 

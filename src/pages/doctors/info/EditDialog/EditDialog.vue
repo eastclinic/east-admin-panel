@@ -13,18 +13,37 @@ const props = defineProps({
 
 let uploadContent = ref(false);
 const emit = defineEmits(['update:visible', 'update', 'updated'])
-const editedData = computed(() => props.editData);
+const editedData = computed(() => JSON.parse(JSON.stringify(props.editData)));
 
 const header = computed(() => (props.editData && Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
 
 
-const dismissModal = () => emit('update:visible', false)
+const dismissModal = () => {
+
+    if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)){
+        const cancelChange = confirm("Данные доктора изменены, выйти без сохранения?");
+        if(cancelChange) {
+            emit('update:visible', false)
+        }else {
+            return false;
+        }
+    }
+    return false;
+}
 const saveItemData = async () => {
     if(props?.editData?.id) editedData.id = props.editData.id;
     const res = await doctorsInfoService.save(toRaw(editedData.value));
     if(res.ok ) dismissModal();
-    //todo refresh row from server
     emit('updated', props.editData.id);
+}
+
+const onChangeVisible = (isVisible) => {
+    if(JSON.stringify(editedData.value) !== JSON.stringify(props.editData)){
+        return false;
+    }
+
+    emit('update:visible', isVisible)
+    return true;
 }
 
 const updated = () => {
@@ -39,7 +58,8 @@ const visibleDiplomsDialog = ref(false);
 
 <template>
 
-    <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
+    <Dialog :visible="props.visible" modal :header="header" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="onChangeVisible">
+
         <div class="grid p-fluid">
             <div class="col-12  lg:col-4 ">
                 <InputText type="text" v-model:modelValue="editedData.surname" placeholder="Фамилия"/>

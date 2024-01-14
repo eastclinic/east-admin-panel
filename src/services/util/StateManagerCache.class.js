@@ -1,14 +1,6 @@
 import {computed, reactive} from 'vue';
 
-const isObject = (value) => {
-    return (
-        typeof value === 'object' &&
-        value !== null &&
-        !Array.isArray(value)
-    );
-}
 
-const isArray = (value) => (Array.isArray(value))
 
 const setCashItems = (items, state) => {
     if (!items || items.length === 0) return;
@@ -40,30 +32,13 @@ const refreshItems = (items, state) => {
 
 class StateManager {
     constructor() {
-        this._state = reactive({ count: 0, _cash: {}, itemsIds: {}, items:null });
-    }
-
-    computed( key, target,  ){
-        return computed({
-            get: () => {
-                if(!target)  throw new Error('not set target');
-                this._state[key] = target
-                return this._state[key];
-            },
-            set: (val) => {
-                this._state[key] = val
-            }
-        });
+        this._state = reactive({ count: 0, _cash: {}, itemsIds: {} });
     }
     // Mutations
     setItems(items) {
         if (!items) return this;
-        // if(isArray(items)) {
-        //     this.setItems([...JSON.parse(JSON.stringify(items))])
-        // }else if (isObject(items)){
-        //     this._state.items = {...JSON.parse(JSON.stringify(items))};
-        // }
-        this._state.items = JSON.parse(JSON.stringify(items));
+        setCashItems( items, this._state );
+        setItemsIds( items, this._state );
         return this;
     }
 
@@ -77,9 +52,21 @@ class StateManager {
         return this;
     }
 
+    refreshItems(items) {
+        if (!items) return this;
+        setCashItems(items, this._state);
+        refreshItems(items, this._state);
+        return this;
+    }
+
     // Getters
     getItems() {
-        return this._state.items;
+        const items = [];
+        for (const n in this._state.itemsIds) {
+            const id = this._state.itemsIds[n];
+            if (this._state._cash[id]) items.push(this._state._cash[id]);
+        }
+        return items;
     }
 
     item(id) {
