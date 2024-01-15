@@ -43,11 +43,13 @@ class StateManager {
         this._state = reactive({ count: 0, _cash: {}, itemsIds: {}, items:null });
     }
 
-    computed( key, target,  ){
+    computed( key, target, clone = false ){
+        if(this._state[key]) return this._state[key];
         return computed({
             get: () => {
                 if(!target)  throw new Error('not set target');
-                this._state[key] = target
+                if(clone) this._state[key] = JSON.parse(JSON.stringify(target));
+                else this._state[key] = target
                 return this._state[key];
             },
             set: (val) => {
