@@ -1,30 +1,25 @@
-import FilesApi from '../../api/FilesApi';
-import toastService from "@/services/Toast";
-import StateManager from "@/services/util/StateManager.class";//probably to use one state manage for many services - its global stat
+import FilesApi from '../../api/FilesApi.js';
+import toastService from '@/services/Toast.js';
+import multiStateManager from "@/services/util/MultiStateManager.class.js";//probably to use one state manage for many services - its global stat
 import {computed, reactive, ref, toRaw} from "vue";
-import FileUploadRequest from "@/services/Content/FileUploadRequest";
-
+import FileUploadRequest from "@/services/Content/FileUploadRequest.js";
+import PreviewUploadInfo from "@/interfaces/AttachFiles/PreviewUploadInfo";
+import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 
 class ContentService {
-    props = null;
-    state = new StateManager();
+    state = new multiStateManager();
     attachedFiles = ref([]);
+    targetType = null;
+    targetId = null;
     constructor(state = null) {
         this.requestInfo = {};
         if(state) this.state = state;
     }
 
-    // attachFiles(){
-    //     return this.state.computed( 'attachFiles', this.props.files );
-    // }
-
-    init(){
-        if(!this.props) throw new Error('Not set props');
-        this.attachFiles= this.state.computed( 'attachFiles', this.props.files );
+    with(field, val){
+        this[field] = val
         return this;
     }
-
-
 
     async fileUploadToServer(fileUploadRequest) {
         if (!fileUploadRequest.getFile()) throw new Error('Not set file');
@@ -59,17 +54,13 @@ class ContentService {
         return res.data;
     }
 
-    setRequestInfo(requestInfo) {
-        this.requestInfo = { ...this.requestInfo, ...requestInfo };
-        return this;
-    }
 
-    async fetchServerData(requestAdapter) {
-        const response = await FilesApi.getContent(requestAdapter ? requestAdapter.toArray() : null);
-        this.state.setFromResponse(response);
-        //todo handle error
-        return this;
-    }
+    // async fetchServerData(requestAdapter) {
+    //     const response = await FilesApi.getContent(requestAdapter ? requestAdapter.toArray() : null);
+    //     this.state.setFromResponse(response);
+    //     //todo handle error
+    //     return this;
+    // }
 
     items(condition) {
         return this.state.getItems();
@@ -94,39 +85,38 @@ class ContentService {
         return mimeFile[1];
     }
 
-    async filesUpload( files ) {
-        if(!this.props)  throw new Error('not set props');
-        for (let i = 0; i < files.length; i++) {
-            if (!this.checkUploadFileParameters(files[i])) continue ;
-            const typeFile = this.getFileType(files[i])
-            this.attachFiles.value.push( reactive({
+    async filesUpload( filesUploadInfo : FilesUploadInfo) {
+        for (let i = 0; i < filesUploadInfo.files.length; i++) {
+            if (!this.checkUploadFileParameters(filesUploadInfo.files[i])) continue ;
+            const typeFile = this.getFileType(filesUploadInfo.files[i])
+            filesUploadInfo.attachFiles.value.push( reactive({
                 typeFile: typeFile,
-                blobPath: URL.createObjectURL(files[i]),  //temp path for show image
+                blobPath: URL.createObjectURL(filesUploadInfo.files[i]),  //temp path for show image
                 loadPersent: 0,
                 errors: {},
                 data:{},
                 id:0,   //random temp id
                 url:''
             }));
-            files[i].attachFileIndex = this.attachFiles.value.length-1;
+            filesUploadInfo.files[i].attachFileIndex = filesUploadInfo.attachFiles.value.length-1;
         }
 
-        for ( const i in files ) {
-            let aIndex =  files[i].attachFileIndex;
-            if(!this.attachFiles.value[aIndex]) continue;
+        for ( const i in filesUploadInfo.files ) {
+            let aIndex =  filesUploadInfo.files[i].attachFileIndex;
+            if(!filesUploadInfo.attachFiles.value[aIndex]) continue;
             let res = await this.fileUpload(
                 (new FileUploadRequest)
-                    .forFile(files[i])
-                    .with('contentable_id', this.props.targetId)
-                    .with('contentable_type', this.props.targetType)
+                    .forFile(filesUploadInfo.files[i])
+                    .with('contentable_id', filesUploadInfo.targetId)
+                    .with('contentable_type', filesUploadInfo.targetType)
                     .withUploadProgressCallback(progressEvent => {
-                        this.attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+                        filesUploadInfo.attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
                         //todo save all upload progress
                     })
             );
 
             if(res.data ){
-                this.attachFiles.value[aIndex] = {...res.data}
+                filesUploadInfo.attachFiles.value[aIndex] = {...res.data}
                 toastService.duration(3000).success('Load image', 'Файл загружен')
             }else if(res.errors ){
                 for ( const error in res.errors){
@@ -137,40 +127,38 @@ class ContentService {
 
                     }
                 }
-                this.attachFiles.value.splice(aIndex, 1);
+                filesUploadInfo.attachFiles.value.splice(aIndex, 1);
             }
         }
 
     }
 
 
-
-    withProps(props){
-        this.props = props;
-        this.init();
-        return this;
-    }
-
-    checkUploadFileParameters (file){
+    checkUploadFileParameters (files, possibleParameters){
         let mimeFile = ''
-        if(file.type) mimeFile = file.type;
-        if(mimeFile) mimeFile = mimeFile.split('/');
-        if( mimeFile.length === 0 ) {
-            toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
-            return ;
-        }
-        const fileExtension = this.getFileExtension(file);
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if(file.type) mimeFile = file.type;
+            if(mimeFile) mimeFile = mimeFile.split('/');
+            if( mimeFile.length === 0 ) {
+                toastService.duration(5000).error('Критическая ошибка, неверный формат загрузки файлов на сервер обратитесь к разработчикам' )
+                return ;
+            }
+            const fileExtension = this.getFileExtension(file);
 
 //check file extension
-        if(!this.props.possibleExtensions.includes(fileExtension)){
-            toastService.duration(5000).error('Неверный тип файла ' + file.name + '. Допустимо до (' +  this.props.possibleExtensions.join(', ') + ')', )
-            return;
-        }
+            if(!possibleParameters.possibleExtensions.includes(fileExtension)){
+                toastService.duration(5000).error('Неверный тип файла ' + file.name + '. Допустимо до (' +  possibleParameters.possibleExtensions.join(', ') + ')', )
+                return;
+            }
 //check file size
-        if(file.size < 200 || file.size > this.props.maxSizeFile){
-            toastService.duration(5000).error('Слишком большой размер файла ' + file.name + '. (' + Math.round(file.size/1000)  +' kb) Допустимо ' + Math.round( this.props.maxSizeFile/1000) +'kb', )
-            return;
+            if(file.size < 200 || file.size > possibleParameters.maxSizeFile){
+                toastService.duration(5000).error('Слишком большой размер файла ' + file.name + '. (' + Math.round(file.size/1000)  +' kb) Допустимо ' + Math.round( this.props.maxSizeFile/1000) +'kb', )
+                return;
+            }
         }
+
         return true;
     }
 
@@ -195,24 +183,19 @@ class ContentService {
 
         }
     }
-    async uploadVideoPreviewFile(file, videoId){
-        if(!videoId) return ;
-        if (!this.checkUploadFileParameters(file)) return ;
+    async uploadVideoPreviewFile(previewInfo : PreviewUploadInfo){
+        if(!previewInfo.previewForVideoId) return ;
+        const file = previewInfo.filePreview;
         let res = await this.fileUpload(
             (new FileUploadRequest)
                 .forFile(file)
-                .with('contentable_id', this.props.targetId)
-                .with('contentable_type', this.props.targetType)
-                .with('is_preview_for', this.uploadVideoPreview.value.videoId)
+                .with('contentable_id', previewInfo.targetId)
+                .with('contentable_type', previewInfo.targetType)
+                .with('is_preview_for', previewInfo.previewForVideoId)
         );
 
         if(res?.data?.id ){
-            for (const fileIndex in this.attachedFiles.value) {
-                if(this.attachedFiles.value[fileIndex].id === this.uploadVideoPreview.value.videoId){
-                    this.attachedFiles.value[fileIndex].preview = res.data;
-                    // this.attachedFiles.value[fileIndex].preview_id = res.data.id;
-                }
-            }
+            previewInfo.videoInfo.preview = reactive(res.data);
             toastService.duration(3000).success('Load image', 'Файл загружен')
         }else if(res.errors ) {
             for (const error in res.errors) {

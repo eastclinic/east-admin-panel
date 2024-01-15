@@ -91,6 +91,10 @@ class StateManager {
     getCount() {
         return this._state.count;
     }
+
+    withName(name){
+
+    }
 }
 
 export default StateManager;

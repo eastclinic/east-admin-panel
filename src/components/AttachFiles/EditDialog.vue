@@ -1,60 +1,39 @@
-<script setup>
+<script setup lang="ts">
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
-import AttachFiles from "@/components/AttachFiles/AttachFiles.vue";
-import doctorDiplomsService from "@/services/Doctors/DoctorsDiplomsService";
-import toastService from '@/services/Toast'
-import ReviewsService from "@/services/Reviews/ReviewsService";
+import toastService from '@/services/Toast.js'
 import {useConfirm} from "primevue/useconfirm";
 import ContentService from "@/services/Content/ContentService";
+import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
+import PreviewUploadInfo from "@/interfaces/AttachFiles/PreviewUploadInfo";
 
 const props = defineProps({
     visible: Boolean,
     modelValue:Object,
+    targetType:{required: true, type:String,},
+    targetId:{required: true, type:Number,},
 })
 const emit = defineEmits(['update:visible', 'updated', 'update:modelValue']);
 let uploadContent = ref(false);
-const editedData = computed(() => props.modelValue);
+const editData = computed(() => props.modelValue);
+const contentService = new ContentService();
+
+const uploadVideoPreview = async (event) =>{
+    debugger
+    const files = event.target.files;
+    if(!files || files.length === 0) return ;
+    const file = files[0];
+    contentService.checkUploadFileParameters(file, props);
+    const filesUploadInfo : PreviewUploadInfo = {filePreview:file, videoInfo:props.modelValue, targetId:props.targetId, targetType:props.targetType};
+    await contentService.uploadVideoPreviewFile( filesUploadInfo );
+}
+
+
 
 const dismissModal = () => emit('update:visible', false)
-const saveItemData = async () => {
-    const saveData = JSON.parse(JSON.stringify(editedData.value));
-    saveData.doctor_id = props.doctor_id;
-    const res = await doctorDiplomsService.save( saveData );
-    if( res.data && res.data.id) {
-        dismissModal();
-        emit('updated', editedData.value.id);
 
-        toastService.success('Контент', 'Контент сохранен')
-    } else {
-        toastService.error('Контент', 'Ошибка сохранения контента')
-    }
-
-
-}
 const confirm = useConfirm();
-const  removeFile = async(file) => {
-    if(!file.id)  return false;
-    const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
-    if(i === -1) return false;
-    //if file.confirm ===  1 temporally deactivate file only on front
-
-
-    attachFiles.value[i].isDeleted = true;
-    if(!file.confirm){
-        attachFiles.value.splice(i, 1);
-        const res = await ContentService.fileDelete(file);
-        if(res && res.ok && res.message){
-            toastService.success('Удаление файла', res.message)
-            return true;
-        }
-
-    }else{
-        attachFiles.value[i].isDeleted = true;
-        emit('update:files', toRaw(attachFiles.value) );
-    }
-};
-
-
+const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
+const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
 </script>
 
@@ -63,24 +42,28 @@ const  removeFile = async(file) => {
     <Dialog :visible="props.visible" modal header="Редактирование контента" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
             <div class="col-12  lg:col-12 ">
-                <InputText type="text" v-model:modelValue="editedData.title" placeholder="Title"/>
+                <InputText type="text" v-model:modelValue="editData.alt" placeholder="Alt"/>
             </div>
 
-            <div class="col-12">
+            <div class="col-12" v-if="isVideo(editData)">
+                <div v-if="editData.preview">
+                    <img v-if="isImage(editData)" :src="(editData.blobPath) ? editData.blobPath :editData.url" class="attach-files__item thumb">
+                    <div v-else-if="isVideo(editData)">
+                        <Button v-if="data.url" icon="pi pi-clone" aria-label="Submit" @click="uploadVideoPreview.click()" />
+                        <video>
+                            <source :src="(data.blobPath) ? data.blobPath :data.url">
+                        </video>
+                        <img v-if="data.preview" :src="data.preview.url">
+
+                    </div>
+                </div>
+                <div v-else>
+                    <Button type="button" icon="pi pi-plus" label="Выбрать превью видео" class="p-button-outlined mb-2" @click="uploadInput.click()" />
+                </div>
 
             </div>
-            <div class="col-12  lg:col-12 ">
-                <AttachFiles
-                        v-if="editedData.id"
-                        v-model:files="editedData.contentOriginal"
-                        v-model:upload="uploadContent"
-                        targetType="doctorDiplom"
-                        :targetId="editedData.id"
-                >
-                    <!--                <template #controlFilePanel="file">-->
-                    <!--                    <InputSwitch :modelValue="file.published" @update:modelValue="contentPublish($event, file)"/>-->
-                    <!--                </template>-->
-                </AttachFiles>
+            <div class="col-12" v-else>
+
             </div>
             <div class="col-12  lg:col-4 ">
                 <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>
@@ -88,10 +71,11 @@ const  removeFile = async(file) => {
             <div class="col-12  lg:col-4 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
             </div>
-            <div class="col-12  lg:col-4 " v-if="editedData.id">
+            <div class="col-12  lg:col-4 " v-if="editData.id">
                 <Button label="Удалить" class="p-button-outlined p-button-danger" @click="deleteDiplom"/>
             </div>
         </div>
+        <input style="display: none" ref="uploadInput" @change="uploadVideoPreview" type="file" accept="image/*" />
     </Dialog>
 
 

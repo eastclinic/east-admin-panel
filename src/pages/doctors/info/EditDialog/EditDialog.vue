@@ -17,6 +17,7 @@ const editData = ref(null);
 
 watchEffect(() => {
     if (props.visible && !editData.value)  editData.value = JSON.parse(JSON.stringify(props.editData));
+    if (!props.visible) editData.value = null;
 });
 
 const header = computed(() => (props.editData && Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
@@ -26,7 +27,6 @@ const dismissModal = (isVisible) => {
     if(JSON.stringify(editData.value) !== JSON.stringify(props.editData)){
         const cancelChange = confirm("Данные доктора изменены, выйти без сохранения?");
         if(cancelChange) {
-            editData.value = null;
             emit('update:visible', false);
         }else {
             return false;

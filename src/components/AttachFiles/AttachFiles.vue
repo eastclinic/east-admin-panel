@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 
 import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMounted} from 'vue';
-import ContentService from "@/services/Content/ContentService";
-import toastService from '../../services/Toast'
-import EditDialog from "@/components/AttachFiles/EditDialog.vue";
+import ContentService from '@/services/Content/ContentService.js';
+import toastService from '@/services/Toast.js'
+import EditDialog from '@/components/AttachFiles/EditDialog.vue';
+import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 
     const props = defineProps({
     files: {
@@ -33,7 +34,7 @@ import EditDialog from "@/components/AttachFiles/EditDialog.vue";
     upload:{type:Boolean}
 });
 
-    const contentService = (new ContentService()).withProps(props);
+    const contentService = (new ContentService()).with('targetId', props.targetId).with('targetType', props.targetType);
 
     const visibleEditDialog = ref(false);
 
@@ -44,26 +45,17 @@ import EditDialog from "@/components/AttachFiles/EditDialog.vue";
     const emit = defineEmits(['update:content', 'delete:content', 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
 
     //todo add opportunity set files from parent component
-    const  attachFiles = contentService.attachFiles;
+    const  attachFiles = computed(() => props.files);
 
-    const OnUploadPreviewForVideoId = (videoId) => {
-        uploadVideoPreview.value.videoId = videoId;
-        uploadVideoPreview.value.click();
 
-    }
-
-    const uploadVideoPreviewFiles = async (event) =>{
-      const files = event.target.files;
-      if(!files || files.length === 0) return ;
-      const file = files[0];
-      await contentService.uploadVideoPreviewFile(file, uploadVideoPreview.value.videoId);
-      emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
-    }
 
 
     const filesUpload = async (event) => {
         try {
-          await contentService.filesUpload(event.target.files);
+            if (!contentService.checkUploadFileParameters(event.target.files, props)) return ;
+            const filesUploadInfo : FilesUploadInfo = {files:event.target.files, attachFiles:attachFiles, targetId:props.targetId, targetType:props.targetType};
+
+          await contentService.filesUpload( filesUploadInfo );
         }catch (e){
           console.log(e)
           toastService.duration(5000).error(e.message);
@@ -97,9 +89,8 @@ import EditDialog from "@/components/AttachFiles/EditDialog.vue";
 </script>
 
 <template>
-    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="emit('updated', $event)" />
+    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="emit('updated', $event)" :target-type="props.targetType" :target-id="props.targetId" />
   <div >
-
       <DataTable
               :value="attachFiles"
               class="p-datatable-gridlines"
@@ -136,11 +127,11 @@ import EditDialog from "@/components/AttachFiles/EditDialog.vue";
                               <div @click="removeFile(data)" class="pi pi-times delete-button" v-if="(data?.id)"></div>
                           </slot>
                       </div>
+                          {{data.loadPersent}}
                       <img v-if="isImage(data)" :src="(data.blobPath) ? data.blobPath :data.url" class="attach-files__item thumb">
 
                       <div v-else-if="isVideo(data)">
-                          <Button v-if="data.url" icon="pi pi-clone" aria-label="Submit" @click="OnUploadPreviewForVideoId(data.id)" />
-                          <video>
+                          <video class="attach-files__item thumb">
                               <source :src="(data.blobPath) ? data.blobPath :data.url">
                           </video>
                           <img v-if="data.preview" :src="data.preview.url">
