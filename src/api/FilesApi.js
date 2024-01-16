@@ -45,7 +45,8 @@ export default (() => ({
 },
 
     async save(contentData, requestData ){
-        return await  putToServer(url+'/save', contentData, requestData);
+        if(!contentData.id) throw new Error('not have id');
+        return await  putToServer(url+'/'+contentData.id, contentData, requestData);
     },
 
     async fileDelete( file, requestData ){

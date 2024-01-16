@@ -17,7 +17,7 @@ const _refreshItems = (store,items) => {
     let itemsNew = {};
     let existItems = [];
     for (const item of items) itemsNew[item.id] = item;
-    if(store._state.items.length === 0 ){
+    if(store._state?.items?.length === 0 ){
         store._state.items = Object.values(itemsNew);
     }else{
         for (const item of store._state.items) {
@@ -27,7 +27,7 @@ const _refreshItems = (store,items) => {
     }
 }
 export default  (() => ({
-        _state : reactive({ count : 0, _cash: {}, itemsIds:{} }),
+        _state : reactive({ count : 0, _cash: {}, itemsIds:{}, items:[] }),
 
         //mutations
         setItems: function(items){
@@ -49,7 +49,7 @@ export default  (() => ({
         refreshItems(items){
             if(!items)   return this;
             _setCashItems(this, items)
-            _refreshItems(items);
+            _refreshItems(this, items);
             return this;
         },
 

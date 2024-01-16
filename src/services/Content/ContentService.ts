@@ -37,12 +37,12 @@ class ContentService {
         return await FilesApi.fileDelete(file, this.requestInfo);
     }
 
-    async save(contentData) {
-        const res = await FilesApi.save(contentData, this.requestInfo);
-
+    async save( contentData ) {
+        const res = await FilesApi.save(contentData);
         if (res.data) {
-            //toastService.duration(3000).success('Load image', 'Файл загружен')
-        } else if (res.errors) {
+            return res.data;
+
+        }        else if (res.errors) {
             for (const error in res.errors) {
                 if (Array.isArray(res.errors[error])) {
                     for (const key in res.errors[error]) {
@@ -51,7 +51,7 @@ class ContentService {
                 }
             }
         }
-        return res.data;
+        return res;
     }
 
 
@@ -109,6 +109,7 @@ class ContentService {
                     .forFile(filesUploadInfo.files[i])
                     .with('contentable_id', filesUploadInfo.targetId)
                     .with('contentable_type', filesUploadInfo.targetType)
+                    .with('original_file_name', filesUploadInfo.files[i].name)
                     .withUploadProgressCallback(progressEvent => {
                         filesUploadInfo.attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
                         //todo save all upload progress
@@ -162,16 +163,16 @@ class ContentService {
         return true;
     }
 
-    async removeFile(file){
+    async removeFile(file, attachFiles){
         if(!file.id)  return false;
-        const i = this.attachFiles.value.findIndex(aFile => aFile.id === file.id)
+        const i = attachFiles.value.findIndex(aFile => aFile.id === file.id)
         if(i === -1) return false;
         //if file.confirm ===  1 temporally deactivate file only on front
 
 
-        this.attachFiles.value[i].isDeleted = true;
+        attachFiles.value[i].isDeleted = true;
         if(!file.confirm){
-            this.attachFiles.value.splice(i, 1);
+            attachFiles.value.splice(i, 1);
             const res = await this.fileDelete(file);
             if(res && res.ok && res.message){
                 toastService.success('Удаление файла', res.message)
@@ -179,13 +180,13 @@ class ContentService {
             }
 
         }else{
-            this.attachFiles.value[i].isDeleted = true;
+            attachFiles.value[i].isDeleted = true;
 
         }
     }
     async uploadVideoPreviewFile(previewInfo : PreviewUploadInfo){
-        if(!previewInfo.previewForVideoId) return ;
         const file = previewInfo.filePreview;
+        debugger
         let res = await this.fileUpload(
             (new FileUploadRequest)
                 .forFile(file)

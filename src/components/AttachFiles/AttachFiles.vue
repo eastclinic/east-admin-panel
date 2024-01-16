@@ -64,8 +64,18 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
         emit('update:upload', false);
     }
     const removeFile = async (file) => {
-        await contentService.removeFile(file);
-        emit('update:files', toRaw(attachFiles.value) );
+        console.log(file)
+        await contentService.removeFile(file, attachFiles);
+        emit('update:files', toRaw(attachFiles.value));
+    }
+
+    const deleteFile = async (file) => {
+        console.log(JSON.parse(JSON.stringify(file)))
+        const res = await contentService.fileDelete(JSON.parse(JSON.stringify(file)))
+        if(res.ok && res.message) {
+            toastService.success(res.message);
+        }
+        emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
     }
 
 
@@ -99,6 +109,8 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
               :totalRecords="attachFiles.length"
               editMode="row"
               @row-edit-init="onOpenEdit"
+              :paginator="true"
+              responsiveLayout="scroll"
       >
           <template #header>
               <div class="flex justify-content-between flex-column sm:flex-row">
@@ -106,23 +118,16 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
               </div>
           </template>
           <template #empty> No content found. </template>
-          <Column field="id" header="id">
-              <template #body="{ data }">
-                  <div class="flex justify-content-between flex-wrap">
-                      <div class="flex align-items-center justify-content-center">{{data.title}}</div>
 
-                  </div>
-              </template>
-          </Column>
           <Column field="contentOriginal" header="File" style="min-width: 12rem">
               <template #body="{ data }">
                   <div class="flex justify-content-between flex-wrap">
-                      <div>
+                      <div :style="fileIsDeleted(data)">
                           <div>
-                          <slot name="controlFilePanel" v-bind="data">
+<!--                          <slot name="controlFilePanel" v-bind="data">-->
 
-                              <div class="pi pi-ellipsis-h load-button"> </div>
-                          </slot>
+<!--                              <div class="pi pi-ellipsis-h load-button"> </div>-->
+<!--                          </slot>-->
                           <slot name="controlFileDelete">
                               <div @click="removeFile(data)" class="pi pi-times delete-button" v-if="(data?.id)"></div>
                           </slot>
@@ -142,8 +147,9 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 
               </template>
           </Column>
-
-          <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center"></Column>
+          <Column field="original_file_name" header="original_file_name">
+          </Column>
+          <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center">{{ 'dsfwe' }}</Column>
       </DataTable>
 
 <!--    <div class="attach-files" >-->

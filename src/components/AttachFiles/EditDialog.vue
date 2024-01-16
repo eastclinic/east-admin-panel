@@ -6,27 +6,53 @@ import ContentService from "@/services/Content/ContentService";
 import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 import PreviewUploadInfo from "@/interfaces/AttachFiles/PreviewUploadInfo";
 
+
+
+
 const props = defineProps({
     visible: Boolean,
     modelValue:Object,
     targetType:{required: true, type:String,},
     targetId:{required: true, type:Number,},
 })
+const uploadInput = ref([]);
 const emit = defineEmits(['update:visible', 'updated', 'update:modelValue']);
 let uploadContent = ref(false);
 const editData = computed(() => props.modelValue);
 const contentService = new ContentService();
 
 const uploadVideoPreview = async (event) =>{
-    debugger
     const files = event.target.files;
     if(!files || files.length === 0) return ;
     const file = files[0];
     contentService.checkUploadFileParameters(file, props);
-    const filesUploadInfo : PreviewUploadInfo = {filePreview:file, videoInfo:props.modelValue, targetId:props.targetId, targetType:props.targetType};
+    const filesUploadInfo : PreviewUploadInfo = {filePreview:file,
+        videoInfo:props.modelValue,
+        targetId:props.targetId,
+        targetType:props.targetType,
+        previewForVideoId:editData.id
+    };
     await contentService.uploadVideoPreviewFile( filesUploadInfo );
 }
 
+
+const save = async () => {
+    const res = await contentService.save(JSON.parse(JSON.stringify(editData.value)))
+    if(res.ok && res.message) {
+        toastService.success(res.message);
+    }
+    emit('updated', editData.value.id);
+
+    emit('update:visible', false)
+
+}
+const deleteFile = async () => {
+    const res = await contentService.fileDelete(JSON.parse(JSON.stringify(editData.value)))
+    if(res.ok && res.message) {
+        toastService.success(res.message);
+    }
+    emit('update:visible', false)
+}
 
 
 const dismissModal = () => emit('update:visible', false)
@@ -66,13 +92,13 @@ const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
             </div>
             <div class="col-12  lg:col-4 ">
-                <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="saveItemData"/>
+                <Button :disabled="uploadContent"  label="Сохранить" text :raised="true" @click="save"/>
             </div>
             <div class="col-12  lg:col-4 ">
                 <Button label="Отмена" class="p-button-outlined" outlined severity="success" @click="dismissModal"/>
             </div>
             <div class="col-12  lg:col-4 " v-if="editData.id">
-                <Button label="Удалить" class="p-button-outlined p-button-danger" @click="deleteDiplom"/>
+                <Button label="Удалить" class="p-button-outlined p-button-danger" @click="deleteFile"/>
             </div>
         </div>
         <input style="display: none" ref="uploadInput" @change="uploadVideoPreview" type="file" accept="image/*" />
