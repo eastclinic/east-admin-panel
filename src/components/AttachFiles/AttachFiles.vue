@@ -64,18 +64,8 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
         emit('update:upload', false);
     }
     const removeFile = async (file) => {
-        console.log(file)
         await contentService.removeFile(file, attachFiles);
         emit('update:files', toRaw(attachFiles.value));
-    }
-
-    const deleteFile = async (file) => {
-        console.log(JSON.parse(JSON.stringify(file)))
-        const res = await contentService.fileDelete(JSON.parse(JSON.stringify(file)))
-        if(res.ok && res.message) {
-            toastService.success(res.message);
-        }
-        emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
     }
 
 
@@ -90,8 +80,11 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
         editData.value = {};
     }
 
+    const updateFile = ($event) => {
+        emit('update:files', toRaw(attachFiles.value.filter((f)=>(!f.isDeleted))) );
+    }
+
     const onOpenEdit = (e) =>{
-        console.log(e)
         visibleEditDialog.value = true;
         editData.value = e.data;
     }
@@ -99,7 +92,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 </script>
 
 <template>
-    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="emit('updated', $event)" :target-type="props.targetType" :target-id="props.targetId" />
+    <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="updateFile($event)" :target-type="props.targetType" :target-id="props.targetId" />
   <div >
       <DataTable
               :value="attachFiles"

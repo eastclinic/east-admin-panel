@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw, watchEffect } from 'vue'
+import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw, watchEffect, watch } from 'vue'
 
 import doctorsInfoService from "@/services/Doctors/DoctorsInfoService";
 import AttachFiles from "@/components/AttachFiles/AttachFiles.vue";
@@ -19,6 +19,11 @@ watchEffect(() => {
     if (props.visible && !editData.value)  editData.value = JSON.parse(JSON.stringify(props.editData));
     if (!props.visible) editData.value = null;
 });
+
+// watch(editData, (newv, old) => {
+//     if(editData?.value?.contentOriginal)
+//     console.log(editData.value.contentOriginal)
+// });
 
 const header = computed(() => (props.editData && Object.keys(props.editData).length > 0) ? 'Редактирование доктора' : 'Создание нового доктора')
 
@@ -48,7 +53,6 @@ const saveItemData = async () => {
 
 
 const updated = () => {
-    console.log('updated')
     emit('updated', props.editData.id);
 }
 

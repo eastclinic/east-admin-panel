@@ -41,7 +41,7 @@ const save = async () => {
     if(res.ok && res.message) {
         toastService.success(res.message);
     }
-    emit('updated', editData.value.id);
+    emit('updated', editData.value);
 
     emit('update:visible', false)
 
@@ -50,7 +50,10 @@ const deleteFile = async () => {
     const res = await contentService.fileDelete(JSON.parse(JSON.stringify(editData.value)))
     if(res.ok && res.message) {
         toastService.success(res.message);
+        editData.value.isDeleted = true;
+        emit('updated', toRaw( editData.value));
     }
+
     emit('update:visible', false)
 }
 
