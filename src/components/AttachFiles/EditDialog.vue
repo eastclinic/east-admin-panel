@@ -30,7 +30,7 @@ const uploadVideoPreview = async (event) =>{
         videoInfo:props.modelValue,
         targetId:props.targetId,
         targetType:props.targetType,
-        previewForVideoId:editData.id
+        previewForVideoId:editData.value.id
     };
     await contentService.uploadVideoPreviewFile( filesUploadInfo );
 }
@@ -40,8 +40,9 @@ const save = async () => {
     const res = await contentService.save(JSON.parse(JSON.stringify(editData.value)))
     if(res.ok && res.message) {
         toastService.success(res.message);
+        emit('updated', toRaw( editData.value));
     }
-    emit('updated', editData.value);
+
 
     emit('update:visible', false)
 
@@ -68,6 +69,7 @@ const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
 <template>
     <ConfirmDialog></ConfirmDialog>
+
     <Dialog :visible="props.visible" modal header="Редактирование контента" :style="{ width: '50vw' }" maximizable :dismissableMask="true"  @update:visible="emit('update:visible', $event)">
         <div class="grid p-fluid">
             <div class="col-12  lg:col-12 ">
@@ -75,16 +77,17 @@ const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
             </div>
 
             <div class="col-12" v-if="isVideo(editData)">
-                <div v-if="editData.preview">
-                    <img v-if="isImage(editData)" :src="(editData.blobPath) ? editData.blobPath :editData.url" class="attach-files__item thumb">
-                    <div v-else-if="isVideo(editData)">
-                        <Button v-if="data.url" icon="pi pi-clone" aria-label="Submit" @click="uploadVideoPreview.click()" />
-                        <video>
-                            <source :src="(data.blobPath) ? data.blobPath :data.url">
-                        </video>
-                        <img v-if="data.preview" :src="data.preview.url">
-
+                <div v-if="editData.previewOriginal && isVideo(editData)">
+                    <div class="grid p-fluid">
+                        <div class="col-12">
+                            <img :src="editData.previewOriginal.url" class="preview__item thumb">
+                        </div>
+                        <div class="col-12">
+                            <Button type="button" icon="pi pi-plus" label="заменить превью видео" class="p-button-outlined mb-2" @click="uploadInput.click()" />
+                        </div>
                     </div>
+
+
                 </div>
                 <div v-else>
                     <Button type="button" icon="pi pi-plus" label="Выбрать превью видео" class="p-button-outlined mb-2" @click="uploadInput.click()" />
@@ -113,6 +116,95 @@ const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
 
 
 
-<style scoped>
+<style scoped  lang="scss">
+.preview {
+    display: flex;
+    overflow-x: scroll;
+    margin-right: 5px;
+    &::-webkit-scrollbar {
+        width: 15px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: transparent;
+        background-clip: content-box;
+        border: 5px solid transparent;
+        border-radius: 20px;
+    }
+    @media (hover: hover) {
+        &:hover {
+            &::-webkit-scrollbar-thumb {
+                background: rgba(135, 143, 162, 0.45);
+                background-clip: content-box;
+                border: 5px solid transparent;
+                border-radius: 20px;
+            }
+        }
+    }
+    @media (hover: none) {
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: rgba(135, 143, 162, 0.45);;
+            background-clip: content-box;
+            border: 7px solid transparent;
+            border-radius: 20px;
+        }
+    }
+    &__item {
+        max-height: 150px;
+        position: relative;
+        display: flex;
+        flex-shrink: 0;
 
+        &.add {
+            background: #d5d5d5;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            & .upload-button {
+                position: absolute;
+                top: 42%;
+                right: 44%;
+            }
+
+        }
+        & .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        & .load-button {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+        &:hover .delete-button {
+            display: block;
+        }
+        &.thumb {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            &:not(:last-child) {
+                margin-right: 5px;
+            }
+            & img {
+
+                width: 100%;
+            }
+        }
+
+    }
+}
 </style>

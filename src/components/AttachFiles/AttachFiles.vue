@@ -85,14 +85,22 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
     }
 
     const onOpenEdit = (e) =>{
+
+        if(!e.data.confirm) {
+            toastService.duration(5000).error('Прежде чем редактировать контент, сохраните данные');
+            return;
+        }
         visibleEditDialog.value = true;
+
         editData.value = e.data;
+
     }
 
 </script>
 
 <template>
     <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="updateFile($event)" :target-type="props.targetType" :target-id="props.targetId" />
+
   <div >
       <DataTable
               :value="attachFiles"
@@ -132,7 +140,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
                           <video class="attach-files__item thumb">
                               <source :src="(data.blobPath) ? data.blobPath :data.url">
                           </video>
-                          <img v-if="data.preview" :src="data.preview.url">
+                          <img class="attach-files__item thumb" v-if="data.previewOriginal" :src="data.previewOriginal.url">
 
                       </div>
                     </div>
@@ -142,7 +150,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
           </Column>
           <Column field="original_file_name" header="original_file_name">
           </Column>
-          <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center">{{ 'dsfwe' }}</Column>
+          <Column :rowEditor="true" style="width: 10%; min-width: 4rem" bodyStyle="text-align:center"></Column>
       </DataTable>
 
 <!--    <div class="attach-files" >-->

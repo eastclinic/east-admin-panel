@@ -186,17 +186,17 @@ class ContentService {
     }
     async uploadVideoPreviewFile(previewInfo : PreviewUploadInfo){
         const file = previewInfo.filePreview;
-        debugger
         let res = await this.fileUpload(
             (new FileUploadRequest)
                 .forFile(file)
                 .with('contentable_id', previewInfo.targetId)
                 .with('contentable_type', previewInfo.targetType)
                 .with('is_preview_for', previewInfo.previewForVideoId)
+                .with('original_file_name', file.name)
         );
 
         if(res?.data?.id ){
-            previewInfo.videoInfo.preview = reactive(res.data);
+            previewInfo.videoInfo.previewOriginal = reactive(res.data);
             toastService.duration(3000).success('Load image', 'Файл загружен')
         }else if(res.errors ) {
             for (const error in res.errors) {
