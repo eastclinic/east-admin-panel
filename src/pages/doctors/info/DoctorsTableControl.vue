@@ -59,8 +59,9 @@ const onPage = async (e) =>{
 }
 
 const onOpenEdit = async (e) =>{
-    visibleEditDialog.value = true;
     editData.value = e.data;
+    visibleEditDialog.value = true;
+
 }
 
 

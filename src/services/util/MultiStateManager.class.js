@@ -1,70 +1,48 @@
 import { ref, reactive, computed, toRef } from 'vue';
 
+
+const _setItems = (items, state, stateName) => {
+    state[stateName].items = items;
+    if(items.length === 0){
+        state[stateName].itemsIds = {};
+        return true;
+    }
+    let i = 0;
+    for (const item of items) {
+        if(!item.id) break;
+        state[stateName].itemsIds[item.id] = i;
+        i++;
+    }
+    return true;
+};
+
+const _setCount = (count, state, stateName) => {
+    state[stateName].count = count;
+};
+
 export default class MultiStateManager {
     _stateName = 'default';
     _requestData = {};
+    _state = reactive({});
+    constructor( name = 'default') {
+        this._stateName = name;
+        this._state[name] = { count: 0, itemsIds: {}, items:[] };
+    }
     //mutations
     setItems(items){
-        if(!items)   return this;
-        return this._setCashItems(items)._setItemsIds(items)._setItems(items);
-    };
-
-    refreshItems(items){
-        if(!items)   return this;
-        return this._setCashItems(items)._refreshItems(items);
-    };
-
-    _setCashItems(items){
-        let cashItems = {};
-        for (const item of items) cashItems[item.id] = item;
-        this._state[this._stateName]._cash = { ...this._state[this._stateName]._cash, ...cashItems};
+        if(!items)  items = [];
+        _setItems(items,this._state, this._stateName );
         return this;
     };
 
-    _setItemsIds(items){
-        let itemsIds = [];
-        for (const item of items) itemsIds.push(item.id);
-        this._state[this._stateName].itemsIds = itemsIds;
-        return this;
-    };
-    _setItems(items){
-        this._state[this._stateName].items = items;
-
-        return this;
-    };
-    _refreshItems(items){
-        if(!items || items.length === 0) return this;
-        let itemsNew = {};
-        let existItems = [];
-        for (const item of items) itemsNew[item.id] = item;
-        if(this._state[this._stateName].items.length === 0 ){
-            this._state[this._stateName].items = Object.values(itemsNew);
-        }else{
-            for (const item of this._state[this._stateName].items) {
-                existItems.push((itemsNew[item.id]) ? itemsNew[item.id] : item);
-            }
-            this._state[this._stateName].items = existItems;
-        }
-        return this;
-    };
     setCount(count){
-        this._state[this._stateName].count = count;
-        return this;
-    };
-    stateInit(name){
-        name = (name) ? name : 'default';
-        this._stateName = name;
-        if(!this._state[this._stateName]) this._state[this._stateName] = { count : 0, items : [], _cash: {}, itemsIds:{} }
-        window.state1 = this._state[this._stateName];
+        _setCount(count, this._state, this._stateName);
         return this;
     };
 
 
     //getters
     getItems(){        return toRef(this._state[this._stateName], 'items'); };
-
-    requestData(){      return this._requestData;    };
-
     count() {
         return toRef(this._state[this._stateName], 'count');
         }

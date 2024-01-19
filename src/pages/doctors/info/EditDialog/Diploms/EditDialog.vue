@@ -1,6 +1,6 @@
 <script setup>
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
-import AttachFiles from "@/components/AttachFiles.vue";
+import AttachFiles from "@/components/AttachFiles/AttachFiles.vue";
 import doctorDiplomsService from "@/services/Doctors/DoctorsDiplomsService";
 import toastService from '@/services/Toast'
 import ReviewsService from "@/services/Reviews/ReviewsService";

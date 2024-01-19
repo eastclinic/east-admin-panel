@@ -2,7 +2,7 @@
 
 <script setup>
 import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 'vue'
-import AttachFiles from "@/components/AttachFiles.vue";
+import AttachFiles from "@/components/AttachFiles/AttachFiles.vue";
 import EditDialog from "@/pages/doctors/info/EditDialog/Diploms/EditDialog.vue";
 import doctorsDiplomsService from "@/services/Doctors/DoctorsDiplomsService";
 const props = defineProps({

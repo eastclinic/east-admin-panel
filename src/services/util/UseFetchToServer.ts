@@ -30,6 +30,7 @@ export async function putToServer<T>(url: string, requestData: Object, options?:
     options.method = 'put';
     options.headers = {   'Content-Type': 'application/json', };
     options.body = JSON.stringify(requestData)
+    console.log(url)
     return fetchToServer(url, options);
 }
 
