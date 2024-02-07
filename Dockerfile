@@ -10,7 +10,7 @@ ENV NODE_OPTIONS=--openssl-legacy-provider
 
 RUN npm install
 RUN echo NODE_ENV=production > /var/www/docker/app/.env
-
+ENV NODE_ENV=production
 COPY . .
 RUN ls -al -R
 RUN npm run build
@@ -24,7 +24,7 @@ RUN mkdir /var/www/docker/app/nimda-panel
 RUN ln -s /var/www/docker/app/src /var/www/docker/app/nimda-panel/src
 
 ENV TZ=Europe/Moscow
-ENV NODE_ENV=production
+
 
 EXPOSE 3080
 
