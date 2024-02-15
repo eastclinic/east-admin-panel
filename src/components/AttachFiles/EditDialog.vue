@@ -3,7 +3,7 @@ import { defineProps, reactive, ref, toRef, defineEmits, computed, toRaw } from 
 import toastService from '@/services/Toast.js'
 import {useConfirm} from "primevue/useconfirm";
 import ContentService from "@/services/Content/ContentService";
-import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
+import FilesUploadInfo from "@/interfaces/AttachFiles/ContentUploadInfo";
 import PreviewUploadInfo from "@/interfaces/AttachFiles/PreviewUploadInfo";
 
 
