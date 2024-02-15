@@ -22,6 +22,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
                 'quicktime',
                 'jpeg',
                 'png',
+                'plain'
             ]
         }
     },
@@ -42,6 +43,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
     const uploadVideoPreview = ref([]);
     const editData = ref({});
     const uploadProgress = ref(null);
+    const countOfUploadVideos = ref(0);
     const emit = defineEmits(['update:content', 'delete:content', 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
 
     //todo add opportunity set files from parent component
@@ -51,9 +53,10 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 
 
     const filesUpload = async (event) => {
+      const files = (event.target?.files) ? event.target?.files : event?.files;
         try {
-            if (!contentService.checkUploadFileParameters(event.target.files, props)) return ;
-            const filesUploadInfo : FilesUploadInfo = {files:event.target.files, attachFiles:attachFiles, targetId:props.targetId, targetType:props.targetType};
+            if (!contentService.checkUploadFileParameters(files, props)) return ;
+            const filesUploadInfo : FilesUploadInfo = {files:files, attachFiles:attachFiles, targetId:props.targetId, targetType:props.targetType};
 
           await contentService.filesUpload( filesUploadInfo );
         }catch (e){
@@ -95,6 +98,16 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
         editData.value = e.data;
 
     }
+    const uploadYoutubeVideo = async (event: string) => {
+      // ельзя отправить кастомный mime тип (из за проверки на сервере).
+      // Для ютуба пока будем использовать text/plain c расширением txt
+      const name = event.target.value.split('=')[1] + '.txt';
+      const file = new File([ event.target.value ], name , {
+            type: 'text/plain'})
+      const fileList = new DataTransfer();
+      fileList.items.add(file);
+      await filesUpload(fileList)
+    }
 
 </script>
 
@@ -114,9 +127,18 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
               responsiveLayout="scroll"
       >
           <template #header>
-              <div class="flex justify-content-between flex-column sm:flex-row">
-                  <Button type="button" icon="pi pi-plus" label="Выбрать файлы" class="p-button-outlined mb-2" @click="uploadInput.click()" />
+              <div class="col-6">
+                  <Button type="button" icon="pi pi-plus" label="Добавить фото" class="p-button-outlined mb-2" @click="uploadInput.click()" />
               </div>
+            <div class="col-6">
+                 <div class="">
+                   <Button type="button" icon="pi pi-plus" label="Добавить видео" class="p-button-outlined mb-2" @click="countOfUploadVideos++" />
+                 </div>
+              <div class="">
+                <input class="p-inputtext p-component mb-2" name="youtubeLinks[]" @change="uploadYoutubeVideo" placeholder="Youtube ссылка" v-for="item in countOfUploadVideos">
+              </div>
+
+            </div>
           </template>
           <template #empty> No content found. </template>
 

@@ -154,8 +154,9 @@ class ContentService {
                 return;
             }
 //check file size
-            if(file.size < 200 || file.size > possibleParameters.maxSizeFile){
-                toastService.duration(5000).error('Слишком большой размер файла ' + file.name + '. (' + Math.round(file.size/1000)  +' kb) Допустимо ' + Math.round( this.props.maxSizeFile/1000) +'kb', )
+            if(file.size < 1 || file.size > possibleParameters.maxSizeFile){
+                console.log('here')
+                toastService.duration(5000).error('Слишком большой размер файла ' + file.name + '. (' + Math.round(file.size/1000)  +' kb) Допустимо ' + Math.round( possibleParameters.maxSizeFile/1000) +'kb', )
                 return;
             }
         }
