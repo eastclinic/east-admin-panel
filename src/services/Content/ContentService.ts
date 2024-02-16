@@ -21,8 +21,8 @@ class ContentService {
         return this;
     }
 
-    async fileUpload(fileUploadRequest:ContentUploadInfo ) {
-        if (!fileUploadRequest.getFile()) throw new Error('Not set file');
+    async fileUpload(fileUploadRequest:FileUploadRequest ) {
+        if (!fileUploadRequest.getFile() && !fileUploadRequest.existsUrl()) throw new Error('Not set upload data');
         if (!fileUploadRequest.getRequestData()) throw new Error('Not fill request data');
         let res = await FilesApi.fileUpload(fileUploadRequest);
 
@@ -151,7 +151,10 @@ class ContentService {
                 videoLinkUploadInfo.attachFiles.value[aIndex].loadPersent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
                 //todo save all upload progress
             })
-        await this.fileUpload( uploadRequest, videoLinkUploadInfo.attachFiles.value[aIndex] );
+        const contentFromServer  = await this.fileUpload( uploadRequest );
+        if(contentFromServer){
+            videoLinkUploadInfo.attachFiles.value[aIndex] = reactive(contentFromServer);
+        }
     }
 
 

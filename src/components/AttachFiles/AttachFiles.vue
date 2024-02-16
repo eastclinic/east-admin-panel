@@ -6,6 +6,7 @@ import toastService from '@/services/Toast.js'
 import EditDialog from '@/components/AttachFiles/EditDialog.vue';
 import ContentUploadInfo from "@/interfaces/AttachFiles/ContentUploadInfo";
 
+
     const props = defineProps({
     files: {
         type: Array,
@@ -75,8 +76,9 @@ import ContentUploadInfo from "@/interfaces/AttachFiles/ContentUploadInfo";
     const fileIsDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
     }
-    const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
-    const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
+    const isVideo = (file) => (file.typeFile == 'video' )
+    const isImage = (file) => (file.typeFile == 'image' )
+    const isYouTube = (file) => (file.typeFile == 'videoLinkYoutube' )
 
     const createItem =  (e) =>{
         visibleEditDialog.value = true;
@@ -171,6 +173,14 @@ import ContentUploadInfo from "@/interfaces/AttachFiles/ContentUploadInfo";
                           <img class="attach-files__item thumb" v-if="data.previewOriginal" :src="data.previewOriginal.url">
 
                       </div>
+                          <div v-else-if="isYouTube(data)" class="attach-files__item thumb">
+                              <VueYtframe
+                                      :video-id="data.original_file_name"
+                                      :player-vars="{ autoplay: 0, listType: 'user_uploads' }"
+                                      height="100%"
+                                      width="100%"
+                              />
+                          </div>
                     </div>
                   </div>
 
