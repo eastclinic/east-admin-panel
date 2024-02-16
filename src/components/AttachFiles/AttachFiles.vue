@@ -122,7 +122,6 @@ import ContentUploadInfo from "@/interfaces/AttachFiles/ContentUploadInfo";
     <EditDialog v-model:visible="visibleEditDialog" v-model="editData" @updated="updateFile($event)" :target-type="props.targetType" :target-id="props.targetId" />
 
   <div >
-      {{attachFiles}}
       <DataTable
               :value="attachFiles"
               class="p-datatable-gridlines"
