@@ -4,7 +4,8 @@ import {defineEmits, defineProps, reactive, ref, toRaw, watch, computed, onMount
 import ContentService from '@/services/Content/ContentService.js';
 import toastService from '@/services/Toast.js'
 import EditDialog from '@/components/AttachFiles/EditDialog.vue';
-import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
+import ContentUploadInfo from "@/interfaces/AttachFiles/ContentUploadInfo";
+
 
     const props = defineProps({
     files: {
@@ -22,6 +23,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
                 'quicktime',
                 'jpeg',
                 'png',
+                'plain'
             ]
         }
     },
@@ -42,6 +44,7 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
     const uploadVideoPreview = ref([]);
     const editData = ref({});
     const uploadProgress = ref(null);
+    const countOfUploadVideos = ref(0);
     const emit = defineEmits(['update:content', 'delete:content', 'saved:content', 'updated:content', 'updating:content', 'update:upload', 'update:files' ]);
 
     //todo add opportunity set files from parent component
@@ -51,9 +54,10 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
 
 
     const filesUpload = async (event) => {
+      const files = (event.target?.files) ? event.target?.files : event?.files;
         try {
-            if (!contentService.checkUploadFileParameters(event.target.files, props)) return ;
-            const filesUploadInfo : FilesUploadInfo = {files:event.target.files, attachFiles:attachFiles, targetId:props.targetId, targetType:props.targetType};
+            if (!contentService.checkUploadFileParameters(files, props)) return ;
+            const filesUploadInfo : ContentUploadInfo = {files:files, attachFiles:attachFiles, targetId:props.targetId, targetType:props.targetType};
 
           await contentService.filesUpload( filesUploadInfo );
         }catch (e){
@@ -72,8 +76,9 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
     const fileIsDeleted = (file) =>{
       return (file.isDeleted) ? {opacity:0.3}:{}
     }
-    const isVideo = (file) => (file.typeFile?.indexOf('video') > -1)
-    const isImage = (file) => (file.typeFile?.indexOf('image') > -1)
+    const isVideo = (file) => (file.typeFile == 'video' )
+    const isImage = (file) => (file.typeFile == 'image' )
+    const isYouTube = (file) => (file.typeFile == 'videoLinkYoutube' )
 
     const createItem =  (e) =>{
         visibleEditDialog.value = true;
@@ -95,6 +100,21 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
         editData.value = e.data;
 
     }
+    const uploadYoutubeVideoLink = async (event: Event ) => {
+
+
+      // ельзя отправить кастомный mime тип (из за проверки на сервере).
+      // Для ютуба пока будем использовать text/plain c расширением txt
+      // const name = event.target.value.split('=')[1] + '.txt';
+      // const file = new File([ event.target.value ], name , {
+      //       type: 'text/plain'})
+      // const fileList = new DataTransfer();
+      // fileList.items.add(file);
+      // await filesUpload(fileList)
+
+        const linkUrlUploadInfo : ContentUploadInfo = {linkUrl:event.target.value, attachFiles:attachFiles, targetId:props.targetId, targetType:props.targetType};
+      await contentService.videoLinkUpload(linkUrlUploadInfo)
+    }
 
 </script>
 
@@ -114,9 +134,18 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
               responsiveLayout="scroll"
       >
           <template #header>
-              <div class="flex justify-content-between flex-column sm:flex-row">
-                  <Button type="button" icon="pi pi-plus" label="Выбрать файлы" class="p-button-outlined mb-2" @click="uploadInput.click()" />
+              <div  class="grid p-fluid">
+                  <div class="col-6">
+                      <Button type="button" icon="pi pi-plus" label="Загрузить файлы" class="p-button-outlined mb-2" @click="uploadInput.click()" />
+                  </div>
+                  <div class="col-6">
+                          <Button type="button" icon="pi pi-plus" label="Добавить YouTube" class="p-button-outlined" @click="countOfUploadVideos++" />
+                  </div>
+                  <div class="col-12">
+                      <input class="p-inputtext p-component mb-2" @change="uploadYoutubeVideoLink" placeholder="Youtube ссылка" v-for="item in countOfUploadVideos">
+                  </div>
               </div>
+
           </template>
           <template #empty> No content found. </template>
 
@@ -134,15 +163,23 @@ import FilesUploadInfo from "@/interfaces/AttachFiles/FilesUploadInfo";
                           </slot>
                       </div>
                           {{data.loadPersent}}
-                      <img v-if="isImage(data)" :src="(data.blobPath) ? data.blobPath :data.url" class="attach-files__item thumb">
+                      <img v-if="isImage(data)" :src="data.url" class="attach-files__item thumb">
 
                       <div v-else-if="isVideo(data)">
                           <video class="attach-files__item thumb">
-                              <source :src="(data.blobPath) ? data.blobPath :data.url">
+                              <source :src="data.url">
                           </video>
                           <img class="attach-files__item thumb" v-if="data.previewOriginal" :src="data.previewOriginal.url">
 
                       </div>
+                          <div v-else-if="isYouTube(data)" class="attach-files__item thumb">
+                              <VueYtframe
+                                      :video-id="data.original_file_name"
+                                      :player-vars="{ autoplay: 0, listType: 'user_uploads' }"
+                                      height="100%"
+                                      width="100%"
+                              />
+                          </div>
                     </div>
                   </div>
 

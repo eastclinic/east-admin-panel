@@ -104,6 +104,8 @@ import VirtualScroller from 'primevue/virtualscroller';
 import CodeHighlight from '@/components/CodeHighlight.vue';
 import BlockViewer from '@/components/BlockViewer.vue';
 
+import VueYtframe from "vue3-ytframe"
+
 import '@/assets/styles.scss';
 
 export const app = createApp(App);
@@ -120,6 +122,7 @@ app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);
+app.use(VueYtframe);
 
 
 app.directive('tooltip', Tooltip);

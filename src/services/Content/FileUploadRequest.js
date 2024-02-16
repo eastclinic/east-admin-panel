@@ -43,6 +43,7 @@ class FileUploadRequest
     getRequestData() { return this._requestData; }
 
     getFile = ()=> file
+    existsUrl = ()=> this._requestData['videoLink']
 
     getUploadProgressCallback(){
         return onUploadProgressCallback;

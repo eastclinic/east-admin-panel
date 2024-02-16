@@ -20,7 +20,8 @@
         "video.js": "^8.5.2",
         "vue": "^3.2.41",
         "vue-router": "^4.1.5",
-        "vue3-treeview": "^0.4.1"
+        "vue3-treeview": "^0.4.1",
+        "vue3-ytframe": "^0.4.0"
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.1.4",
